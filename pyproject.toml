@@ -1,0 +1,50 @@
+[project]
+name = "gerenciamento-hexagonal"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "João Martins",email = "joaommn1998@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+dependencies = [
+    "fastapi[all] (>=0.115.11,<0.116.0)"
+]
+
+[tool.poetry]
+packages = [{include = "gerenciamento_hexagonal"}]
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.0"
+pytest = "^8.3.5"
+pytest-cov = "^6.0.0"
+taskipy = "^1.14.1"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 180
+extend-exclude = ['migrations']
+
+[tool.ruff.lint]
+preview = true
+select = ['I', 'F', 'E', 'W', 'PL', 'PT']
+
+[tool.ruff.format]
+preview = true
+quote-style = 'single'
+
+[tool.pytest.ini_options]
+pythonpath = "."
+addopts = '-p no:warnings'
+
+[tool.taskipy.tasks]
+run = 'fastapi dev gerenciamento_hexagonal/entrypoint/app.py'
+pre_test = 'task lint'
+test = 'pytest --cov=gerenciamento_hexagonal -vv'
+post_test = 'coverage html'
+lint = 'ruff check . && ruff check . --diff'
+format = 'ruff check . --fix && ruff format .'
