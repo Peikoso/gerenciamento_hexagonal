@@ -1,20 +1,21 @@
 import datetime
 import uuid
 from abc import abstractmethod
-from dataclasses import dataclass, field
 from datetime import date
 from enum import Enum
-from typing import Optional, Set
+from typing import Optional
 
-from Arquivo import Arquivo
+from pydantic import BaseModel, Field
+
+from domain.models.arquivo import Arquivo
 
 
-class TipoGerenciamento(Enum):
+class TipoGerenciamento(str, Enum):
     TRIMESTRAL = 'TRIMESTRAL'
     FINAL = 'FINAL'
 
 
-class StatusGereciamentoContrapartida(Enum):
+class StatusGereciamentoContrapartida(str, Enum):
     PLANEJADO = 'Planejado'  # padrão
     EM_APROVACAO = 'Em aprovação'
     EM_AJUSTE = 'Em ajuste'
@@ -23,54 +24,40 @@ class StatusGereciamentoContrapartida(Enum):
     NAO_ENTREGUE = 'Não entregue'
 
 
-@dataclass
-class GerenciamentoComentario:
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
+class GerenciamentoComentario(BaseModel):
     comentario: str
-    data_cricao: datetime.datetime = field(default_factory=datetime.datetime.now)
-    gerenciamentoproposta: Set['GerenciamentoProposta'] = field(default_factory=set)
-    gerenciamentoquantitativo: Set['GerenciamentoQuantitativo'] = field(default_factory=set)
-    gerenciamentoqualitativos: Set['GerenciamentoQualitativo'] = field(default_factory=set)
-
-    # relação Many to Many
-    def adicionar_gerenciamentoproposta(self, proposta: 'GerenciamentoProposta'):
-        self.gerenciamentoproposta.add(proposta)
-        proposta.metas_comentarios.add(self)
-
-    def adicionar_gerenciamentoquantitativo(self, quantitativo: 'GerenciamentoQuantitativo'):
-        self.gerenciamentoquantitativo.add(quantitativo)
-        quantitativo.comentarios.add(self)
-
-    def adicionar_gerenciamentoqualitativos(self, qualitativo: 'GerenciamentoQualitativo'):
-        self.gerenciamentoqualitativos.add(qualitativo)
-        qualitativo.comentarios.add(self)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    data_cricao: datetime.datetime = Field(default_factory=datetime.datetime.now)
 
 
-@dataclass
-class GerenciamentoProposta:
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
-    proposta: any
-    criado_em: datetime.datetime = field(default_factory=datetime.datetime.now)
+class GerenciamentoProposta(BaseModel):
+    proposta: str
     trimestre_de_referencia: date
-    tipo: TipoGerenciamento
-    metas_comentarios: Set[GerenciamentoComentario] = field(default_factory=set)  # relação Many to Many
-
-    def adicionar_comentario(self, comentario: GerenciamentoComentario):
-        self.metas_comentarios.add(comentario)
-        comentario.gerenciamentoproposta.add(self)
+    tipo: TipoGerenciamento = Field(default_factory=TipoGerenciamento.TRIMESTRAL)
+    id: uuid.UUID | None
+    criado_em: datetime.datetime | None
+    metas_comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  # relação Many to Many
 
 
-@dataclass
-class GerenciamentoMeta:
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
+class GerenciamentoPropostaDTO(BaseModel):
+    proposta: str
+    trimestre_de_referencia: date
+    tipo: TipoGerenciamento = Field(default_factory=TipoGerenciamento.TRIMESTRAL)
+    metas_comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  # relação Many to Many
+
+
+class GerenciamentoPropostaListResponse(BaseModel):
+    Gerenciamento_Propostas: list[GerenciamentoProposta]
+
+
+class GerenciamentoMeta(BaseModel):
+    alcancado: int
     gerenciamento_proposta: GerenciamentoProposta
     ordem: Optional[int] = None
-    alcancado: int
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
 
 
-@dataclass
-class GerenciamentoQuantitativo:
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
+class GerenciamentoQuantitativo(BaseModel):
     gerenciamento_proposta: GerenciamentoProposta
     educacao_financeira_impactados: int
     educacao_financeira_alcancados: int
@@ -78,56 +65,51 @@ class GerenciamentoQuantitativo:
     alcance_marca_pessoas_alcancadas_publicacao_digitais: int
     pessoas_alcancadas: int
     pessoas_impactadas: int
-    comentarios: Set[GerenciamentoComentario] = field(default_factory=set)  # relação Many to Many
-
-    def adicionar_comentario(self, comentario: GerenciamentoComentario):
-        self.comentarios.add(comentario)
-        comentario.gerenciamentoquantitativo.add(self)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  # relação Many to Many
 
 
-@dataclass
-class GerenciamentoQualitativo:
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
+class GerenciamentoQualitativo(BaseModel):
     gerenciamento_proposta: GerenciamentoProposta
     acoes_realizadas: Optional[str] = None
     acoes_previstas: Optional[str] = None
     visao_proponente: Optional[str] = None
-    comentarios: Set[GerenciamentoComentario] = field(default_factory=set)  # relação Many to Many
-
-    def adicionar_comentario(self, comentario: GerenciamentoComentario):
-        self.comentarios.add(comentario)
-        comentario.gerenciamentoqualitativos.add(self)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  # relação Many to Many
 
 
 # Arquivo de especificações de modelos
 class GerenciamentoBeneficiarioCategorizacaoSpec:
     MODEL_NAME = 'GerenciamentoBeneficiarioCategorizacao'
-    FIELD_GERENCIAMENTO_BENEFICIARIO = 'gerenciamento_beneficiario'
-    FIELD_CATEGORIZACAO = 'categorizacao'
+    Field_GERENCIAMENTO_BENEFICIARIO = 'gerenciamento_beneficiario'
+    Field_CATEGORIZACAO = 'categorizacao'
     CONSTRAINT_GERENCIAMENTO_BENEFICIARIO_CATEGORIZACAO_UQ = 'gerenciamento_beneficiario_categorizacao_uq'
 
 
-@dataclass
-class GerenciamentoCaracterizacao:
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
+class GerenciamentoCaracterizacao(BaseModel):
     gerenciamento_quantitativo: GerenciamentoQualitativo
     quantidade: int
     categorizacoes: any  # Many to Many com categorizacaoBeneficiario, through=GerenciamentoBeneficiarioCategorizacaoSpec.MODEL_NAME
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+
+    class Config:
+        arbitrary_types_allowed = True  # Permite tipos arbitrários
 
 
-@dataclass
-class GerenciamentoBeneficiarioCategorizacao:
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
+class GerenciamentoBeneficiarioCategorizacao(BaseModel):
     gerenciamento_beneficiario: GerenciamentoCaracterizacao
     categorizacao: any
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
 
-    # unique Constraint com  (GerenciamentoBeneficiarioCategorizacaoSpec.FIELD_GERENCIAMENTO_BENEFICIARIO,
-    # GerenciamentoBeneficiarioCategorizacaoSpec.FIELD_CATEGORIZACAO),
+    class Config:
+        arbitrary_types_allowed = True  # Permite tipos arbitrários
+
+    # unique Constraint com  (GerenciamentoBeneficiarioCategorizacaoSpec.Field_GERENCIAMENTO_BENEFICIARIO,
+    # GerenciamentoBeneficiarioCategorizacaoSpec.Field_CATEGORIZACAO),
     # name=GerenciamentoBeneficiarioCategorizacaoSpec.CONSTRAINT_GERENCIAMENTO_BENEFICIARIO_CATEGORIZACAO_UQ)
 
 
-@dataclass
-class GerenciamentoMetaArquivo(Arquivo):
+class GerenciamentoMetaArquivo(Arquivo, BaseModel):
     gerenciamento_meta: GerenciamentoMeta
 
     @abstractmethod
@@ -147,8 +129,7 @@ class GerenciamentoMetaArquivo(Arquivo):
         pass
 
 
-@dataclass
-class GerenciamentoQualitativoArquivo(Arquivo):
+class GerenciamentoQualitativoArquivo(Arquivo, BaseModel):
     gerenciamento_qualitativo: GerenciamentoQualitativo
 
     @abstractmethod
@@ -168,20 +149,21 @@ class GerenciamentoQualitativoArquivo(Arquivo):
         pass
 
 
-@dataclass
-class GerenciamentoContrapartida:
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
+class GerenciamentoContrapartida(BaseModel):
     gerenciamento_proposta: GerenciamentoProposta
     proposta_contrapartida: any
     quantidade: int
     observacao: str = ''
-    data: datetime = field(default_factory=datetime.now)
-    status: StatusGereciamentoContrapartida = field(default=StatusGereciamentoContrapartida.PLANEJADO)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    data: datetime.datetime = Field(default_factory=datetime.datetime.now)
+    status: StatusGereciamentoContrapartida = Field(default=StatusGereciamentoContrapartida.PLANEJADO)
     # TODO:falta arquivo
 
+    class Config:
+        arbitrary_types_allowed = True  # Permite tipos arbitrários
 
-@dataclass
-class GerenciamentoContrapartidaArquivo(Arquivo):
+
+class GerenciamentoContrapartidaArquivo(Arquivo, BaseModel):
     gerenciamento_contrapartida: GerenciamentoContrapartida
 
     @abstractmethod
@@ -201,11 +183,10 @@ class GerenciamentoContrapartidaArquivo(Arquivo):
         pass
 
 
-@dataclass
-class GerenciamentoContrapartidaAdmin:
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
+class GerenciamentoContrapartidaAdmin(BaseModel):
     # campo usuario em um futuro não muito distante
     gerenciamento_contrapartida: GerenciamentoContrapartida
     quantidade: int
     justificativa: str  # O campo é obrigatório
-    data: datetime = field(default_factory=datetime.now)
+    data: datetime.date = Field(default_factory=datetime.datetime.now)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)

@@ -1,7 +1,7 @@
 import uuid
 from abc import ABC, abstractmethod
 
-from gerenciamento_hexagonal.domain.models.gerenciamento import (
+from domain.models.gerenciamento import (
     GerenciamentoBeneficiarioCategorizacao,
     GerenciamentoCaracterizacao,
     GerenciamentoComentario,
@@ -19,67 +19,67 @@ from gerenciamento_hexagonal.domain.models.gerenciamento import (
 
 class GerenciamentoComentarioRepository(ABC):
     @abstractmethod
-    def get_gerenciamentoComentario_by_id(self, gerenciamentoComentario_id: uuid) -> GerenciamentoComentario | None:
+    async def get_gerenciamentoComentario_by_id(self, gerenciamentoComentario_id: uuid) -> GerenciamentoComentario | None:
         pass
 
     @abstractmethod
-    def create_gerenciamentoComentario(self, gerenciamentoComentario: GerenciamentoComentario) -> GerenciamentoComentario:
+    async def create_gerenciamentoComentario(self, gerenciamentoComentario: GerenciamentoComentario) -> GerenciamentoComentario:
         pass
 
     @abstractmethod
-    def update_gerenciamentoComentario(self, gerenciamentoComentario: GerenciamentoComentario) -> GerenciamentoComentario | None:
+    async def update_gerenciamentoComentario(self, gerenciamentoComentario: GerenciamentoComentario) -> GerenciamentoComentario | None:
         pass
 
     @abstractmethod
-    def delete_gerenciamentoComentario(self, gerenciamentoComentario_id: uuid):
+    async def delete_gerenciamentoComentario(self, gerenciamentoComentario_id: uuid) -> None:
         pass
 
     @abstractmethod
-    def get_gerenciamentoComentario(self) -> list[GerenciamentoComentario]:
+    async def get_gerenciamentoComentario(self) -> list[GerenciamentoComentario]:
         pass
 
 
 class GerenciamentoPropostaRepository(ABC):
     @abstractmethod
-    def get_gerenciamentoProposta_by_id(self, gerenciamentoProposta_id: uuid) -> GerenciamentoProposta | None:
+    async def get_gerenciamentoProposta_by_id(self, gerenciamentoProposta_id: uuid) -> GerenciamentoProposta | None:
         pass
 
     @abstractmethod
-    def create_gerenciamentoProposta(self, gerenciamentoProposta: GerenciamentoProposta) -> GerenciamentoProposta:
+    async def create_gerenciamentoProposta(self, gerenciamentoProposta: GerenciamentoProposta) -> GerenciamentoProposta:
         pass
 
     @abstractmethod
-    def update_gerenciamentoProposta(self, gerenciamentoProposta: GerenciamentoProposta) -> GerenciamentoProposta | None:
+    async def update_gerenciamentoProposta(self, gerenciamentoProposta: GerenciamentoProposta) -> GerenciamentoProposta | None:
         pass
 
     @abstractmethod
-    def delete_gerenciamentoProposta(self, gerenciamentoProposta_id: uuid):
+    async def delete_gerenciamentoProposta(self, gerenciamentoProposta_id: uuid):
         pass
 
     @abstractmethod
-    def get_gerenciamentoProposta(self) -> list[GerenciamentoProposta]:
+    async def get_gerenciamentoProposta(self) -> list[GerenciamentoProposta]:
         pass
 
 
 class GerenciamentoMetaRepository(ABC):
     @abstractmethod
-    def get_gerenciamentoMeta_by_id(self, gerenciamentoMeta_id: uuid) -> GerenciamentoMeta | None:
+    async def get_gerenciamentoMeta_by_id(self, gerenciamentoMeta_id: uuid) -> GerenciamentoMeta | None:
         pass
 
     @abstractmethod
-    def create_gerenciamentoMeta(self, gerenciamentoMeta: GerenciamentoMeta) -> GerenciamentoMeta:
+    async def create_gerenciamentoMeta(self, gerenciamentoMeta: GerenciamentoMeta) -> GerenciamentoMeta:
         pass
 
     @abstractmethod
-    def update_gerenciamentoMeta(self, gerenciamentoMeta: GerenciamentoMeta) -> GerenciamentoMeta | None:
+    async def update_gerenciamentoMeta(self, gerenciamentoMeta: GerenciamentoMeta) -> GerenciamentoMeta | None:
         pass
 
     @abstractmethod
-    def delete_gerenciamentoMeta(self, gerenciamentoMeta_id: uuid):
+    async def delete_gerenciamentoMeta(self, gerenciamentoMeta_id: uuid):
         pass
 
     @abstractmethod
-    def get_gerenciamentoMeta(self) -> list[GerenciamentoMeta]:
+    async def get_gerenciamentoMeta(self) -> list[GerenciamentoMeta]:
         pass
 
 
