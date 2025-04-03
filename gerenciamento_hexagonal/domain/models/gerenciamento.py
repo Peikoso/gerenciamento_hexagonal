@@ -26,8 +26,8 @@ class StatusGereciamentoContrapartida(str, Enum):
 
 class GerenciamentoComentario(BaseModel):
     comentario: str
-    id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    data_cricao: datetime.datetime = Field(default_factory=datetime.datetime.now)
+    id: uuid.UUID | None
+    data_cricao: datetime.datetime | None
 
 
 class GerenciamentoProposta(BaseModel):
@@ -37,17 +37,6 @@ class GerenciamentoProposta(BaseModel):
     id: uuid.UUID | None
     criado_em: datetime.datetime | None
     metas_comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  # relação Many to Many
-
-
-class GerenciamentoPropostaDTO(BaseModel):
-    proposta: str
-    trimestre_de_referencia: date
-    tipo: TipoGerenciamento = Field(default_factory=TipoGerenciamento.TRIMESTRAL)
-    metas_comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  # relação Many to Many
-
-
-class GerenciamentoPropostaListResponse(BaseModel):
-    Gerenciamento_Propostas: list[GerenciamentoProposta]
 
 
 class GerenciamentoMeta(BaseModel):
@@ -89,20 +78,14 @@ class GerenciamentoBeneficiarioCategorizacaoSpec:
 class GerenciamentoCaracterizacao(BaseModel):
     gerenciamento_quantitativo: GerenciamentoQualitativo
     quantidade: int
-    categorizacoes: any  # Many to Many com categorizacaoBeneficiario, through=GerenciamentoBeneficiarioCategorizacaoSpec.MODEL_NAME
+    categorizacoes: str  # Many to Many com categorizacaoBeneficiario, through=GerenciamentoBeneficiarioCategorizacaoSpec.MODEL_NAME
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
-
-    class Config:
-        arbitrary_types_allowed = True  # Permite tipos arbitrários
 
 
 class GerenciamentoBeneficiarioCategorizacao(BaseModel):
     gerenciamento_beneficiario: GerenciamentoCaracterizacao
-    categorizacao: any
+    categorizacao: str
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
-
-    class Config:
-        arbitrary_types_allowed = True  # Permite tipos arbitrários
 
     # unique Constraint com  (GerenciamentoBeneficiarioCategorizacaoSpec.Field_GERENCIAMENTO_BENEFICIARIO,
     # GerenciamentoBeneficiarioCategorizacaoSpec.Field_CATEGORIZACAO),
@@ -151,16 +134,13 @@ class GerenciamentoQualitativoArquivo(Arquivo, BaseModel):
 
 class GerenciamentoContrapartida(BaseModel):
     gerenciamento_proposta: GerenciamentoProposta
-    proposta_contrapartida: any
+    proposta_contrapartida: str
     quantidade: int
     observacao: str = ''
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     data: datetime.datetime = Field(default_factory=datetime.datetime.now)
     status: StatusGereciamentoContrapartida = Field(default=StatusGereciamentoContrapartida.PLANEJADO)
     # TODO:falta arquivo
-
-    class Config:
-        arbitrary_types_allowed = True  # Permite tipos arbitrários
 
 
 class GerenciamentoContrapartidaArquivo(Arquivo, BaseModel):

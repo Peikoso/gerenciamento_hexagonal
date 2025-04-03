@@ -1,11 +1,12 @@
 import uuid
 from http import HTTPStatus
 
-from application.services import GerenciamentoPropostaServices
-from domain.models.gerenciamento import GerenciamentoProposta, GerenciamentoPropostaDTO, GerenciamentoPropostaListResponse
+from application.services import GerenciamentoComentarioServices, GerenciamentoPropostaServices
+from domain.models.gerenciamento import GerenciamentoProposta
+from domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoPropostaDTO, GerenciamentoPropostaListResponse
 from fastapi import APIRouter, Depends, HTTPException
 from infrastructure.database import Database
-from infrastructure.repositories.gerenciamentorepository import GerenciamentoPropostaInMemoryRepository
+from infrastructure.repositories.gerenciamentorepository import GerenciamentoComentarioInMemoryRepository, GerenciamentoPropostaInMemoryRepository
 
 router = APIRouter()
 
@@ -17,9 +18,15 @@ def get_gerenciamentoProposta_service() -> GerenciamentoPropostaServices:
     return GerenciamentoPropostaServices(repository)
 
 
+def get_gerenciamentoComentario_service() -> GerenciamentoComentarioServices:
+    repository = GerenciamentoComentarioInMemoryRepository(database)
+    return GerenciamentoComentarioServices(repository)
+
+
 @router.get('/GerenciamentoProposta/', response_model=GerenciamentoPropostaListResponse)
 async def get_gerenciamentoPropostas(service: GerenciamentoPropostaServices = Depends(get_gerenciamentoProposta_service)):
     gerenciamentoPropostas = await service.get_gerenciamentoProposta()
+
     return gerenciamentoPropostas
 
 
@@ -35,8 +42,7 @@ async def get_gerenciamentoProposta_by_id(gerenciamentoProposta_id: uuid.UUID, s
 @router.post('/GerenciamentoProposta/', response_model=GerenciamentoProposta)
 async def create_gerenciamentoProposta(gerenciamentoProposta_data: GerenciamentoPropostaDTO, service: GerenciamentoPropostaServices = Depends(get_gerenciamentoProposta_service)):
     gerenciamentoProposta = await service.create_gerenciamentoProposta(gerenciamentoProposta_data)
-    if not gerenciamentoProposta:
-        raise HTTPException(status_code=400, detail='Proposta não criada')
+
     return gerenciamentoProposta
 
 
@@ -58,3 +64,17 @@ async def delete_gerenciamentoProposta(gerenciamentoProposta_id: uuid.UUID, serv
         return {'message': 'Gerenciamento Proposta deletada'}
 
     raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='User not found')
+
+
+@router.get('/gerenciamentoComentario/{gerenciamentoProposta_id}/{gerenciamentoComentario_id}')
+async def get_gerenciamentoCometarios(service: GerenciamentoPropostaServices = Depends(get_gerenciamentoComentario_service)): ...
+
+
+@router.post('/gerenciamentoProposta/{gerenciamentoProposta_id}/Comentario')
+async def create_gerenciamentoPropostaComentario(
+    gerenciamentoProposta_id: uuid.UUID, gerenciamentoComentarioDTO: GerenciamentoComentarioDTO, service: GerenciamentoPropostaServices = Depends(get_gerenciamentoProposta_service)
+):
+    gerenciamentoComentario = gerenciamentoComentarioDTO
+    gerenciamentoComentario = await service.create_gerenciamentoPropostaComentario(gerenciamentoProposta_id, gerenciamentoComentario)
+
+    return gerenciamentoComentario

@@ -1,2 +1,3 @@
 class Database:
     gerenciamentoPropostaDB = []
+    gerenciamentoComentarioDB = []

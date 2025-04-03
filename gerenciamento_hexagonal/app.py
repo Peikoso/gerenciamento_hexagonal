@@ -3,7 +3,7 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-app.include_router(gerenciamento_proposta_router, prefix='/gerenciamento_proposta', tags=['Gerenciamento Proposta'])
+app.include_router(gerenciamento_proposta_router, prefix='/gerenciamento', tags=['Gerenciamento'])
 
 
 @app.get('/')
