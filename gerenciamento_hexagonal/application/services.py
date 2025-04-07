@@ -2,10 +2,18 @@ import datetime
 import uuid
 from typing import List
 
-from infrastructure.repositories.gerenciamentorepository import GerenciamentoPropostaInMemoryRepository
+from infrastructure.repositories.gerenciamentorepository import (
+    GerenciamentoPropostaInMemoryRepository,
+)
 
-from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario, GerenciamentoProposta
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoPropostaDTO
+from gerenciamento_hexagonal.domain.models.gerenciamento import (
+    GerenciamentoComentario,
+    GerenciamentoProposta,
+)
+from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import (
+    GerenciamentoComentarioDTO,
+    GerenciamentoPropostaDTO,
+)
 
 
 class GerenciamentoPropostaServices:

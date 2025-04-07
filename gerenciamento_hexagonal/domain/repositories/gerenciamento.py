@@ -2,18 +2,18 @@ import uuid
 from abc import ABC, abstractmethod
 
 from domain.models.gerenciamento import (
-    GerenciamentoBeneficiarioCategorizacao,
-    GerenciamentoCaracterizacao,
+    # GerenciamentoBeneficiarioCategorizacao,
+    # GerenciamentoCaracterizacao,
     GerenciamentoComentario,
-    GerenciamentoContrapartida,
-    GerenciamentoContrapartidaAdmin,
-    GerenciamentoContrapartidaArquivo,
-    GerenciamentoMeta,
-    GerenciamentoMetaArquivo,
+    # GerenciamentoContrapartida,
+    # GerenciamentoContrapartidaAdmin,
+    # GerenciamentoContrapartidaArquivo,
+    # GerenciamentoMeta,
+    # GerenciamentoMetaArquivo,
     GerenciamentoProposta,
-    GerenciamentoQualitativo,
-    GerenciamentoQualitativoArquivo,
-    GerenciamentoQuantitativo,
+    # GerenciamentoQualitativo,
+    # GerenciamentoQualitativoArquivo,
+    # GerenciamentoQuantitativo,
 )
 
 
@@ -27,7 +27,7 @@ class GerenciamentoComentarioRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_gerenciamentoComentario(self, gerenciamentoComentario: GerenciamentoComentario) -> GerenciamentoComentario | None:
+    async def update_gerenciamentoComentario(self, gerenciamentoComentario_id: int, gerenciamentoComentario: GerenciamentoComentario) -> GerenciamentoComentario | None:
         pass
 
     @abstractmethod
@@ -49,7 +49,7 @@ class GerenciamentoPropostaRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_gerenciamentoProposta(self, gerenciamentoProposta: GerenciamentoProposta) -> GerenciamentoProposta | None:
+    async def update_gerenciamentoProposta(self, gerenciamentoProposta_id: int, gerenciamentoProposta: GerenciamentoProposta) -> GerenciamentoProposta | None:
         pass
 
     @abstractmethod
@@ -61,6 +61,7 @@ class GerenciamentoPropostaRepository(ABC):
         pass
 
 
+"""
 class GerenciamentoMetaRepository(ABC):
     @abstractmethod
     async def get_gerenciamentoMeta_by_id(self, gerenciamentoMeta_id: uuid) -> GerenciamentoMeta | None:
@@ -283,3 +284,4 @@ class GerenciamentoContrapartidaAdminRepository(ABC):
     @abstractmethod
     def get_gerenciamentoContrapartidaAdmin(self) -> list[GerenciamentoContrapartidaAdmin]:
         pass
+"""

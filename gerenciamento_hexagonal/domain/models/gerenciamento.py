@@ -1,13 +1,8 @@
-import datetime
-import uuid
-from abc import abstractmethod
-from datetime import date
+from datetime import date, datetime, timezone
 from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, Field
-
-from domain.models.arquivo import Arquivo
 
 
 class TipoGerenciamento(str, Enum):
@@ -26,22 +21,23 @@ class StatusGereciamentoContrapartida(str, Enum):
 
 class GerenciamentoComentario(BaseModel):
     comentario: str
-    id: uuid.UUID | None
-    data_cricao: datetime.datetime | None
+    id: Optional[int] = None
+    data_cricao: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class GerenciamentoProposta(BaseModel):
-    proposta: str
+    proposta_id: int
     trimestre_de_referencia: date
     tipo: TipoGerenciamento = Field(default_factory=TipoGerenciamento.TRIMESTRAL)
-    id: uuid.UUID | None
-    criado_em: datetime.datetime | None
+    id: Optional[int] = None
+    criado_em: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     metas_comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  # relação Many to Many
 
 
+"""
 class GerenciamentoMeta(BaseModel):
     alcancado: int
-    gerenciamento_proposta: GerenciamentoProposta
+    gerenciamento_proposta_id: GerenciamentoProposta
     ordem: Optional[int] = None
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
 
@@ -170,3 +166,4 @@ class GerenciamentoContrapartidaAdmin(BaseModel):
     justificativa: str  # O campo é obrigatório
     data: datetime.date = Field(default_factory=datetime.datetime.now)
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
+"""

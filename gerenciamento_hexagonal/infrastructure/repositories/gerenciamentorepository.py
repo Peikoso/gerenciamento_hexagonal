@@ -2,8 +2,11 @@ import uuid
 from typing import List
 
 from domain.models.gerenciamento import GerenciamentoComentario, GerenciamentoProposta
-from domain.repositories.gerenciamento import GerenciamentoComentarioRepository, GerenciamentoPropostaRepository
-from infrastructure.database import Database
+from domain.repositories.gerenciamento import (
+    GerenciamentoComentarioRepository,
+    GerenciamentoPropostaRepository,
+)
+from infrastructure.databaseList import Database
 
 
 class GerenciamentoPropostaInMemoryRepository(GerenciamentoPropostaRepository):

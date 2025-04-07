@@ -1,18 +1,92 @@
-import uuid
 from http import HTTPStatus
 
-from application.services import GerenciamentoComentarioServices, GerenciamentoPropostaServices
 from domain.models.gerenciamento import GerenciamentoProposta
-from domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoPropostaDTO, GerenciamentoPropostaListResponse
+from domain.models.gerenciamentoDTO_Response import (
+    GerenciamentoComentarioDTO,
+    GerenciamentoPropostaDTO,
+    GerenciamentoPropostaListResponse,
+)
 from fastapi import APIRouter, Depends, HTTPException
-from infrastructure.database import Database
-from infrastructure.repositories.gerenciamentorepository import GerenciamentoComentarioInMemoryRepository, GerenciamentoPropostaInMemoryRepository
+
+from gerenciamento_hexagonal.application.servicesSQLite import (
+    GerenciamentoPropostaSQLiteServices,
+)
+from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import (
+    NotFoundError,
+)
+from gerenciamento_hexagonal.infrastructure.repositories.SQLiterepository import (
+    GerenciamentoComentarioSQLiteRepository,
+    GerenciamentoPropostaSQLiteRepository,
+)
+
+# from infrastructure.database import Database
 
 router = APIRouter()
 
-database = Database()
+# database = Database()
 
 
+def get_gerenciamentoPropostaSQLite_service() -> GerenciamentoPropostaSQLiteServices:
+    gerenciamentoComentario_repository = GerenciamentoComentarioSQLiteRepository()
+    gerenciamentoProposta_repository = GerenciamentoPropostaSQLiteRepository(gerenciamentoComentario_repository)
+    return GerenciamentoPropostaSQLiteServices(gerenciamentoProposta_repository)
+
+
+@router.post('/GerenciamentoProposta/', response_model=GerenciamentoProposta)
+async def create_gerenciamentoProposta(gerenciamentoProposta_data: GerenciamentoPropostaDTO, service: GerenciamentoPropostaSQLiteServices = Depends(get_gerenciamentoPropostaSQLite_service)):
+    gerenciamentoProposta = await service.create_gerenciamentoProposta(gerenciamentoProposta_data)
+
+    return gerenciamentoProposta
+
+
+@router.get('/GerenciamentoProposta/', response_model=GerenciamentoPropostaListResponse)
+async def get_gerencimentoPropostas(service: GerenciamentoPropostaSQLiteServices = Depends(get_gerenciamentoPropostaSQLite_service)):
+    gerenciamentoProposta = await service.get_gerenciamentoProposta()
+
+    return {'Gerenciamento_Propostas': gerenciamentoProposta}
+
+
+@router.get('/GerenciamentoProposta/{gerenciamentoProposta_id}', response_model=GerenciamentoProposta)
+async def get_by_id_gerenciamentoProposta(gerenciamentoProposta_id: int, service: GerenciamentoPropostaSQLiteServices = Depends(get_gerenciamentoPropostaSQLite_service)):
+    try:
+        gerenciamentoProposta_by_id = await service.get_gerenciamentoProposta_by_id(gerenciamentoProposta_id)
+
+        return gerenciamentoProposta_by_id
+
+    except NotFoundError as e:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
+
+
+@router.delete('/GerenciamentoProposta/{gerenciamentoProposta_id}')
+async def delete_gerenciamentoProposta(gerenciamentoProposta_id: int, service: GerenciamentoPropostaSQLiteServices = Depends(get_gerenciamentoPropostaSQLite_service)):
+    try:
+        await service.delete_gerenciamentoProposta(gerenciamentoProposta_id)
+
+        return {'message': 'gerenciamento_proposta deleted'}
+
+    except NotFoundError as e:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
+
+
+@router.put('/GerenciamentoProposta/{gerenciamentoProposta_id}')
+async def update_gerenciamentoProposta(gerenciamentoProposta_id: int, gerenciamentoProposta_data: GerenciamentoPropostaDTO, service: GerenciamentoPropostaSQLiteServices = Depends(get_gerenciamentoPropostaSQLite_service)):
+    try:
+        gerencimentoProposta = await service.update_gerenciamentoProposta(gerenciamentoProposta_id, gerenciamentoProposta_data)
+
+        return gerencimentoProposta
+
+    except NotFoundError as e:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
+
+
+@router.post('/gerenciamentoProposta/{gerenciamentoProposta_id}/Comentario')
+async def create_gerenciamentoPropostaComentario(gerenciamentoProposta_id: int, gerenciamentoComentarioDTO: GerenciamentoComentarioDTO, service: GerenciamentoPropostaSQLiteServices = Depends(get_gerenciamentoPropostaSQLite_service)):
+    gerenciamentoComentario = await service.create_gerenciamentoPropostaComentario(gerenciamentoProposta_id, gerenciamentoComentarioDTO)
+
+    return gerenciamentoComentario
+
+
+"""
 def get_gerenciamentoProposta_service() -> GerenciamentoPropostaServices:
     repository = GerenciamentoPropostaInMemoryRepository(database)
     return GerenciamentoPropostaServices(repository)
@@ -21,7 +95,6 @@ def get_gerenciamentoProposta_service() -> GerenciamentoPropostaServices:
 def get_gerenciamentoComentario_service() -> GerenciamentoComentarioServices:
     repository = GerenciamentoComentarioInMemoryRepository(database)
     return GerenciamentoComentarioServices(repository)
-
 
 @router.get('/GerenciamentoProposta/', response_model=GerenciamentoPropostaListResponse)
 async def get_gerenciamentoPropostas(service: GerenciamentoPropostaServices = Depends(get_gerenciamentoProposta_service)):
@@ -78,3 +151,4 @@ async def create_gerenciamentoPropostaComentario(
     gerenciamentoComentario = await service.create_gerenciamentoPropostaComentario(gerenciamentoProposta_id, gerenciamentoComentario)
 
     return gerenciamentoComentario
+"""
