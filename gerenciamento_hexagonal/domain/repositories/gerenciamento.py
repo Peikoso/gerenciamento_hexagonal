@@ -1,7 +1,6 @@
-import uuid
 from abc import ABC, abstractmethod
 
-from domain.models.gerenciamento import (
+from gerenciamento_hexagonal.domain.models.gerenciamento import (
     # GerenciamentoBeneficiarioCategorizacao,
     # GerenciamentoCaracterizacao,
     GerenciamentoComentario,
@@ -19,7 +18,7 @@ from domain.models.gerenciamento import (
 
 class GerenciamentoComentarioRepository(ABC):
     @abstractmethod
-    async def get_gerenciamentoComentario_by_id(self, gerenciamentoComentario_id: uuid) -> GerenciamentoComentario | None:
+    async def get_gerenciamentoComentario_by_id(self, gerenciamentoComentario_id: int) -> GerenciamentoComentario:
         pass
 
     @abstractmethod
@@ -27,11 +26,11 @@ class GerenciamentoComentarioRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_gerenciamentoComentario(self, gerenciamentoComentario_id: int, gerenciamentoComentario: GerenciamentoComentario) -> GerenciamentoComentario | None:
+    async def update_gerenciamentoComentario(self, gerenciamentoComentario_id: int, gerenciamentoComentario: GerenciamentoComentario) -> GerenciamentoComentario:
         pass
 
     @abstractmethod
-    async def delete_gerenciamentoComentario(self, gerenciamentoComentario_id: uuid) -> None:
+    async def delete_gerenciamentoComentario(self, gerenciamentoComentario_id: int) -> bool:
         pass
 
     @abstractmethod
@@ -41,7 +40,7 @@ class GerenciamentoComentarioRepository(ABC):
 
 class GerenciamentoPropostaRepository(ABC):
     @abstractmethod
-    async def get_gerenciamentoProposta_by_id(self, gerenciamentoProposta_id: uuid) -> GerenciamentoProposta | None:
+    async def get_gerenciamentoProposta_by_id(self, gerenciamentoProposta_id: int) -> GerenciamentoProposta:
         pass
 
     @abstractmethod
@@ -49,11 +48,11 @@ class GerenciamentoPropostaRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_gerenciamentoProposta(self, gerenciamentoProposta_id: int, gerenciamentoProposta: GerenciamentoProposta) -> GerenciamentoProposta | None:
+    async def update_gerenciamentoProposta(self, gerenciamentoProposta_id: int, gerenciamentoProposta: GerenciamentoProposta) -> GerenciamentoProposta:
         pass
 
     @abstractmethod
-    async def delete_gerenciamentoProposta(self, gerenciamentoProposta_id: uuid):
+    async def delete_gerenciamentoProposta(self, gerenciamentoProposta_id: int) -> bool:
         pass
 
     @abstractmethod

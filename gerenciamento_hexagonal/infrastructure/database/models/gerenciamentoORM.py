@@ -29,7 +29,7 @@ class GerenciamentoComentarioModel:
     comentario: Mapped[str] = mapped_column(String(100), nullable=False)
     data_criacao: Mapped[datetime] = mapped_column(DateTime, init=False, nullable=False, server_default=func.now())
 
-    gerenciamentoPropostas: Mapped[list['GerenciamentoPropostaModel']] = relationship(secondary='gerenciamento_comentario_association', back_populates='metas_comentarios', cascade='all, delete', default_factory=list)
+    gerenciamentoPropostas: Mapped[list['GerenciamentoPropostaModel']] = relationship(secondary='gerenciamento_comentario_association', back_populates='metas_comentarios', cascade='save-update, merge', default_factory=list)
 
 
 gerenciamento_comentario_association = Table(

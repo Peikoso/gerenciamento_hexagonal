@@ -1,21 +1,31 @@
-from domain.models.gerenciamento import GerenciamentoComentario, GerenciamentoProposta
-from domain.repositories.gerenciamento import (
+from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario, GerenciamentoProposta
+from gerenciamento_hexagonal.domain.repositories.gerenciamento import (
     GerenciamentoComentarioRepository,
     GerenciamentoPropostaRepository,
 )
-from infrastructure.database.models.gerenciamentoORM import GerenciamentoComentarioModel, GerenciamentoPropostaModel
-from infrastructure.database.SQLiteConfig import get_session
+from gerenciamento_hexagonal.infrastructure.database.models.gerenciamentoORM import GerenciamentoComentarioModel, GerenciamentoPropostaModel
+from gerenciamento_hexagonal.infrastructure.database.SQLiteConfig import get_session
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import (
     ClientError,
 )
+from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO
 
 
 class GerenciamentoComentarioSQLiteRepository(GerenciamentoComentarioRepository):
-    async def get_gerenciamentoComentario_by_id(self, gerenciamentoComentario_id: int) -> GerenciamentoComentario | None:
-        pass
+    async def get_gerenciamentoComentario_by_id(self, gerenciamentoComentario_id: int) -> GerenciamentoComentario:
+        async with get_session() as session:
+            try:
+                db_gerenciamentoComentario = await session.scalar(select(GerenciamentoComentarioModel).where(GerenciamentoComentarioModel.id == gerenciamentoComentario_id))
+                if db_gerenciamentoComentario:
+                    return GerenciamentoComentario.model_validate(vars(db_gerenciamentoComentario))
+
+                return None
+
+            except ClientError as e:
+                raise Exception(f'Failed to fetch gerenciamento_comentario from SQLite: {str(e)}')
 
     async def create_gerenciamentoComentario(self, gerenciamentoComentario: GerenciamentoComentario) -> GerenciamentoComentarioModel:
         async with get_session() as session:
@@ -30,27 +40,62 @@ class GerenciamentoComentarioSQLiteRepository(GerenciamentoComentarioRepository)
             except ClientError as e:
                 raise Exception(f'Failed to create gerenciamento_comentario: {str(e)}')
 
-    async def update_gerenciamentoComentario(self, gerenciamentoComentario: GerenciamentoComentario) -> GerenciamentoComentario | None:
-        pass
+    async def update_gerenciamentoComentario(self, gerenciamentoComentario_id, gerenciamentoComentario_data: GerenciamentoComentarioDTO) -> GerenciamentoComentario:
+        async with get_session() as session:
+            try:
+                db_gerenciamentoComentario = await session.scalar(select(GerenciamentoComentarioModel).where(GerenciamentoComentarioModel.id == gerenciamentoComentario_id))
 
-    async def delete_gerenciamentoComentario(self, gerenciamentoComentario_id: int) -> None:
-        pass
+                if db_gerenciamentoComentario:
+                    db_gerenciamentoComentario.comentario = gerenciamentoComentario_data.comentario
+
+                    await session.commit()
+                    await session.refresh(db_gerenciamentoComentario)
+
+                    return GerenciamentoComentario.model_validate(vars(db_gerenciamentoComentario))
+
+            except ClientError as e:
+                raise Exception(f'Failed to update gereciamento_comentario: {str(e)}')
+
+    async def delete_gerenciamentoComentario(self, gerenciamentoComentario_id: int) -> bool:
+        async with get_session() as session:
+            try:
+                db_gerenciamentoComentario = await session.scalar(select(GerenciamentoComentarioModel).where(GerenciamentoComentarioModel.id == gerenciamentoComentario_id))
+
+                if db_gerenciamentoComentario:
+                    await session.delete(db_gerenciamentoComentario)
+                    await session.commit()
+
+                    return True
+
+                return False
+
+            except ClientError as e:
+                raise Exception(f'Failed to delete gerenciamento_comentario: {str(e)}')
 
     async def get_gerenciamentoComentario(self) -> list[GerenciamentoComentario]:
-        pass
+        async with get_session() as session:
+            try:
+                db_gerenciamentoComentarios = await session.scalars(select(GerenciamentoComentarioModel))
+
+                result = [GerenciamentoComentario.model_validate({**vars(db_gerenciamentoComentario)}) for db_gerenciamentoComentario in db_gerenciamentoComentarios if db_gerenciamentoComentario is not None]
+
+                return result
+
+            except ClientError as e:
+                raise Exception(f'Failed to fetch gerenciamento_comentarios: {str(e)}')
 
 
 class GerenciamentoPropostaSQLiteRepository(GerenciamentoPropostaRepository):
     def __init__(self, gerenciamentoComentarioRepository: GerenciamentoComentarioSQLiteRepository):
         self.gerenciamentoComentarioRepository = gerenciamentoComentarioRepository
 
-    async def get_gerenciamentoProposta_by_id(self, gerenciamentoProposta_id: int) -> GerenciamentoProposta | None:
+    async def get_gerenciamentoProposta_by_id(self, gerenciamentoProposta_id: int) -> GerenciamentoProposta:
         async with get_session() as session:
             try:
                 db_gerenciamentoProposta = await session.scalar(select(GerenciamentoPropostaModel).where(GerenciamentoPropostaModel.id == gerenciamentoProposta_id))
                 if db_gerenciamentoProposta:
                     await session.refresh(db_gerenciamentoProposta, ['metas_comentarios'])
-                    return GerenciamentoProposta.model_validate({**db_gerenciamentoProposta.__dict__, 'metas_comentarios': [GerenciamentoComentario.model_validate(gerenciamentoComentario.__dict__) for gerenciamentoComentario in db_gerenciamentoProposta.metas_comentarios]})
+                    return GerenciamentoProposta.model_validate({**vars(db_gerenciamentoProposta), 'metas_comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamentoComentario)) for gerenciamentoComentario in db_gerenciamentoProposta.metas_comentarios]})
                 return None
             except ClientError as e:
                 raise Exception(f'Failed to fetch gerenciamento_proposta from SQLite: {str(e)}')
@@ -63,12 +108,12 @@ class GerenciamentoPropostaSQLiteRepository(GerenciamentoPropostaRepository):
                 await session.commit()
                 await session.refresh(db_gerenciamentoProposta)
 
-                return GerenciamentoProposta.model_validate(db_gerenciamentoProposta.__dict__)
+                return GerenciamentoProposta.model_validate(vars(db_gerenciamentoProposta))
 
             except ClientError as e:
                 raise Exception(f'Failed to create gerenciamento_proposta: {str(e)}')
 
-    async def update_gerenciamentoProposta(self, gerenciamentoProposta_id: int, gerenciamentoProposta: GerenciamentoProposta) -> GerenciamentoProposta | None:
+    async def update_gerenciamentoProposta(self, gerenciamentoProposta_id: int, gerenciamentoProposta: GerenciamentoProposta) -> GerenciamentoProposta:
         async with get_session() as session:
             try:
                 db_gerenciamentoProposta = await session.scalar(select(GerenciamentoPropostaModel).where(GerenciamentoPropostaModel.id == gerenciamentoProposta_id))
@@ -81,7 +126,7 @@ class GerenciamentoPropostaSQLiteRepository(GerenciamentoPropostaRepository):
                     await session.refresh(db_gerenciamentoProposta)
 
                     await session.refresh(db_gerenciamentoProposta, ['metas_comentarios'])
-                    return GerenciamentoProposta.model_validate({**db_gerenciamentoProposta.__dict__, 'metas_comentarios': [GerenciamentoComentario.model_validate(gerenciamentoComentario.__dict__) for gerenciamentoComentario in db_gerenciamentoProposta.metas_comentarios]})
+                    return GerenciamentoProposta.model_validate({**vars(db_gerenciamentoProposta), 'metas_comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamentoComentario)) for gerenciamentoComentario in db_gerenciamentoProposta.metas_comentarios]})
 
                 return None
 
@@ -109,13 +154,10 @@ class GerenciamentoPropostaSQLiteRepository(GerenciamentoPropostaRepository):
 
             result = [
                 GerenciamentoProposta.model_validate({
-                    **gerenciamentoProposta.__dict__,
-                    'metas_comentarios': [
-                        GerenciamentoComentario.model_validate(gerenciamentoComentario.__dict__)
-                        for gerenciamentoComentario in gerenciamentoProposta.metas_comentarios  # Converte os comentários
-                    ],
+                    **vars(gerenciamentoProposta),
+                    'metas_comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamentoComentario)) for gerenciamentoComentario in gerenciamentoProposta.metas_comentarios],
                 })
-                for gerenciamentoProposta in gerenciamentoPropostas.all()
+                for gerenciamentoProposta in gerenciamentoPropostas
                 if gerenciamentoProposta is not None
             ]
 
@@ -141,9 +183,9 @@ class GerenciamentoPropostaSQLiteRepository(GerenciamentoPropostaRepository):
                     await session.refresh(db_gerenciamentoProposta)
 
                     await session.refresh(db_gerenciamentoProposta, ['metas_comentarios'])
-                    return GerenciamentoProposta.model_validate({**db_gerenciamentoProposta.__dict__, 'metas_comentarios': [GerenciamentoComentario.model_validate(gerenciamentoComentario.__dict__) for gerenciamentoComentario in db_gerenciamentoProposta.metas_comentarios]})
+                    return GerenciamentoProposta.model_validate({**vars(db_gerenciamentoProposta), 'metas_comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamentoComentario)) for gerenciamentoComentario in db_gerenciamentoProposta.metas_comentarios]})
 
-                return False
+                return None
 
             except ClientError as e:
-                raise Exception(f'Failed to fetch gerenciamento_proposta from SQLite: {str(e)}')
+                raise Exception(f'Failed to create gerenciamento_proposta_comentario: {str(e)}')

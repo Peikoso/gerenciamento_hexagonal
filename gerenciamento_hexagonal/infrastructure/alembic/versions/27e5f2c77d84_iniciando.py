@@ -1,17 +1,18 @@
-"""Iniciando Denovo
+"""iniciando
 
-Revision ID: 90a4f4366e9c
+Revision ID: 27e5f2c77d84
 Revises: 
-Create Date: 2025-04-07 02:11:52.339917
+Create Date: 2025-04-07 22:18:28.657887
 
 """
 from typing import Sequence, Union
 
-import sqlalchemy as sa
 from alembic import op
+import sqlalchemy as sa
+
 
 # revision identifiers, used by Alembic.
-revision: str = '90a4f4366e9c'
+revision: str = '27e5f2c77d84'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

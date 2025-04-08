@@ -3,6 +3,7 @@ from datetime import date
 from pydantic import BaseModel, Field
 
 from gerenciamento_hexagonal.domain.models.gerenciamento import (
+    GerenciamentoComentario,
     GerenciamentoProposta,
     TipoGerenciamento,
 )
@@ -20,3 +21,7 @@ class GerenciamentoPropostaDTO(BaseModel):
 
 class GerenciamentoPropostaListResponse(BaseModel):
     Gerenciamento_Propostas: list[GerenciamentoProposta]
+
+
+class GerenciamentoComentarioListResponse(BaseModel):
+    Gerenciamento_Comentarios: list[GerenciamentoComentario]
