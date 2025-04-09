@@ -4,6 +4,7 @@ from gerenciamento_hexagonal.domain.models.gerenciamento import (
     # GerenciamentoBeneficiarioCategorizacao,
     # GerenciamentoCaracterizacao,
     GerenciamentoComentario,
+    GerenciamentoMeta,
     # GerenciamentoContrapartida,
     # GerenciamentoContrapartidaAdmin,
     # GerenciamentoContrapartidaArquivo,
@@ -17,6 +18,10 @@ from gerenciamento_hexagonal.domain.models.gerenciamento import (
 
 
 class GerenciamentoComentarioRepository(ABC):
+    @abstractmethod
+    async def get_gerenciamentoComentario(self) -> list[GerenciamentoComentario]:
+        pass
+
     @abstractmethod
     async def get_gerenciamentoComentario_by_id(self, gerenciamentoComentario_id: int) -> GerenciamentoComentario:
         pass
@@ -33,12 +38,12 @@ class GerenciamentoComentarioRepository(ABC):
     async def delete_gerenciamentoComentario(self, gerenciamentoComentario_id: int) -> bool:
         pass
 
-    @abstractmethod
-    async def get_gerenciamentoComentario(self) -> list[GerenciamentoComentario]:
-        pass
-
 
 class GerenciamentoPropostaRepository(ABC):
+    @abstractmethod
+    async def get_gerenciamentoProposta(self) -> list[GerenciamentoProposta]:
+        pass
+
     @abstractmethod
     async def get_gerenciamentoProposta_by_id(self, gerenciamentoProposta_id: int) -> GerenciamentoProposta:
         pass
@@ -56,14 +61,17 @@ class GerenciamentoPropostaRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_gerenciamentoProposta(self) -> list[GerenciamentoProposta]:
+    async def create_gerenciamentoPropostaComentario(self, gerenciamentoProposta_id: int, gerenciamentoComentario_data: GerenciamentoComentario) -> GerenciamentoProposta:
         pass
 
 
-"""
 class GerenciamentoMetaRepository(ABC):
     @abstractmethod
-    async def get_gerenciamentoMeta_by_id(self, gerenciamentoMeta_id: uuid) -> GerenciamentoMeta | None:
+    async def get_gerenciamentoMeta(self) -> list[GerenciamentoMeta]:
+        pass
+
+    @abstractmethod
+    async def get_gerenciamentoMeta_by_id(self, gerenciamentoMeta_id: int) -> GerenciamentoMeta:
         pass
 
     @abstractmethod
@@ -71,18 +79,15 @@ class GerenciamentoMetaRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_gerenciamentoMeta(self, gerenciamentoMeta: GerenciamentoMeta) -> GerenciamentoMeta | None:
+    async def update_gerenciamentoMeta(self, gerenciamentoMeta_id: int, gerenciamentoMeta: GerenciamentoMeta) -> GerenciamentoMeta:
         pass
 
     @abstractmethod
-    async def delete_gerenciamentoMeta(self, gerenciamentoMeta_id: uuid):
-        pass
-
-    @abstractmethod
-    async def get_gerenciamentoMeta(self) -> list[GerenciamentoMeta]:
+    async def delete_gerenciamentoMeta(self, gerenciamentoMeta_id: int) -> bool:
         pass
 
 
+"""
 class GerenciamentoQuantitativoRepository(ABC):
     @abstractmethod
     def get_gerenciamentoQuantitativo_by_id(self, gerenciamentoQuantitativo_id: uuid) -> GerenciamentoQuantitativo | None:

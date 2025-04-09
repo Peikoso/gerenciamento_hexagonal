@@ -34,14 +34,14 @@ class GerenciamentoProposta(BaseModel):
     metas_comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  # relação Many to Many
 
 
-"""
 class GerenciamentoMeta(BaseModel):
     alcancado: int
-    gerenciamento_proposta_id: GerenciamentoProposta
+    gerenciamento_proposta_id: Optional[int] = None
     ordem: Optional[int] = None
-    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    id: Optional[int] = None
 
 
+"""
 class GerenciamentoQuantitativo(BaseModel):
     gerenciamento_proposta: GerenciamentoProposta
     educacao_financeira_impactados: int

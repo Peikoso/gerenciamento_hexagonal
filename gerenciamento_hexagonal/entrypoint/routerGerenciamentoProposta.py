@@ -1,11 +1,5 @@
 from http import HTTPStatus
 
-from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoProposta
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import (
-    GerenciamentoComentarioDTO,
-    GerenciamentoPropostaDTO,
-    GerenciamentoPropostaListResponse,
-)
 from fastapi import APIRouter, Depends, HTTPException
 
 from gerenciamento_hexagonal.application.servicesSQLite import (
@@ -14,11 +8,16 @@ from gerenciamento_hexagonal.application.servicesSQLite import (
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import (
     NotFoundError,
 )
+from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoProposta
+from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import (
+    GerenciamentoComentarioDTO,
+    GerenciamentoPropostaDTO,
+    GerenciamentoPropostaListResponse,
+)
 from gerenciamento_hexagonal.infrastructure.repositories.SQLiterepository import (
     GerenciamentoComentarioSQLiteRepository,
     GerenciamentoPropostaSQLiteRepository,
 )
-
 
 router = APIRouter()
 
@@ -85,4 +84,3 @@ async def delete_gerenciamentoProposta(gerenciamentoProposta_id: int, service: G
 
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
-
