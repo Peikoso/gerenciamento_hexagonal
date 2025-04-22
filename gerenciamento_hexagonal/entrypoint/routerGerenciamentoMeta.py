@@ -12,8 +12,8 @@ router = APIRouter()
 
 
 def get_gerenciamentoMetaSQLite_Service() -> GerenciamentoMetaSQLiteServices:
-    gerenciamentoMeto_repository = GerenciamentoMetaSQLiteRepository()
-    return GerenciamentoMetaSQLiteServices(gerenciamentoMeto_repository)
+    gerenciamentoMeta_repository = GerenciamentoMetaSQLiteRepository()
+    return GerenciamentoMetaSQLiteServices(gerenciamentoMeta_repository)
 
 
 @router.get('/', response_model=GerenciamentoMetaListResponse)
@@ -34,7 +34,7 @@ async def get_gerenciamentoMeto_by_id(gerenciamentoMeta_id: int, service: Gerenc
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
 
 
-@router.post('/', response_model=GerenciamentoMeta)
+@router.post('/{gerenciamentoProposta_id}', response_model=GerenciamentoMeta)
 async def create_gerenciamentoMeta(gerenciamentoProposta_id: int, gerenciamentoMeta_data: GerenciamentoMetaDTO, service: GerenciamentoMetaSQLiteServices = Depends(get_gerenciamentoMetaSQLite_Service)):
     try:
         gerenciamentoMeta = await service.create_gerenciamentoMeta(gerenciamentoProposta_id, gerenciamentoMeta_data)

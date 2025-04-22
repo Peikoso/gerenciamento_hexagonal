@@ -3,17 +3,19 @@ from typing import List
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import (
     NotFoundError,
 )
-from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario, GerenciamentoMeta, GerenciamentoProposta
+from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario, GerenciamentoMeta, GerenciamentoProposta, GerenciamentoQuantitativo
 from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import (
     GerenciamentoComentarioDTO,
     GerenciamentoMetaDTO,
     GerenciamentoPropostaDTO,
+    GerenciamentoQuantitativoDTO,
     RelatorioResponse,
 )
 from gerenciamento_hexagonal.infrastructure.repositories.SQLiterepository import (
     GerenciamentoComentarioSQLiteRepository,
     GerenciamentoMetaSQLiteRepository,
     GerenciamentoPropostaSQLiteRepository,
+    GerenciamentoQuantitativoSQLiteRepository,
     RelatorioSQLiteRepository,
 )
 
@@ -149,3 +151,61 @@ class GerenciamentoMetaSQLiteServices:
             raise NotFoundError(f'gerenciamento_meta with ID {gerenciamentoMeta_id} not found')
 
         return True
+
+
+class GerenciamentoQuantitativoSQLiteServices:
+    def __init__(self, repositoryGerenciamento: GerenciamentoQuantitativoSQLiteRepository):
+        self.repository = repositoryGerenciamento
+    
+    async def get_gerenciamentoQuantitativo(self) -> list[GerenciamentoQuantitativo]:
+        gerenciamentoQuantitativos = await self.repository.get_gerenciamentoQuantitativo()
+        
+        return gerenciamentoQuantitativos
+    
+    async def get_gerenciamentoQuantitativo_by_id(self, gerenciamentoQuantitativo_id: int) -> GerenciamentoQuantitativo:
+        try:
+            gerenciamentoQuantitativo = await self.repository.get_gerenciamentoQuantitativo_by_id(gerenciamentoQuantitativo_id)
+            
+            return gerenciamentoQuantitativo
+        
+        except NotFoundError as e:
+            raise e
+    
+    async def create_gerenciamentoQuantitativo(self, gerenciamentoProposta_id: int, gerenciamentoQuantitativo: GerenciamentoQuantitativoDTO) -> GerenciamentoQuantitativo:
+        try:
+            gerenciamentoQuantitativo = GerenciamentoQuantitativo(**gerenciamentoQuantitativo.model_dump())
+            gerenciamentoQuantitativo = await self.repository.create_gerenciamentoQuantitativo(gerenciamentoProposta_id, gerenciamentoQuantitativo)
+            
+            return gerenciamentoQuantitativo
+        
+        except NotFoundError as e:
+            raise e
+    
+    async def update_gerenciamentoQuantitativo(self, gerenciamentoQuantitativo_id: int, gerenciamentoQuantitativo: GerenciamentoQuantitativo) -> GerenciamentoQuantitativo:
+        try:
+            gerenciamentoQuantitativo = GerenciamentoQuantitativo(**gerenciamentoQuantitativo.model_dump())       
+            gerenciamentoQuantitativo = await self.repository.update_gerenciamentoQuantitativo(gerenciamentoQuantitativo_id, gerenciamentoQuantitativo)
+            
+            return gerenciamentoQuantitativo
+        
+        except NotFoundError as e:
+            raise e
+
+    async def delete_gerenciamentoQuantitativo(self, gerenciamentoQuantitativo_id: int):
+        try:
+            result = await self.repository.delete_gerenciamentoQuantitativo(gerenciamentoQuantitativo_id)
+            
+            return result
+        except NotFoundError as e:
+            raise e
+    
+    async def create_gerenciamentoQuantitativoComentario(self, gerenciamentoQuantitativo_id: int, gerenciamentoComentario: GerenciamentoComentarioDTO) -> GerenciamentoQuantitativo:
+        try:
+            gerenciamentoComentario = GerenciamentoComentario(**gerenciamentoComentario.model_dump())
+            gerenciamentoQuantitativoComentario = await self.repository.create_gerenciamentoQuantitativoComentario(gerenciamentoQuantitativo_id, gerenciamentoComentario)
+            
+            return gerenciamentoQuantitativoComentario
+        
+        except NotFoundError as e:
+            raise e
+            

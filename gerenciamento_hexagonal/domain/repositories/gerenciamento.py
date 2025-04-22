@@ -11,6 +11,7 @@ from gerenciamento_hexagonal.domain.models.gerenciamento import (
     # GerenciamentoMeta,
     # GerenciamentoMetaArquivo,
     GerenciamentoProposta,
+    GerenciamentoQuantitativo,
     # GerenciamentoQualitativo,
     # GerenciamentoQualitativoArquivo,
     # GerenciamentoQuantitativo,
@@ -75,7 +76,7 @@ class GerenciamentoMetaRepository(ABC):
         pass
 
     @abstractmethod
-    async def create_gerenciamentoMeta(self, gerenciamentoMeta: GerenciamentoMeta) -> GerenciamentoMeta:
+    async def create_gerenciamentoMeta(self, gerenciamentoProposta_id: int, gerenciamentoMeta: GerenciamentoMeta) -> GerenciamentoMeta:
         pass
 
     @abstractmethod
@@ -87,29 +88,31 @@ class GerenciamentoMetaRepository(ABC):
         pass
 
 
-"""
+
 class GerenciamentoQuantitativoRepository(ABC):
     @abstractmethod
-    def get_gerenciamentoQuantitativo_by_id(self, gerenciamentoQuantitativo_id: uuid) -> GerenciamentoQuantitativo | None:
+    async def get_gerenciamentoQuantitativo(self) -> list[GerenciamentoQuantitativo]:
+        pass
+    
+    @abstractmethod
+    async def get_gerenciamentoQuantitativo_by_id(self, gerenciamentoQuantitativo_id: int) -> GerenciamentoQuantitativo:
         pass
 
     @abstractmethod
-    def create_gerenciamentoQuantitativo(self, gerenciamentoQuantitativo: GerenciamentoQuantitativo) -> GerenciamentoQuantitativo:
+    async def create_gerenciamentoQuantitativo(self, gerenciamentoProposta_id: int, gerenciamentoQuantitativo: GerenciamentoQuantitativo) -> GerenciamentoQuantitativo:
         pass
 
     @abstractmethod
-    def update_gerenciamentoQuantitativo(self, gerenciamentoQuantitativo: GerenciamentoQuantitativo) -> GerenciamentoQuantitativo | None:
+    async def update_gerenciamentoQuantitativo(self, gerenciamentoQuantitativo_id: int, gerenciamentoQuantitativo: GerenciamentoQuantitativo) -> GerenciamentoQuantitativo:
         pass
 
     @abstractmethod
-    def delete_gerenciamentoQuantitativo(self, gerenciamentoQuantitativo_id: uuid):
-        pass
-
-    @abstractmethod
-    def get_gerenciamentoQuantitativo(self) -> list[GerenciamentoQuantitativo]:
+    async def delete_gerenciamentoQuantitativo(self, gerenciamentoQuantitativo_id: int):
         pass
 
 
+
+"""
 class GerenciamentoQualitativoRepository(ABC):
     @abstractmethod
     def get_gerenciamentoQualitativo_by_id(self, gerenciamentoQualitativo_id: uuid) -> GerenciamentoQualitativo | None:

@@ -35,7 +35,7 @@ async def create_gerenciamentoProposta(gerenciamentoProposta_data: Gerenciamento
     return gerenciamentoProposta
 
 
-@router.post('/{gerenciamentoProposta_id}/Comentario', response_model=GerenciamentoProposta)
+@router.post('/Comentario/{gerenciamentoProposta_id}', response_model=GerenciamentoProposta)
 async def create_gerenciamentoPropostaComentario(gerenciamentoProposta_id: int, gerenciamentoComentarioDTO: GerenciamentoComentarioDTO, service: GerenciamentoPropostaSQLiteServices = Depends(get_gerenciamentoPropostaSQLite_service)):
     try:
         gerenciamentoComentario = await service.create_gerenciamentoPropostaComentario(gerenciamentoProposta_id, gerenciamentoComentarioDTO)

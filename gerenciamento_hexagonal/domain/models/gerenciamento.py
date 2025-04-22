@@ -41,28 +41,28 @@ class GerenciamentoMeta(BaseModel):
     id: Optional[int] = None
 
 
-"""
 class GerenciamentoQuantitativo(BaseModel):
-    gerenciamento_proposta: GerenciamentoProposta
     educacao_financeira_impactados: int
     educacao_financeira_alcancados: int
     geracao_renda_postos_trabalho_gerados: int
     alcance_marca_pessoas_alcancadas_publicacao_digitais: int
     pessoas_alcancadas: int
     pessoas_impactadas: int
-    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    gerenciamento_proposta_id: Optional[int] = None
+    id: Optional[int] = None
     comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  # relação Many to Many
 
 
 class GerenciamentoQualitativo(BaseModel):
-    gerenciamento_proposta: GerenciamentoProposta
-    acoes_realizadas: Optional[str] = None
+    acoes_realizadas: Optional[str] = None #500
     acoes_previstas: Optional[str] = None
     visao_proponente: Optional[str] = None
-    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    gerenciamento_proposta_id: int
+    id: Optional[int] = None
     comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  # relação Many to Many
 
 
+"""
 # Arquivo de especificações de modelos
 class GerenciamentoBeneficiarioCategorizacaoSpec:
     MODEL_NAME = 'GerenciamentoBeneficiarioCategorizacao'
