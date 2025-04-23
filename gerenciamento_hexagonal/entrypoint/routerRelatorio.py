@@ -2,21 +2,21 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from gerenciamento_hexagonal.application.servicesSQLite import RelatorioSQLiteServices
+from gerenciamento_hexagonal.application.services import RelatorioServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import WrappedRelatorioResponse
-from gerenciamento_hexagonal.infrastructure.repositories.SQLiterepository import RelatorioSQLiteRepository
+from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy_repository import RelatorioRepository
 
 router = APIRouter()
 
 
-def get_relatorio_sqlite_service() -> RelatorioSQLiteServices:
-    relatorio_repository = RelatorioSQLiteRepository()
-    return RelatorioSQLiteServices(relatorio_repository)
+def get_relatorio__service() -> RelatorioServices:
+    relatorio_repository = RelatorioRepository()
+    return RelatorioServices(relatorio_repository)
 
 
 @router.get('/{gerenciamento_proposta_id}', response_model=WrappedRelatorioResponse)
-async def get_relatorio(gerenciamento_proposta_id: int, service: RelatorioSQLiteServices = Depends(get_relatorio_sqlite_service)):
+async def get_relatorio(gerenciamento_proposta_id: int, service: RelatorioServices = Depends(get_relatorio__service)):
     try:
         relatorio = await service.get_relatorio(gerenciamento_proposta_id)
 

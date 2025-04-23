@@ -1,0 +1,30 @@
+from enum import Enum
+
+
+class TipoArquivoContexto(str, Enum):
+    PROPONENTE = 'PROPONENTE'
+    PROJETO = 'PROJETO'
+    DADOS_BANCARIOS = 'DADOS_BANCARIOS'
+    EDITAL = 'EDITAL'
+    GERENCIAMENTO_META = 'GERENCIAMENTO_META'
+    GERENCIAMENTO_QUALITATIVO = 'GERENCIAMENTO_QUALITATIVO'
+    GERENCIAMENTO_CONTRAPARTIDA = 'GERENCIAMENTO_CONTRAPARTIDA'
+
+class TipoGerenciamento(str, Enum):
+    TRIMESTRAL = 'TRIMESTRAL'
+    FINAL = 'FINAL'
+
+class StatusGereciamentoContrapartida(str, Enum):
+    PLANEJADO = 'Planejado'  # padrão
+    EM_APROVACAO = 'Em aprovação'
+    EM_AJUSTE = 'Em ajuste'
+    ENTREGUE = 'Entregue'
+    JUSTIFICADA = 'Justificada'
+    NAO_ENTREGUE = 'Não entregue'
+
+# Arquivo de especificações de modelos
+class GerenciamentoBeneficiarioCategorizacaoSpec:
+    MODEL_NAME = 'GerenciamentoBeneficiarioCategorizacao'
+    Field_GERENCIAMENTO_BENEFICIARIO = 'gerenciamento_beneficiario'
+    Field_CATEGORIZACAO = 'categorizacao'
+    CONSTRAINT_GERENCIAMENTO_BENEFICIARIO_CATEGORIZACAO_UQ = 'gerenciamento_beneficiario_categorizacao_uq'

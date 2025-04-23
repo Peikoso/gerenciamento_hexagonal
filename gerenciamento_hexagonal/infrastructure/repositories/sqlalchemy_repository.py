@@ -11,10 +11,10 @@ from gerenciamento_hexagonal.domain.repositories.gerenciamento import (
     GerenciamentoQuantitativoRepository,
 )
 from gerenciamento_hexagonal.infrastructure.database.models.gerenciamentoORM import GerenciamentoComentarioModel, GerenciamentoMetaModel, GerenciamentoPropostaModel, GerenciamentoQualitativoModel, GerenciamentoQuantitativoModel
-from gerenciamento_hexagonal.infrastructure.database.SQLiteConfig import get_session
+from gerenciamento_hexagonal.infrastructure.database.sqlalchemyConfig import get_session
 
 
-class RelatorioSQLiteRepository:
+class RelatorioRepository:
     async def get_relatorio(self, gerenciamento_proposta_id: int) -> RelatorioResponse:
         async with get_session() as session:
             relatorio = await session.scalar(select(GerenciamentoPropostaModel).where(GerenciamentoPropostaModel.id == gerenciamento_proposta_id))
@@ -41,7 +41,7 @@ class RelatorioSQLiteRepository:
         )
 
 
-class GerenciamentoComentarioSQLiteRepository(GerenciamentoComentarioRepository):
+class GerenciamentoComentarioRepository(GerenciamentoComentarioRepository):
     async def get_gerenciamento_comentario(self) -> list[GerenciamentoComentario]:
         async with get_session() as session:
             db_gerenciamento_comentarios = await session.scalars(select(GerenciamentoComentarioModel))
@@ -92,8 +92,8 @@ class GerenciamentoComentarioSQLiteRepository(GerenciamentoComentarioRepository)
             return False
 
 
-class GerenciamentoPropostaSQLiteRepository(GerenciamentoPropostaRepository):
-    def __init__(self, gerenciamento_comentario_repository: GerenciamentoComentarioSQLiteRepository):
+class GerenciamentoPropostaRepository(GerenciamentoPropostaRepository):
+    def __init__(self, gerenciamento_comentario_repository: GerenciamentoComentarioRepository):
         self.gerenciamento_comentario_repository = gerenciamento_comentario_repository
 
     async def get_gerenciamento_proposta(self) -> list[GerenciamentoProposta]:
@@ -167,7 +167,7 @@ class GerenciamentoPropostaSQLiteRepository(GerenciamentoPropostaRepository):
             return None
 
 
-class GerenciamentoMetaSQLiteRepository(GerenciamentoMetaRepository):
+class GerenciamentoMetaRepository(GerenciamentoMetaRepository):
     async def get_gerenciamento_meta(self) -> list[GerenciamentoMeta]:
         async with get_session() as session:
             db_gerenciamento_metas = await session.scalars(select(GerenciamentoMetaModel))
@@ -227,8 +227,8 @@ class GerenciamentoMetaSQLiteRepository(GerenciamentoMetaRepository):
             return False
 
 
-class GerenciamentoQuantitativoSQLiteRepository(GerenciamentoQuantitativoRepository):
-    def __init__(self, gerenciamento_comentario_repository: GerenciamentoComentarioSQLiteRepository):
+class GerenciamentoQuantitativoRepository(GerenciamentoQuantitativoRepository):
+    def __init__(self, gerenciamento_comentario_repository: GerenciamentoComentarioRepository):
         self.gerenciamento_comentario_repository = gerenciamento_comentario_repository
 
     async def get_gerenciamento_quantitativo(self) -> list[GerenciamentoQuantitativo]:
@@ -325,8 +325,8 @@ class GerenciamentoQuantitativoSQLiteRepository(GerenciamentoQuantitativoReposit
             return GerenciamentoQuantitativo.model_validate({**vars(db_gerenciamento_quantitativo), 'comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamento_comentario)) for gerenciamento_comentario in db_gerenciamento_quantitativo.comentarios]})
 
 
-class GerenciamentoQualitativoSQLiteRepository(GerenciamentoQualitativoRepository):
-    def __init__(self, gerenciamento_comentario_repository: GerenciamentoComentarioSQLiteRepository):
+class GerenciamentoQualitativoRepository(GerenciamentoQualitativoRepository):
+    def __init__(self, gerenciamento_comentario_repository: GerenciamentoComentarioRepository):
         self.gerenciamento_comentario_repository = gerenciamento_comentario_repository
 
     async def get_gerenciamento_qualitativo(self) -> list[GerenciamentoQualitativo]:

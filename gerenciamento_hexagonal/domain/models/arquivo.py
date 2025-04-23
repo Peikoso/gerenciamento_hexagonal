@@ -1,18 +1,10 @@
-import uuid
+"""import uuid
 from abc import ABC, abstractmethod
 from enum import Enum
 
 from pydantic import BaseModel, Field
 
-
-class TipoArquivoContexto(str, Enum):
-    PROPONENTE = 'PROPONENTE'
-    PROJETO = 'PROJETO'
-    DADOS_BANCARIOS = 'DADOS_BANCARIOS'
-    EDITAL = 'EDITAL'
-    GERENCIAMENTO_META = 'GERENCIAMENTO_META'
-    GERENCIAMENTO_QUALITATIVO = 'GERENCIAMENTO_QUALITATIVO'
-    GERENCIAMENTO_CONTRAPARTIDA = 'GERENCIAMENTO_CONTRAPARTIDA'
+from gerenciamento_hexagonal.domain.models.enums_specs import TipoArquivoContexto
 
 
 class TipoArquivo(BaseModel):
@@ -65,3 +57,4 @@ class Arquivo(ABC):
     @abstractmethod
     def save(self, *args, **kwargs):
         pass
+"""

@@ -1,22 +1,9 @@
 from datetime import date, datetime, timezone
-from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, Field
 
-
-class TipoGerenciamento(str, Enum):
-    TRIMESTRAL = 'TRIMESTRAL'
-    FINAL = 'FINAL'
-
-
-class StatusGereciamentoContrapartida(str, Enum):
-    PLANEJADO = 'Planejado'  # padrão
-    EM_APROVACAO = 'Em aprovação'
-    EM_AJUSTE = 'Em ajuste'
-    ENTREGUE = 'Entregue'
-    JUSTIFICADA = 'Justificada'
-    NAO_ENTREGUE = 'Não entregue'
+from gerenciamento_hexagonal.domain.models.enums_specs import TipoGerenciamento
 
 
 class GerenciamentoComentario(BaseModel):
@@ -31,7 +18,7 @@ class GerenciamentoProposta(BaseModel):
     tipo: TipoGerenciamento = Field(default_factory=TipoGerenciamento.TRIMESTRAL)
     id: Optional[int] = None
     criado_em: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    metas_comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  # relação Many to Many
+    metas_comentarios: list[GerenciamentoComentario] = Field(default_factory=list) 
 
 
 class GerenciamentoMeta(BaseModel):
@@ -50,7 +37,7 @@ class GerenciamentoQuantitativo(BaseModel):
     pessoas_impactadas: int
     gerenciamento_proposta_id: Optional[int] = None
     id: Optional[int] = None
-    comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  # relação Many to Many
+    comentarios: list[GerenciamentoComentario] = Field(default_factory=list) 
 
 
 class GerenciamentoQualitativo(BaseModel):
@@ -59,35 +46,23 @@ class GerenciamentoQualitativo(BaseModel):
     visao_proponente: Optional[str] = None
     gerenciamento_proposta_id: Optional[int] = None
     id: Optional[int] = None
-    comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  # relação Many to Many
-
-
-"""
-# Arquivo de especificações de modelos
-class GerenciamentoBeneficiarioCategorizacaoSpec:
-    MODEL_NAME = 'GerenciamentoBeneficiarioCategorizacao'
-    Field_GERENCIAMENTO_BENEFICIARIO = 'gerenciamento_beneficiario'
-    Field_CATEGORIZACAO = 'categorizacao'
-    CONSTRAINT_GERENCIAMENTO_BENEFICIARIO_CATEGORIZACAO_UQ = 'gerenciamento_beneficiario_categorizacao_uq'
+    comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  
 
 
 class GerenciamentoCaracterizacao(BaseModel):
-    gerenciamento_quantitativo: GerenciamentoQualitativo
     quantidade: int
-    categorizacoes: str  # Many to Many com categorizacaoBeneficiario, through=GerenciamentoBeneficiarioCategorizacaoSpec.MODEL_NAME
-    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    categorizacoes: str 
+    gerenciamento_quantitativo_id: Optional[int] = None
+    id: Optional[int] = None
 
 
 class GerenciamentoBeneficiarioCategorizacao(BaseModel):
-    gerenciamento_beneficiario: GerenciamentoCaracterizacao
-    categorizacao: str
-    id: uuid.UUID = Field(default_factory=uuid.uuid4)
-
-    # unique Constraint com  (GerenciamentoBeneficiarioCategorizacaoSpec.Field_GERENCIAMENTO_BENEFICIARIO,
-    # GerenciamentoBeneficiarioCategorizacaoSpec.Field_CATEGORIZACAO),
-    # name=GerenciamentoBeneficiarioCategorizacaoSpec.CONSTRAINT_GERENCIAMENTO_BENEFICIARIO_CATEGORIZACAO_UQ)
+    categorizacao_caracterizacao_id: str
+    gerenciamento_beneficiario_id: Optional[int] = None
+    id: Optional[int] = None
 
 
+"""
 class GerenciamentoMetaArquivo(Arquivo, BaseModel):
     gerenciamento_meta: GerenciamentoMeta
 

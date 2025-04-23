@@ -12,18 +12,18 @@ from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import (
     GerenciamentoQuantitativoDTO,
     RelatorioResponse,
 )
-from gerenciamento_hexagonal.infrastructure.repositories.SQLiterepository import (
-    GerenciamentoComentarioSQLiteRepository,
-    GerenciamentoMetaSQLiteRepository,
-    GerenciamentoPropostaSQLiteRepository,
-    GerenciamentoQualitativoSQLiteRepository,
-    GerenciamentoQuantitativoSQLiteRepository,
-    RelatorioSQLiteRepository,
+from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy_repository import (
+    GerenciamentoComentarioRepository,
+    GerenciamentoMetaRepository,
+    GerenciamentoPropostaRepository,
+    GerenciamentoQualitativoRepository,
+    GerenciamentoQuantitativoRepository,
+    RelatorioRepository,
 )
 
 
-class RelatorioSQLiteServices:
-    def __init__(self, repository_relatorio: RelatorioSQLiteRepository):
+class RelatorioServices:
+    def __init__(self, repository_relatorio: RelatorioRepository):
         self.repository = repository_relatorio
 
     async def get_relatorio(self, gerenciamento_proposta_id: int) -> RelatorioResponse:
@@ -34,8 +34,8 @@ class RelatorioSQLiteServices:
         return relatorio
 
 
-class GerenciamentoPropostaSQLiteServices:
-    def __init__(self, repository_gerenciamento: GerenciamentoPropostaSQLiteRepository):
+class GerenciamentoPropostaServices:
+    def __init__(self, repository_gerenciamento: GerenciamentoPropostaRepository):
         self.repository = repository_gerenciamento
 
     async def get_gerenciamento_proposta(self) -> List[GerenciamentoProposta]:
@@ -80,8 +80,8 @@ class GerenciamentoPropostaSQLiteServices:
         return gerenciamento_proposta
 
 
-class GerenciamentoComentarioSQLiteServices:
-    def __init__(self, repository_gerenciamento: GerenciamentoComentarioSQLiteRepository):
+class GerenciamentoComentarioServices:
+    def __init__(self, repository_gerenciamento: GerenciamentoComentarioRepository):
         self.repository = repository_gerenciamento
 
     async def get_gerenciamento_comentario(self) -> list[GerenciamentoComentario]:
@@ -113,8 +113,8 @@ class GerenciamentoComentarioSQLiteServices:
         return delete
 
 
-class GerenciamentoMetaSQLiteServices:
-    def __init__(self, repository_gerenciamento: GerenciamentoMetaSQLiteRepository):
+class GerenciamentoMetaServices:
+    def __init__(self, repository_gerenciamento: GerenciamentoMetaRepository):
         self.repository = repository_gerenciamento
 
     async def get_gerenciamento_meta(self) -> list[GerenciamentoMeta]:
@@ -155,8 +155,8 @@ class GerenciamentoMetaSQLiteServices:
         return True
 
 
-class GerenciamentoQuantitativoSQLiteServices:
-    def __init__(self, repository_gerenciamento: GerenciamentoQuantitativoSQLiteRepository):
+class GerenciamentoQuantitativoServices:
+    def __init__(self, repository_gerenciamento: GerenciamentoQuantitativoRepository):
         self.repository = repository_gerenciamento
 
     async def get_gerenciamento_quantitativo(self) -> list[GerenciamentoQuantitativo]:
@@ -212,8 +212,8 @@ class GerenciamentoQuantitativoSQLiteServices:
             raise e
 
 
-class GerenciamentoQualitativoSQLiteServices:
-    def __init__(self, repository_gerenciamento: GerenciamentoQualitativoSQLiteRepository):
+class GerenciamentoQualitativoServices:
+    def __init__(self, repository_gerenciamento: GerenciamentoQualitativoRepository):
         self.repository = repository_gerenciamento
         
     async def get_gerenciamento_qualitativo(self) -> list[GerenciamentoQualitativo]:

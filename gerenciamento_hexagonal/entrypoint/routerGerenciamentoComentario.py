@@ -2,29 +2,29 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from gerenciamento_hexagonal.application.servicesSQLite import GerenciamentoComentarioSQLiteServices
+from gerenciamento_hexagonal.application.services import GerenciamentoComentarioServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario
 from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoComentarioListResponse
-from gerenciamento_hexagonal.infrastructure.repositories.SQLiterepository import GerenciamentoComentarioSQLiteRepository
+from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy_repository import GerenciamentoComentarioRepository
 
 router = APIRouter()
 
 
-def get_gerenciamento_comentario_sqlite_service() -> GerenciamentoComentarioSQLiteServices:
-    gerenciamento_comentario_repository = GerenciamentoComentarioSQLiteRepository()
-    return GerenciamentoComentarioSQLiteServices(gerenciamento_comentario_repository)
+def get_gerenciamento_comentario__service() -> GerenciamentoComentarioServices:
+    gerenciamento_comentario_repository = GerenciamentoComentarioRepository()
+    return GerenciamentoComentarioServices(gerenciamento_comentario_repository)
 
 
 @router.get('/', response_model=GerenciamentoComentarioListResponse)
-async def get_gerenciamento_comentarios(service: GerenciamentoComentarioSQLiteServices = Depends(get_gerenciamento_comentario_sqlite_service)):
+async def get_gerenciamento_comentarios(service: GerenciamentoComentarioServices = Depends(get_gerenciamento_comentario__service)):
     gerenciamento_comentarios = await service.get_gerenciamento_comentario()
 
     return {'Gerenciamento_Comentarios': gerenciamento_comentarios}
 
 
 @router.get('/{gerenciamento_comentario_id}', response_model=GerenciamentoComentario)
-async def get_by_id_gerenciamento_comentario(gerenciamento_comentario_id: int, service: GerenciamentoComentarioSQLiteServices = Depends(get_gerenciamento_comentario_sqlite_service)):
+async def get_by_id_gerenciamento_comentario(gerenciamento_comentario_id: int, service: GerenciamentoComentarioServices = Depends(get_gerenciamento_comentario__service)):
     try:
         gerenciamento_comentario = await service.get_gerenciamento_comentario_by_id(gerenciamento_comentario_id)
 
@@ -35,7 +35,7 @@ async def get_by_id_gerenciamento_comentario(gerenciamento_comentario_id: int, s
 
 
 @router.put('/{gerenciamento_comentario_id}', response_model=GerenciamentoComentario)
-async def update_gerenciamento_comentario(gerenciamento_comentario_id: int, gerenciamento_comentario: GerenciamentoComentarioDTO, service: GerenciamentoComentarioSQLiteServices = Depends(get_gerenciamento_comentario_sqlite_service)):
+async def update_gerenciamento_comentario(gerenciamento_comentario_id: int, gerenciamento_comentario: GerenciamentoComentarioDTO, service: GerenciamentoComentarioServices = Depends(get_gerenciamento_comentario__service)):
     try:
         gerenciamento_comentario = await service.update_gerenciamento_comentario(gerenciamento_comentario_id, gerenciamento_comentario)
 
@@ -46,7 +46,7 @@ async def update_gerenciamento_comentario(gerenciamento_comentario_id: int, gere
 
 
 @router.delete('/{gerenciamento_comentario_id}', response_model=str)
-async def delete_gerenciamento_comentario(gerenciamento_comentario_id: int, service: GerenciamentoComentarioSQLiteServices = Depends(get_gerenciamento_comentario_sqlite_service)):
+async def delete_gerenciamento_comentario(gerenciamento_comentario_id: int, service: GerenciamentoComentarioServices = Depends(get_gerenciamento_comentario__service)):
     try:
         await service.delete_gerenciamento_comentario(gerenciamento_comentario_id)
 
