@@ -1,4 +1,5 @@
 from http import HTTPStatus
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from gerenciamento_hexagonal.application.servicesSQLite import RelatorioSQLiteServices
@@ -9,18 +10,17 @@ from gerenciamento_hexagonal.infrastructure.repositories.SQLiterepository import
 router = APIRouter()
 
 
-def get_relatorioSQLite_Service() -> RelatorioSQLiteServices:
+def get_relatorio_sqlite_service() -> RelatorioSQLiteServices:
     relatorio_repository = RelatorioSQLiteRepository()
     return RelatorioSQLiteServices(relatorio_repository)
 
 
-@router.get('/{gerenciamentoProposta_id}', response_model=WrappedRelatorioResponse)
-async def get_relatorio(gerenciamentoProposta_id: int, service: RelatorioSQLiteServices = Depends(get_relatorioSQLite_Service)): 
-    try:   
-        relatorio = await service.get_relatorio(gerenciamentoProposta_id)
+@router.get('/{gerenciamento_proposta_id}', response_model=WrappedRelatorioResponse)
+async def get_relatorio(gerenciamento_proposta_id: int, service: RelatorioSQLiteServices = Depends(get_relatorio_sqlite_service)):
+    try:
+        relatorio = await service.get_relatorio(gerenciamento_proposta_id)
 
         return {'gerenciamento_proposta': relatorio}
-        
+
     except NotFoundError as e:
-         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
-    
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))

@@ -11,6 +11,7 @@ from gerenciamento_hexagonal.domain.models.gerenciamento import (
     # GerenciamentoMeta,
     # GerenciamentoMetaArquivo,
     GerenciamentoProposta,
+    GerenciamentoQualitativo,
     GerenciamentoQuantitativo,
     # GerenciamentoQualitativo,
     # GerenciamentoQualitativoArquivo,
@@ -20,121 +21,126 @@ from gerenciamento_hexagonal.domain.models.gerenciamento import (
 
 class GerenciamentoComentarioRepository(ABC):
     @abstractmethod
-    async def get_gerenciamentoComentario(self) -> list[GerenciamentoComentario]:
+    async def get_gerenciamento_comentario(self) -> list[GerenciamentoComentario]:
         pass
 
     @abstractmethod
-    async def get_gerenciamentoComentario_by_id(self, gerenciamentoComentario_id: int) -> GerenciamentoComentario:
+    async def get_gerenciamento_comentario_by_id(self, gerenciamento_comentario_id: int) -> GerenciamentoComentario:
         pass
 
     @abstractmethod
-    async def create_gerenciamentoComentario(self, gerenciamentoComentario: GerenciamentoComentario) -> GerenciamentoComentario:
+    async def create_gerenciamento_comentario(self, gerenciamento_comentario: GerenciamentoComentario) -> GerenciamentoComentario:
         pass
 
     @abstractmethod
-    async def update_gerenciamentoComentario(self, gerenciamentoComentario_id: int, gerenciamentoComentario: GerenciamentoComentario) -> GerenciamentoComentario:
+    async def update_gerenciamento_comentario(self, gerenciamento_comentario_id: int, gerenciamento_comentario: GerenciamentoComentario) -> GerenciamentoComentario:
         pass
 
     @abstractmethod
-    async def delete_gerenciamentoComentario(self, gerenciamentoComentario_id: int) -> bool:
+    async def delete_gerenciamento_comentario(self, gerenciamento_comentario_id: int) -> bool:
         pass
 
 
 class GerenciamentoPropostaRepository(ABC):
     @abstractmethod
-    async def get_gerenciamentoProposta(self) -> list[GerenciamentoProposta]:
+    async def get_gerenciamento_proposta(self) -> list[GerenciamentoProposta]:
         pass
 
     @abstractmethod
-    async def get_gerenciamentoProposta_by_id(self, gerenciamentoProposta_id: int) -> GerenciamentoProposta:
+    async def get_gerenciamento_proposta_by_id(self, gerenciamento_proposta_id: int) -> GerenciamentoProposta:
         pass
 
     @abstractmethod
-    async def create_gerenciamentoProposta(self, gerenciamentoProposta: GerenciamentoProposta) -> GerenciamentoProposta:
+    async def create_gerenciamento_proposta(self, gerenciamento_proposta: GerenciamentoProposta) -> GerenciamentoProposta:
         pass
 
     @abstractmethod
-    async def update_gerenciamentoProposta(self, gerenciamentoProposta_id: int, gerenciamentoProposta: GerenciamentoProposta) -> GerenciamentoProposta:
+    async def update_gerenciamento_proposta(self, gerenciamento_proposta_id: int, gerenciamento_proposta: GerenciamentoProposta) -> GerenciamentoProposta:
         pass
 
     @abstractmethod
-    async def delete_gerenciamentoProposta(self, gerenciamentoProposta_id: int) -> bool:
+    async def delete_gerenciamento_proposta(self, gerenciamento_proposta_id: int) -> bool:
         pass
 
     @abstractmethod
-    async def create_gerenciamentoPropostaComentario(self, gerenciamentoProposta_id: int, gerenciamentoComentario_data: GerenciamentoComentario) -> GerenciamentoProposta:
+    async def create_gerenciamento_proposta_comentario(self, gerenciamento_proposta_id: int, gerenciamento_comentario: GerenciamentoComentario) -> GerenciamentoProposta:
         pass
 
 
 class GerenciamentoMetaRepository(ABC):
     @abstractmethod
-    async def get_gerenciamentoMeta(self) -> list[GerenciamentoMeta]:
+    async def get_gerenciamento_meta(self) -> list[GerenciamentoMeta]:
         pass
 
     @abstractmethod
-    async def get_gerenciamentoMeta_by_id(self, gerenciamentoMeta_id: int) -> GerenciamentoMeta:
+    async def get_gerenciamento_meta_by_id(self, gerenciamento_meta_id: int) -> GerenciamentoMeta:
         pass
 
     @abstractmethod
-    async def create_gerenciamentoMeta(self, gerenciamentoProposta_id: int, gerenciamentoMeta: GerenciamentoMeta) -> GerenciamentoMeta:
+    async def create_gerenciamento_meta(self, gerenciamento_proposta_id: int, gerenciamento_meta: GerenciamentoMeta) -> GerenciamentoMeta:
         pass
 
     @abstractmethod
-    async def update_gerenciamentoMeta(self, gerenciamentoMeta_id: int, gerenciamentoMeta: GerenciamentoMeta) -> GerenciamentoMeta:
+    async def update_gerenciamento_meta(self, gerenciamento_meta_id: int, gerenciamento_meta: GerenciamentoMeta) -> GerenciamentoMeta:
         pass
 
     @abstractmethod
-    async def delete_gerenciamentoMeta(self, gerenciamentoMeta_id: int) -> bool:
+    async def delete_gerenciamento_meta(self, gerenciamento_meta_id: int) -> bool:
         pass
-
 
 
 class GerenciamentoQuantitativoRepository(ABC):
     @abstractmethod
-    async def get_gerenciamentoQuantitativo(self) -> list[GerenciamentoQuantitativo]:
+    async def get_gerenciamento_quantitativo(self) -> list[GerenciamentoQuantitativo]:
+        pass
+
+    @abstractmethod
+    async def get_gerenciamento_quantitativo_by_id(self, gerenciamento_quantitativo_id: int) -> GerenciamentoQuantitativo:
+        pass
+
+    @abstractmethod
+    async def create_gerenciamento_quantitativo(self, gerenciamento_proposta_id: int, gerenciamento_quantitativo: GerenciamentoQuantitativo) -> GerenciamentoQuantitativo:
+        pass
+
+    @abstractmethod
+    async def update_gerenciamento_quantitativo(self, gerenciamento_quantitativo_id: int, gerenciamento_quantitativo: GerenciamentoQuantitativo) -> GerenciamentoQuantitativo:
+        pass
+
+    @abstractmethod
+    async def delete_gerenciamento_quantitativo(self, gerenciamento_quantitativo_id: int):
+        pass
+
+    @abstractmethod
+    async def create_gerenciamento_quantitativo_comentario(self, gerenciamento_quantitativo_id: int, gerenciamento_comentario: GerenciamentoComentario) -> GerenciamentoQuantitativo:
+        pass
+
+
+class GerenciamentoQualitativoRepository(ABC):
+    @abstractmethod
+    async def get_gerenciamento_qualitativo(self) -> list[GerenciamentoQualitativo]:
+        pass
+
+    @abstractmethod
+    async def get_gerenciamento_qualitativo_by_id(self, gerenciamento_qualitativo_id: int) -> GerenciamentoQualitativo:
+        pass
+
+    @abstractmethod
+    async def create_gerenciamento_qualitativo(self, gerenciamento_proposta_id: int, gerenciamento_qualitativo: GerenciamentoQualitativo) -> GerenciamentoQualitativo:
+        pass
+
+    @abstractmethod
+    async def update_gerenciamento_qualitativo(self, gerenciamento_qualitativo_id: int, gerenciamento_qualitativo: GerenciamentoQualitativo) -> GerenciamentoQualitativo | None:
+        pass
+
+    @abstractmethod
+    async def delete_gerenciamento_qualitativo(self, gerenciamento_qualitativo_id: int):
         pass
     
     @abstractmethod
-    async def get_gerenciamentoQuantitativo_by_id(self, gerenciamentoQuantitativo_id: int) -> GerenciamentoQuantitativo:
-        pass
-
-    @abstractmethod
-    async def create_gerenciamentoQuantitativo(self, gerenciamentoProposta_id: int, gerenciamentoQuantitativo: GerenciamentoQuantitativo) -> GerenciamentoQuantitativo:
-        pass
-
-    @abstractmethod
-    async def update_gerenciamentoQuantitativo(self, gerenciamentoQuantitativo_id: int, gerenciamentoQuantitativo: GerenciamentoQuantitativo) -> GerenciamentoQuantitativo:
-        pass
-
-    @abstractmethod
-    async def delete_gerenciamentoQuantitativo(self, gerenciamentoQuantitativo_id: int):
-        pass
-
-
+    async def create_gerenciamento_qualitativo_comentario(self, gerenciamento_qualitativo_id: int, gerenciamento_comentario: GerenciamentoComentario) -> GerenciamentoQualitativo:
+        pass    
 
 """
-class GerenciamentoQualitativoRepository(ABC):
-    @abstractmethod
-    def get_gerenciamentoQualitativo_by_id(self, gerenciamentoQualitativo_id: uuid) -> GerenciamentoQualitativo | None:
-        pass
-
-    @abstractmethod
-    def create_gerenciamentoQualitativo(self, gerenciamentoQuantitativo: GerenciamentoQualitativo) -> GerenciamentoQualitativo:
-        pass
-
-    @abstractmethod
-    def update_gerenciamentoQualitativo(self, gerenciamentoQualitativo: GerenciamentoQualitativo) -> GerenciamentoQualitativo | None:
-        pass
-
-    @abstractmethod
-    def delete_gerenciamentoQualitativo(self, gerenciamentoQualitativo_id: uuid):
-        pass
-
-    @abstractmethod
-    def get_gerenciamentoQualitativo(self) -> list[GerenciamentoQualitativo]:
-        pass
-
-
 class GerenciamentoCaracterizacaoRepository(ABC):
     @abstractmethod
     def get_gerenciamentoCaracterizacao_by_id(self, gerenciamentoCaracterizacao_id: uuid) -> GerenciamentoCaracterizacao | None:

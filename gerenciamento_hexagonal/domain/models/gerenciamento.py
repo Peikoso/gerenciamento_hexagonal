@@ -54,10 +54,10 @@ class GerenciamentoQuantitativo(BaseModel):
 
 
 class GerenciamentoQualitativo(BaseModel):
-    acoes_realizadas: Optional[str] = None #500
+    acoes_realizadas: Optional[str] = None  # 500
     acoes_previstas: Optional[str] = None
     visao_proponente: Optional[str] = None
-    gerenciamento_proposta_id: int
+    gerenciamento_proposta_id: Optional[int] = None
     id: Optional[int] = None
     comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  # relação Many to Many
 

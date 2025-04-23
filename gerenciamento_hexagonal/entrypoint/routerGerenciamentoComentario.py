@@ -11,44 +11,44 @@ from gerenciamento_hexagonal.infrastructure.repositories.SQLiterepository import
 router = APIRouter()
 
 
-def get_gerenciamentoComentarioSQlite_service() -> GerenciamentoComentarioSQLiteServices:
-    gerenciamentoComentario_repository = GerenciamentoComentarioSQLiteRepository()
-    return GerenciamentoComentarioSQLiteServices(gerenciamentoComentario_repository)
+def get_gerenciamento_comentario_sqlite_service() -> GerenciamentoComentarioSQLiteServices:
+    gerenciamento_comentario_repository = GerenciamentoComentarioSQLiteRepository()
+    return GerenciamentoComentarioSQLiteServices(gerenciamento_comentario_repository)
 
 
 @router.get('/', response_model=GerenciamentoComentarioListResponse)
-async def get_gerenciamentoComentarios(service: GerenciamentoComentarioSQLiteServices = Depends(get_gerenciamentoComentarioSQlite_service)):
-    gerenciamentoComentarios = await service.get_gerenciamentoComentario()
+async def get_gerenciamento_comentarios(service: GerenciamentoComentarioSQLiteServices = Depends(get_gerenciamento_comentario_sqlite_service)):
+    gerenciamento_comentarios = await service.get_gerenciamento_comentario()
 
-    return {'Gerenciamento_Comentarios': gerenciamentoComentarios}
+    return {'Gerenciamento_Comentarios': gerenciamento_comentarios}
 
 
-@router.get('/{gerenciamentoComentario_id}', response_model=GerenciamentoComentario)
-async def get_by_id_gerenciamentoComentario(gerenciamentoComentario_id: int, service: GerenciamentoComentarioSQLiteServices = Depends(get_gerenciamentoComentarioSQlite_service)):
+@router.get('/{gerenciamento_comentario_id}', response_model=GerenciamentoComentario)
+async def get_by_id_gerenciamento_comentario(gerenciamento_comentario_id: int, service: GerenciamentoComentarioSQLiteServices = Depends(get_gerenciamento_comentario_sqlite_service)):
     try:
-        gerenciamentoComentario = await service.get_gerenciamentoComentario_by_id(gerenciamentoComentario_id)
+        gerenciamento_comentario = await service.get_gerenciamento_comentario_by_id(gerenciamento_comentario_id)
 
-        return gerenciamentoComentario
+        return gerenciamento_comentario
 
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
 
 
-@router.put('/{gerenciamentoComentario_id}', response_model=GerenciamentoComentario)
-async def update_gerenciamentoComentario(gerenciamentoComentario_id: int, gerenciamentoComentario_data: GerenciamentoComentarioDTO, service: GerenciamentoComentarioSQLiteServices = Depends(get_gerenciamentoComentarioSQlite_service)):
+@router.put('/{gerenciamento_comentario_id}', response_model=GerenciamentoComentario)
+async def update_gerenciamento_comentario(gerenciamento_comentario_id: int, gerenciamento_comentario: GerenciamentoComentarioDTO, service: GerenciamentoComentarioSQLiteServices = Depends(get_gerenciamento_comentario_sqlite_service)):
     try:
-        gerenciamentoComentario = await service.update_gerenciamentoComentario(gerenciamentoComentario_id, gerenciamentoComentario_data)
+        gerenciamento_comentario = await service.update_gerenciamento_comentario(gerenciamento_comentario_id, gerenciamento_comentario)
 
-        return gerenciamentoComentario
+        return gerenciamento_comentario
 
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
 
 
-@router.delete('/{gerenciamentoComentario_id}', response_model=str)
-async def delete_gerenciamentoComentario(gerenciamentoComentario_id: int, service: GerenciamentoComentarioSQLiteServices = Depends(get_gerenciamentoComentarioSQlite_service)):
+@router.delete('/{gerenciamento_comentario_id}', response_model=str)
+async def delete_gerenciamento_comentario(gerenciamento_comentario_id: int, service: GerenciamentoComentarioSQLiteServices = Depends(get_gerenciamento_comentario_sqlite_service)):
     try:
-        await service.delete_gerenciamentoComentario(gerenciamentoComentario_id)
+        await service.delete_gerenciamento_comentario(gerenciamento_comentario_id)
 
         return 'message: gerenciamento_comentario deleted'
     except NotFoundError as e:

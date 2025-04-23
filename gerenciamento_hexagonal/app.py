@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 
-from gerenciamento_hexagonal.entrypoint.routerRelatorio import router as relatorio_router
 from gerenciamento_hexagonal.entrypoint.routerGerenciamentoComentario import router as gerenciamento_comentario_router
 from gerenciamento_hexagonal.entrypoint.routerGerenciamentoMeta import router as gerenciamento_meta_router
 from gerenciamento_hexagonal.entrypoint.routerGerenciamentoProposta import router as gerenciamento_proposta_router
 from gerenciamento_hexagonal.entrypoint.routerGerenciamentoQuantitativo import router as gerenciamento_quantitativo_router
-
+from gerenciamento_hexagonal.entrypoint.routerRelatorio import router as relatorio_router
+from gerenciamento_hexagonal.entrypoint.routerGerenciamentoQualitativo import router as gerenciamento_qualitativo_router
 
 app = FastAPI()
 
@@ -14,6 +14,8 @@ app.include_router(gerenciamento_proposta_router, prefix='/GerenciamentoProposta
 app.include_router(gerenciamento_comentario_router, prefix='/GerenciamentoComentario', tags=['Gerenciamento Comentario'])
 app.include_router(gerenciamento_meta_router, prefix='/GerenciamentoMeta', tags=['Gerenciamento Meta'])
 app.include_router(gerenciamento_quantitativo_router, prefix='/GerenciamentoQuantitativo', tags=['Gerenciamento Quantitativo'])
+app.include_router(gerenciamento_qualitativo_router, prefix='/GerenciamentoQualitativo', tags=['Gerenciamento Qualitativo'])
+
 
 @app.get('/')
 async def read_root():

@@ -20,11 +20,12 @@ class GerenciamentoPropostaModel:
     criado_em: Mapped[datetime] = mapped_column(DateTime, init=False, nullable=False, server_default=func.now())
     proposta_id: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    
     metas_comentarios: Mapped[Optional[list['GerenciamentoComentarioModel']]] = relationship(secondary='gerenciamentoProposta_comentario_association', back_populates='comentario_gerenciamentoPropostas', cascade='all, delete', default_factory=list, lazy='selectin')
-    
+
     gerenciamentoMetas: Mapped[list['GerenciamentoMetaModel']] = relationship('GerenciamentoMetaModel', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
     gerenciamentoQuantitativos: Mapped[list['GerenciamentoQuantitativoModel']] = relationship('GerenciamentoQuantitativoModel', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
+    gerenciamentoQualitativos: Mapped[list['GerenciamentoQualitativoModel']] = relationship('GerenciamentoQualitativoModel', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
+
 
 @table_registry.mapped_as_dataclass
 class GerenciamentoComentarioModel:
@@ -37,6 +38,7 @@ class GerenciamentoComentarioModel:
 
     comentario_gerenciamentoPropostas: Mapped[list['GerenciamentoPropostaModel']] = relationship(secondary='gerenciamentoProposta_comentario_association', back_populates='metas_comentarios', cascade='save-update, merge', default_factory=list)
     comentario_gerenciamentoQuantitativos: Mapped[list['GerenciamentoQuantitativoModel']] = relationship(secondary='gerenciamentoQuantitativo_comentario_association', back_populates='comentarios', cascade='save-update, merge', default_factory=list)
+    comentario_gerenciamentoQualitativos: Mapped[list['GerenciamentoQualitativoModel']] = relationship(secondary='gerenciamentoQualitativo_comentario_association', back_populates='comentarios', cascade='save-update, merge', default_factory=list)
 
 
 gerenciamentoProposta_comentario_association = Table(
@@ -55,7 +57,7 @@ class GerenciamentoMetaModel:
     id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False, autoincrement=True, init=False)
     ordem: Mapped[Optional[int]] = mapped_column(SmallInteger, nullable=True)
     alcancado: Mapped[int] = mapped_column(Integer, nullable=False)
-    
+
     gerenciamento_proposta_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_proposta.id', ondelete='CASCADE'), nullable=False)
 
 
@@ -63,7 +65,7 @@ class GerenciamentoMetaModel:
 class GerenciamentoQuantitativoModel:
     __tablename__ = 'gerenciamento_quantitativo'
     __table_args__ = {'sqlite_autoincrement': True}
-    
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False, autoincrement=True, init=False)
     educacao_financeira_impactados: Mapped[int] = mapped_column(Integer, nullable=False)
     educacao_financeira_alcancados: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -71,7 +73,7 @@ class GerenciamentoQuantitativoModel:
     alcance_marca_pessoas_alcancadas_publicacao_digitais: Mapped[int] = mapped_column(Integer, nullable=False)
     pessoas_alcancadas: Mapped[int] = mapped_column(Integer, nullable=False)
     pessoas_impactadas: Mapped[int] = mapped_column(Integer, nullable=False)
-    
+
     gerenciamento_proposta_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_proposta.id', ondelete='CASCADE'), nullable=False)
     comentarios: Mapped[Optional[list['GerenciamentoComentarioModel']]] = relationship(secondary='gerenciamentoQuantitativo_comentario_association', back_populates='comentario_gerenciamentoQuantitativos', cascade='all, delete', default_factory=list, lazy='selectin')
 
@@ -83,3 +85,19 @@ gerenciamentoQuantitativo_comentario_association = Table(
     Column('comentario_id', ForeignKey('gerenciamento_comentario.id', ondelete='CASCADE'), primary_key=True),
 )
 
+
+@table_registry.mapped_as_dataclass
+class GerenciamentoQualitativoModel:
+    __tablename__ = 'gerenciamento_qualitativo'
+    __table_args__ = {'sqlite_autoincrement': True}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False, autoincrement=True, init=False)
+    acoes_realizadas: Mapped[str] = mapped_column(String(500))
+    acoes_previstas: Mapped[str] = mapped_column(String(500))
+    visao_proponente: Mapped[str] = mapped_column(String(500))
+
+    gerenciamento_proposta_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_proposta.id', ondelete='CASCADE'), nullable=False)
+    comentarios: Mapped[Optional[list['GerenciamentoComentarioModel']]] = relationship(secondary='gerenciamentoQualitativo_comentario_association', back_populates='comentario_gerenciamentoQualitativos', cascade='all, delete', default_factory=list, lazy='selectin')
+
+
+gerenciamentoQualitativo_comentario_association = Table('gerenciamentoQualitativo_comentario_association', table_registry.metadata, Column('gerenciamentoQualitativo_id', ForeignKey('gerenciamento_qualitativo.id', ondelete='CASCADE'), primary_key=True), Column('comentario_id', ForeignKey('gerenciamento_comentario.id', ondelete='CASCADE'), primary_key=True))
