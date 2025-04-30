@@ -10,9 +10,11 @@ class TipoArquivoContexto(str, Enum):
     GERENCIAMENTO_QUALITATIVO = 'GERENCIAMENTO_QUALITATIVO'
     GERENCIAMENTO_CONTRAPARTIDA = 'GERENCIAMENTO_CONTRAPARTIDA'
 
+
 class TipoGerenciamento(str, Enum):
     TRIMESTRAL = 'TRIMESTRAL'
     FINAL = 'FINAL'
+
 
 class StatusGereciamentoContrapartida(str, Enum):
     PLANEJADO = 'Planejado'  # padrão
@@ -22,9 +24,9 @@ class StatusGereciamentoContrapartida(str, Enum):
     JUSTIFICADA = 'Justificada'
     NAO_ENTREGUE = 'Não entregue'
 
-# Arquivo de especificações de modelos
+
 class GerenciamentoBeneficiarioCategorizacaoSpec:
-    MODEL_NAME = 'GerenciamentoBeneficiarioCategorizacao'
-    Field_GERENCIAMENTO_BENEFICIARIO = 'gerenciamento_beneficiario'
-    Field_CATEGORIZACAO = 'categorizacao'
+    MODEL_NAME = 'gerenciamento_beneficiario_categorizacao'
+    FIELD_GERENCIAMENTO_BENEFICIARIO = 'gerenciamento_beneficiario_id'
+    FIELD_CATEGORIZACAO = 'categorizacao_id'
     CONSTRAINT_GERENCIAMENTO_BENEFICIARIO_CATEGORIZACAO_UQ = 'gerenciamento_beneficiario_categorizacao_uq'

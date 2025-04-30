@@ -1,8 +1,8 @@
-"""postgres
+"""Postgres mais adições
 
-Revision ID: 32b2dc06d906
+Revision ID: 322f076d1da7
 Revises: 
-Create Date: 2025-04-22 23:43:07.907804
+Create Date: 2025-04-23 05:33:23.580295
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '32b2dc06d906'
+revision: str = '322f076d1da7'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -25,8 +25,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('comentario', sa.String(length=100), nullable=False),
     sa.Column('data_criacao', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.PrimaryKeyConstraint('id'),
-    sqlite_autoincrement=True
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('gerenciamento_proposta',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -34,8 +33,21 @@ def upgrade() -> None:
     sa.Column('tipo', sa.Enum('TRIMESTRAL', 'FINAL', name='tipogerenciamento'), nullable=False),
     sa.Column('criado_em', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('proposta_id', sa.Integer(), nullable=False),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('tipo_categorizacao_beneficiario',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('info', sa.String(length=50), nullable=False),
+    sa.Column('descricao', sa.String(length=150), nullable=False),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('categorizacao_beneficiario',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('tipo_categ_beneficiario_id', sa.Integer(), nullable=False),
+    sa.Column('valor', sa.String(length=64), nullable=False),
+    sa.ForeignKeyConstraint(['tipo_categ_beneficiario_id'], ['tipo_categorizacao_beneficiario.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id'),
-    sqlite_autoincrement=True
+    sa.UniqueConstraint('tipo_categ_beneficiario_id', 'valor', name='categorizacao_beneficiario_tipo_valor_uq')
     )
     op.create_table('gerenciamentoProposta_comentario_association',
     sa.Column('gerenciamentoProposta_id', sa.Integer(), nullable=False),
@@ -50,8 +62,7 @@ def upgrade() -> None:
     sa.Column('alcancado', sa.Integer(), nullable=False),
     sa.Column('gerenciamento_proposta_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['gerenciamento_proposta_id'], ['gerenciamento_proposta.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id'),
-    sqlite_autoincrement=True
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('gerenciamento_qualitativo',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -60,8 +71,7 @@ def upgrade() -> None:
     sa.Column('visao_proponente', sa.String(length=500), nullable=False),
     sa.Column('gerenciamento_proposta_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['gerenciamento_proposta_id'], ['gerenciamento_proposta.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id'),
-    sqlite_autoincrement=True
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('gerenciamento_quantitativo',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -73,8 +83,7 @@ def upgrade() -> None:
     sa.Column('pessoas_impactadas', sa.Integer(), nullable=False),
     sa.Column('gerenciamento_proposta_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['gerenciamento_proposta_id'], ['gerenciamento_proposta.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id'),
-    sqlite_autoincrement=True
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('gerenciamentoQualitativo_comentario_association',
     sa.Column('gerenciamentoQualitativo_id', sa.Integer(), nullable=False),
@@ -90,18 +99,37 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['gerenciamentoQuantitativo_id'], ['gerenciamento_quantitativo.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('gerenciamentoQuantitativo_id', 'comentario_id')
     )
+    op.create_table('gerenciamento_caracterizacao',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('quantidade', sa.Integer(), nullable=False),
+    sa.Column('gerenciamento_quantitativo_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['gerenciamento_quantitativo_id'], ['gerenciamento_quantitativo.id'], ondelete='RESTRICT'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('gerenciamento_beneficiario_categorizacao',
+    sa.Column('gerenciamento_beneficiario_id', sa.Integer(), nullable=False),
+    sa.Column('categorizacao_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['categorizacao_id'], ['categorizacao_beneficiario.id'], ondelete='RESTRICT'),
+    sa.ForeignKeyConstraint(['gerenciamento_beneficiario_id'], ['gerenciamento_caracterizacao.id'], ondelete='RESTRICT'),
+    sa.PrimaryKeyConstraint('gerenciamento_beneficiario_id', 'categorizacao_id'),
+    sa.UniqueConstraint('gerenciamento_beneficiario_id', 'categorizacao_id', name='gerenciamento_beneficiario_categorizacao_uq')
+    )
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     """Downgrade schema."""
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_table('gerenciamento_beneficiario_categorizacao')
+    op.drop_table('gerenciamento_caracterizacao')
     op.drop_table('gerenciamentoQuantitativo_comentario_association')
     op.drop_table('gerenciamentoQualitativo_comentario_association')
     op.drop_table('gerenciamento_quantitativo')
     op.drop_table('gerenciamento_qualitativo')
     op.drop_table('gerenciamento_meta')
     op.drop_table('gerenciamentoProposta_comentario_association')
+    op.drop_table('categorizacao_beneficiario')
+    op.drop_table('tipo_categorizacao_beneficiario')
     op.drop_table('gerenciamento_proposta')
     op.drop_table('gerenciamento_comentario')
     # ### end Alembic commands ###

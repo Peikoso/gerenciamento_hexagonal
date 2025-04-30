@@ -135,10 +135,11 @@ class GerenciamentoQualitativoRepository(ABC):
     @abstractmethod
     async def delete_gerenciamento_qualitativo(self, gerenciamento_qualitativo_id: int):
         pass
-    
+
     @abstractmethod
     async def create_gerenciamento_qualitativo_comentario(self, gerenciamento_qualitativo_id: int, gerenciamento_comentario: GerenciamentoComentario) -> GerenciamentoQualitativo:
-        pass    
+        pass
+
 
 """
 class GerenciamentoCaracterizacaoRepository(ABC):

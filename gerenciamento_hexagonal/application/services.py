@@ -215,18 +215,18 @@ class GerenciamentoQuantitativoServices:
 class GerenciamentoQualitativoServices:
     def __init__(self, repository_gerenciamento: GerenciamentoQualitativoRepository):
         self.repository = repository_gerenciamento
-        
+
     async def get_gerenciamento_qualitativo(self) -> list[GerenciamentoQualitativo]:
         gerenciamento_qualitativos = await self.repository.get_gerenciamento_qualitativo()
-        
+
         return gerenciamento_qualitativos
 
     async def get_gerenciamento_qualitativo_by_id(self, gerenciamento_qualitativo_id: int) -> GerenciamentoQualitativo:
         try:
             gerenciamento_qualitativo = await self.repository.get_gerenciamento_qualitativo_by_id(gerenciamento_qualitativo_id)
-            
+
             return gerenciamento_qualitativo
-        
+
         except NotFoundError:
             raise NotFoundError(f'gerenciamento_qualitativo with ID: {gerenciamento_qualitativo_id} not found')
 
@@ -234,37 +234,37 @@ class GerenciamentoQualitativoServices:
         try:
             gerenciamento_qualitativo = GerenciamentoQualitativo(**gerenciamento_qualitativo.model_dump())
             gerenciamento_qualitativo = await self.repository.create_gerenciamento_qualitativo(gerenciamento_proposta_id, gerenciamento_qualitativo)
-            
+
             return gerenciamento_qualitativo
-        
+
         except NotFoundError as e:
             raise e
-            
+
     async def update_gerenciamento_qualitativo(self, gerenciamento_qualitativo_id: int, gerenciamento_qualitativo: GerenciamentoQualitativoDTO) -> GerenciamentoQualitativo | None:
         try:
             gerenciamento_qualitativo = GerenciamentoQualitativo(**gerenciamento_qualitativo.model_dump())
             gerenciamento_qualitativo = await self.repository.update_gerenciamento_qualitativo(gerenciamento_qualitativo_id, gerenciamento_qualitativo)
-            
+
             return gerenciamento_qualitativo
-        
+
         except NotFoundError as e:
             raise e
-            
+
     async def delete_gerenciamento_qualitativo(self, gerenciamento_qualitativo_id: int):
         try:
             result = await self.repository.delete_gerenciamento_qualitativo(gerenciamento_qualitativo_id)
-            
+
             return result
-        
+
         except NotFoundError as e:
             raise e
 
     async def create_gerenciamento_qualitativo_comentario(self, gerenciamento_qualitativo_id: int, gerenciamento_comentario: GerenciamentoComentarioDTO) -> GerenciamentoQualitativo:
-            try:
-                gerenciamento_comentario = GerenciamentoComentario(**gerenciamento_comentario.model_dump())
-                gerenciamento_qualitativo_comentario = await self.repository.create_gerenciamento_qualitativo_comentario(gerenciamento_qualitativo_id, gerenciamento_comentario)
-                
-                return gerenciamento_qualitativo_comentario
-            
-            except NotFoundError as e:
-                raise e
+        try:
+            gerenciamento_comentario = GerenciamentoComentario(**gerenciamento_comentario.model_dump())
+            gerenciamento_qualitativo_comentario = await self.repository.create_gerenciamento_qualitativo_comentario(gerenciamento_qualitativo_id, gerenciamento_comentario)
+
+            return gerenciamento_qualitativo_comentario
+
+        except NotFoundError as e:
+            raise e

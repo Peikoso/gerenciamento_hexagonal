@@ -2,7 +2,7 @@ from sqlalchemy import select
 
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario, GerenciamentoMeta, GerenciamentoProposta, GerenciamentoQualitativo, GerenciamentoQuantitativo
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoMetaDTO, GerenciamentoQuantitativoDTO, RelatorioResponse
+from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoMetaDTO, GerenciamentoQualitativoDTO, GerenciamentoQuantitativoDTO, RelatorioResponse
 from gerenciamento_hexagonal.domain.repositories.gerenciamento import (
     GerenciamentoComentarioRepository,
     GerenciamentoMetaRepository,
@@ -26,7 +26,15 @@ class RelatorioRepository:
             proposta_id=relatorio.proposta_id,
             trimestre_de_referencia=relatorio.trimestre_de_referencia,
             tipo=relatorio.tipo,
-            gerenciamento_metas=[GerenciamentoMetaDTO(ordem=gerenciamento_meta.ordem, alcancado=gerenciamento_meta.alcancado) for gerenciamento_meta in relatorio.gerenciamentoMetas],
+            gerenciamento_metas=[GerenciamentoMetaDTO(id=gerenciamento_meta.id, ordem=gerenciamento_meta.ordem, alcancado=gerenciamento_meta.alcancado) for gerenciamento_meta in relatorio.gerenciamentoMetas],
+            gerenciamento_qualitativos=[
+                GerenciamentoQualitativoDTO(
+                    acoes_previstas=gerenciamento_qualitativo.acoes_previstas,
+                    acoes_realizadas=gerenciamento_qualitativo.acoes_realizadas,
+                    visao_proponente=gerenciamento_qualitativo.visao_proponente,
+                )
+                for gerenciamento_qualitativo in relatorio.gerenciamentoQualitativos
+            ],
             gerenciamento_quantitativos=[
                 GerenciamentoQuantitativoDTO(
                     educacao_financeira_alcancados=gerenciamento_quantitativo.educacao_financeira_alcancados,
@@ -339,18 +347,18 @@ class GerenciamentoQualitativoRepository(GerenciamentoQualitativoRepository):
 
     async def get_gerenciamento_qualitativo_by_id(self, gerenciamento_qualitativo_id: int) -> GerenciamentoQualitativo:
         async with get_session() as session:
-            db_gerenciamento_qualitativo = await session.scalar(select(GerenciamentoQualitativoModel).where(GerenciamentoQualitativoModel.id==gerenciamento_qualitativo_id))
-            
+            db_gerenciamento_qualitativo = await session.scalar(select(GerenciamentoQualitativoModel).where(GerenciamentoQualitativoModel.id == gerenciamento_qualitativo_id))
+
             if not db_gerenciamento_qualitativo:
                 raise NotFoundError()
-            
+
             result = GerenciamentoQualitativo.model_validate({**vars(db_gerenciamento_qualitativo), 'comentarios': [GerenciamentoComentario.model_validate(vars(comentario)) for comentario in db_gerenciamento_qualitativo.comentarios]})
-            
+
             return result
-            
+
     async def create_gerenciamento_qualitativo(self, gerenciamento_proposta_id: int, gerenciamento_qualitativo: GerenciamentoQualitativo) -> GerenciamentoQualitativo:
         async with get_session() as session:
-            db_gerenciamento_proposta = await session.scalar(select(GerenciamentoPropostaModel).where(GerenciamentoPropostaModel.id==gerenciamento_proposta_id))
+            db_gerenciamento_proposta = await session.scalar(select(GerenciamentoPropostaModel).where(GerenciamentoPropostaModel.id == gerenciamento_proposta_id))
 
             if not db_gerenciamento_proposta:
                 raise NotFoundError(f'gerenciamento_proposta with ID: {gerenciamento_proposta_id} not found')
@@ -365,53 +373,52 @@ class GerenciamentoQualitativoRepository(GerenciamentoQualitativoRepository):
 
     async def update_gerenciamento_qualitativo(self, gerenciamento_qualitativo_id: int, gerenciamento_qualitativo: GerenciamentoQualitativo) -> GerenciamentoQualitativo | None:
         async with get_session() as session:
-            db_gerenciamento_qualitativo = await session.scalar(select(GerenciamentoQualitativoModel).where(GerenciamentoQualitativoModel.id==gerenciamento_qualitativo_id))
-            
+            db_gerenciamento_qualitativo = await session.scalar(select(GerenciamentoQualitativoModel).where(GerenciamentoQualitativoModel.id == gerenciamento_qualitativo_id))
+
             if not db_gerenciamento_qualitativo:
                 raise NotFoundError(f'gerenciamento_qualitativo with ID: {gerenciamento_qualitativo_id} not found')
-            
+
             db_gerenciamento_qualitativo.acoes_previstas = gerenciamento_qualitativo.acoes_previstas
             db_gerenciamento_qualitativo.acoes_realizadas = gerenciamento_qualitativo.acoes_realizadas
             db_gerenciamento_qualitativo.visao_proponente = gerenciamento_qualitativo.visao_proponente
-            
+
             await session.commit()
             await session.refresh(db_gerenciamento_qualitativo)
-            
+
             result = GerenciamentoQualitativo.model_validate({**vars(db_gerenciamento_qualitativo), 'comentarios': [GerenciamentoComentario.model_validate(vars(comentario)) for comentario in db_gerenciamento_qualitativo.comentarios]})
-            
+
             return result
 
     async def delete_gerenciamento_qualitativo(self, gerenciamento_qualitativo_id: int):
         async with get_session() as session:
-            db_gerenciamento_qualitativo = await session.scalar(select(GerenciamentoQualitativoModel).where(GerenciamentoQualitativoModel.id==gerenciamento_qualitativo_id))
-            
+            db_gerenciamento_qualitativo = await session.scalar(select(GerenciamentoQualitativoModel).where(GerenciamentoQualitativoModel.id == gerenciamento_qualitativo_id))
+
             if not db_gerenciamento_qualitativo:
                 raise NotFoundError(f'gerenciamento_qualitativo with ID: {gerenciamento_qualitativo_id} not found')
-            
+
             await session.delete(db_gerenciamento_qualitativo)
             await session.commit()
-            
+
             return {'message': f'gerenciamento_qualitativo with ID {gerenciamento_qualitativo_id} deleted'}
-    
+
     async def create_gerenciamento_qualitativo_comentario(self, gerenciamento_qualitativo_id: int, gerenciamento_comentario: GerenciamentoComentario) -> GerenciamentoQualitativo:
         async with get_session() as session:
-            db_gerenciamento_qualitativo = await session.scalar(select(GerenciamentoQualitativoModel).where(GerenciamentoQualitativoModel.id==gerenciamento_qualitativo_id))
-            
+            db_gerenciamento_qualitativo = await session.scalar(select(GerenciamentoQualitativoModel).where(GerenciamentoQualitativoModel.id == gerenciamento_qualitativo_id))
+
             if not db_gerenciamento_qualitativo:
                 raise NotFoundError(f'gerenciamento_qualitativo with ID: {gerenciamento_qualitativo_id} not found')
-            
+
             db_gerenciamento_comentario = await self.gerenciamento_comentario_repository.create_gerenciamento_comentario(gerenciamento_comentario)
-            
+
             if db_gerenciamento_comentario not in session:
                 session.add(db_gerenciamento_comentario)
-                
+
             db_gerenciamento_qualitativo.comentarios.append(db_gerenciamento_comentario)
-            
+
             session.add(db_gerenciamento_qualitativo)
             await session.commit()
             await session.refresh(db_gerenciamento_qualitativo)
-            
+
             result = GerenciamentoQualitativo.model_validate({**vars(db_gerenciamento_qualitativo), 'comentarios': [GerenciamentoComentario.model_validate(vars(comentario)) for comentario in db_gerenciamento_qualitativo.comentarios]})
-            
+
             return result
-        

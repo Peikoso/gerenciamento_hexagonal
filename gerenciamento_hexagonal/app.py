@@ -3,9 +3,9 @@ from fastapi import FastAPI
 from gerenciamento_hexagonal.entrypoint.routerGerenciamentoComentario import router as gerenciamento_comentario_router
 from gerenciamento_hexagonal.entrypoint.routerGerenciamentoMeta import router as gerenciamento_meta_router
 from gerenciamento_hexagonal.entrypoint.routerGerenciamentoProposta import router as gerenciamento_proposta_router
+from gerenciamento_hexagonal.entrypoint.routerGerenciamentoQualitativo import router as gerenciamento_qualitativo_router
 from gerenciamento_hexagonal.entrypoint.routerGerenciamentoQuantitativo import router as gerenciamento_quantitativo_router
 from gerenciamento_hexagonal.entrypoint.routerRelatorio import router as relatorio_router
-from gerenciamento_hexagonal.entrypoint.routerGerenciamentoQualitativo import router as gerenciamento_qualitativo_router
 
 app = FastAPI()
 

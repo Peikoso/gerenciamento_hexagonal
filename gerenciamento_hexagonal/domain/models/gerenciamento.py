@@ -18,7 +18,7 @@ class GerenciamentoProposta(BaseModel):
     tipo: TipoGerenciamento = Field(default_factory=TipoGerenciamento.TRIMESTRAL)
     id: Optional[int] = None
     criado_em: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    metas_comentarios: list[GerenciamentoComentario] = Field(default_factory=list) 
+    metas_comentarios: list[GerenciamentoComentario] = Field(default_factory=list)
 
 
 class GerenciamentoMeta(BaseModel):
@@ -37,7 +37,7 @@ class GerenciamentoQuantitativo(BaseModel):
     pessoas_impactadas: int
     gerenciamento_proposta_id: Optional[int] = None
     id: Optional[int] = None
-    comentarios: list[GerenciamentoComentario] = Field(default_factory=list) 
+    comentarios: list[GerenciamentoComentario] = Field(default_factory=list)
 
 
 class GerenciamentoQualitativo(BaseModel):
@@ -46,21 +46,19 @@ class GerenciamentoQualitativo(BaseModel):
     visao_proponente: Optional[str] = None
     gerenciamento_proposta_id: Optional[int] = None
     id: Optional[int] = None
-    comentarios: list[GerenciamentoComentario] = Field(default_factory=list)  
+    comentarios: list[GerenciamentoComentario] = Field(default_factory=list)
 
 
 class GerenciamentoCaracterizacao(BaseModel):
-    quantidade: int
-    categorizacoes: str 
+    quantidade: int = Field(..., ge=0)
+    categorizacoes: list[int]
     gerenciamento_quantitativo_id: Optional[int] = None
     id: Optional[int] = None
 
 
 class GerenciamentoBeneficiarioCategorizacao(BaseModel):
-    categorizacao_caracterizacao_id: str
-    gerenciamento_beneficiario_id: Optional[int] = None
-    id: Optional[int] = None
-
+    gerenciamento_id: int
+    categorizacoes_ids: list[int]
 
 """
 class GerenciamentoMetaArquivo(Arquivo, BaseModel):

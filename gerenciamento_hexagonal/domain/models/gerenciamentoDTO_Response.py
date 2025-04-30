@@ -7,6 +7,7 @@ from gerenciamento_hexagonal.domain.models.gerenciamento import (
     GerenciamentoComentario,
     GerenciamentoMeta,
     GerenciamentoProposta,
+    GerenciamentoQualitativo,
     GerenciamentoQuantitativo,
     TipoGerenciamento,
 )
@@ -53,7 +54,7 @@ class GerenciamentoQuantitativoListResponse(BaseModel):
 
 
 class GerenciamentoQualitativoDTO(BaseModel):
-    acoes_realizadas: Optional[str] = None 
+    acoes_realizadas: Optional[str] = None
     acoes_previstas: Optional[str] = None
     visao_proponente: Optional[str] = None
 
@@ -63,8 +64,8 @@ class RelatorioResponse(BaseModel):
     trimestre_de_referencia: date
     tipo: TipoGerenciamento = Field(default_factory=TipoGerenciamento.TRIMESTRAL)
     gerenciamento_metas: list[GerenciamentoMetaDTO]
+    gerenciamento_qualitativos: list[GerenciamentoQualitativoDTO]
     gerenciamento_quantitativos: list[GerenciamentoQuantitativoDTO]
-
 
 class WrappedRelatorioResponse(BaseModel):
     gerenciamento_proposta: RelatorioResponse
