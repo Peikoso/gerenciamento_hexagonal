@@ -7,7 +7,6 @@ from gerenciamento_hexagonal.domain.models.gerenciamento import (
     GerenciamentoComentario,
     GerenciamentoMeta,
     GerenciamentoProposta,
-    GerenciamentoQualitativo,
     GerenciamentoQuantitativo,
     TipoGerenciamento,
 )
@@ -59,13 +58,19 @@ class GerenciamentoQualitativoDTO(BaseModel):
     visao_proponente: Optional[str] = None
 
 
+class GerenciamentoCaracterizacaoDTO(BaseModel):
+    quantidade: int = Field(..., ge=0)
+    categorizacoes_ids: list[int]
+
+
 class RelatorioResponse(BaseModel):
     proposta_id: int
     trimestre_de_referencia: date
     tipo: TipoGerenciamento = Field(default_factory=TipoGerenciamento.TRIMESTRAL)
     gerenciamento_metas: list[GerenciamentoMetaDTO]
-    gerenciamento_qualitativos: list[GerenciamentoQualitativoDTO]
-    gerenciamento_quantitativos: list[GerenciamentoQuantitativoDTO]
+    gerenciamento_qualitativo: Optional[GerenciamentoQualitativoDTO]
+    gerenciamento_quantitativo: Optional[GerenciamentoQuantitativoDTO]
+
 
 class WrappedRelatorioResponse(BaseModel):
     gerenciamento_proposta: RelatorioResponse

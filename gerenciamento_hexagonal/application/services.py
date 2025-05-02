@@ -2,9 +2,12 @@ from typing import List
 
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import (
     NotFoundError,
+    NotNullViolationError,
+    UniqueViolation,
 )
-from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario, GerenciamentoMeta, GerenciamentoProposta, GerenciamentoQualitativo, GerenciamentoQuantitativo
+from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoCaracterizacao, GerenciamentoComentario, GerenciamentoMeta, GerenciamentoProposta, GerenciamentoQualitativo, GerenciamentoQuantitativo
 from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import (
+    GerenciamentoCaracterizacaoDTO,
     GerenciamentoComentarioDTO,
     GerenciamentoMetaDTO,
     GerenciamentoPropostaDTO,
@@ -12,14 +15,7 @@ from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import (
     GerenciamentoQuantitativoDTO,
     RelatorioResponse,
 )
-from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy_repository import (
-    GerenciamentoComentarioRepository,
-    GerenciamentoMetaRepository,
-    GerenciamentoPropostaRepository,
-    GerenciamentoQualitativoRepository,
-    GerenciamentoQuantitativoRepository,
-    RelatorioRepository,
-)
+from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy_repository import GerenciamentoCaracterizacaoRepository, GerenciamentoComentarioRepository, GerenciamentoMetaRepository, GerenciamentoPropostaRepository, GerenciamentoQualitativoRepository, GerenciamentoQuantitativoRepository, RelatorioRepository
 
 
 class RelatorioServices:
@@ -156,8 +152,9 @@ class GerenciamentoMetaServices:
 
 
 class GerenciamentoQuantitativoServices:
-    def __init__(self, repository_gerenciamento: GerenciamentoQuantitativoRepository):
+    def __init__(self, repository_gerenciamento: GerenciamentoQuantitativoRepository, service_proposta: GerenciamentoPropostaServices):
         self.repository = repository_gerenciamento
+        self.service_proposta = service_proposta
 
     async def get_gerenciamento_quantitativo(self) -> list[GerenciamentoQuantitativo]:
         gerenciamento_quantitativos = await self.repository.get_gerenciamento_quantitativo()
@@ -165,51 +162,53 @@ class GerenciamentoQuantitativoServices:
         return gerenciamento_quantitativos
 
     async def get_gerenciamento_quantitativo_by_id(self, gerenciamento_quantitativo_id: int) -> GerenciamentoQuantitativo:
-        try:
-            gerenciamento_quantitativo = await self.repository.get_gerenciamento_quantitativo_by_id(gerenciamento_quantitativo_id)
+        gerenciamento_quantitativo = await self.repository.get_gerenciamento_quantitativo_by_id(gerenciamento_quantitativo_id)
 
-            return gerenciamento_quantitativo
+        if not gerenciamento_quantitativo:
+            raise NotFoundError(f'gerenciamento_quantitativo with ID: {gerenciamento_quantitativo_id} not found')
 
-        except NotFoundError as e:
-            raise e
+        return gerenciamento_quantitativo
 
     async def create_gerenciamento_quantitativo(self, gerenciamento_proposta_id: int, gerenciamento_quantitativo: GerenciamentoQuantitativoDTO) -> GerenciamentoQuantitativo:
-        try:
-            gerenciamento_quantitativo = GerenciamentoQuantitativo(**gerenciamento_quantitativo.model_dump())
-            gerenciamento_quantitativo = await self.repository.create_gerenciamento_quantitativo(gerenciamento_proposta_id, gerenciamento_quantitativo)
+        await self.service_proposta.get_gerenciamento_proposta_by_id(gerenciamento_proposta_id)
 
-            return gerenciamento_quantitativo
+        UniqueViolationCheck = await self.repository.find_by_gerenciamento_proposta_id(gerenciamento_proposta_id)
 
-        except NotFoundError as e:
-            raise e
+        if UniqueViolationCheck:
+            raise UniqueViolation(f'gerenciamento_quantitativo already exist for gerenciamento_proposta ID: {gerenciamento_proposta_id}')
+
+        gerenciamento_quantitativo = GerenciamentoQuantitativo(**gerenciamento_quantitativo.model_dump())
+        gerenciamento_quantitativo = await self.repository.create_gerenciamento_quantitativo(gerenciamento_proposta_id, gerenciamento_quantitativo)
+
+        return gerenciamento_quantitativo
 
     async def update_gerenciamento_quantitativo(self, gerenciamento_quantitativo_id: int, gerenciamento_quantitativo: GerenciamentoQuantitativo) -> GerenciamentoQuantitativo:
-        try:
-            gerenciamento_quantitativo = GerenciamentoQuantitativo(**gerenciamento_quantitativo.model_dump())
-            gerenciamento_quantitativo = await self.repository.update_gerenciamento_quantitativo(gerenciamento_quantitativo_id, gerenciamento_quantitativo)
+        await self.get_gerenciamento_quantitativo_by_id(gerenciamento_quantitativo_id)
 
-            return gerenciamento_quantitativo
+        gerenciamento_quantitativo = GerenciamentoQuantitativo(**gerenciamento_quantitativo.model_dump())
+        gerenciamento_quantitativo = await self.repository.update_gerenciamento_quantitativo(gerenciamento_quantitativo_id, gerenciamento_quantitativo)
 
-        except NotFoundError as e:
-            raise e
+        return gerenciamento_quantitativo
 
     async def delete_gerenciamento_quantitativo(self, gerenciamento_quantitativo_id: int):
-        try:
-            result = await self.repository.delete_gerenciamento_quantitativo(gerenciamento_quantitativo_id)
+        await self.get_gerenciamento_quantitativo_by_id(gerenciamento_quantitativo_id)
 
-            return result
-        except NotFoundError as e:
-            raise e
+        NotNullViolation = await self.repository.check_gerenciamento_caracterizacao_exist(gerenciamento_quantitativo_id)
+
+        if NotNullViolation:
+            raise NotNullViolationError('cannot delete a gerenciamento_quantitativo when there is an associated gerenciamento_caracterizacao')
+
+        await self.repository.delete_gerenciamento_quantitativo(gerenciamento_quantitativo_id)
+
+        return {'message': f'gerenciamento_quantitativo with ID {gerenciamento_quantitativo_id} deleted'}
 
     async def create_gerenciamento_quantitativo_comentario(self, gerenciamento_quantitativo_id: int, gerenciamento_comentario: GerenciamentoComentarioDTO) -> GerenciamentoQuantitativo:
-        try:
-            gerenciamento_comentario = GerenciamentoComentario(**gerenciamento_comentario.model_dump())
-            gerenciamento_quantitativo_comentario = await self.repository.create_gerenciamento_quantitativo_comentario(gerenciamento_quantitativo_id, gerenciamento_comentario)
+        await self.get_gerenciamento_quantitativo_by_id(gerenciamento_quantitativo_id)
 
-            return gerenciamento_quantitativo_comentario
+        gerenciamento_comentario = GerenciamentoComentario(**gerenciamento_comentario.model_dump())
+        gerenciamento_quantitativo_comentario = await self.repository.create_gerenciamento_quantitativo_comentario(gerenciamento_quantitativo_id, gerenciamento_comentario)
 
-        except NotFoundError as e:
-            raise e
+        return gerenciamento_quantitativo_comentario
 
 
 class GerenciamentoQualitativoServices:
@@ -237,8 +236,11 @@ class GerenciamentoQualitativoServices:
 
             return gerenciamento_qualitativo
 
-        except NotFoundError as e:
-            raise e
+        except NotFoundError:
+            raise NotFoundError(f'gerenciamento_proposta with ID: {gerenciamento_proposta_id} not found')
+
+        except UniqueViolation:
+            raise UniqueViolation(f'gerenciamento_qualitativo already exist for gerenciamento_proposta ID: {gerenciamento_proposta_id}')
 
     async def update_gerenciamento_qualitativo(self, gerenciamento_qualitativo_id: int, gerenciamento_qualitativo: GerenciamentoQualitativoDTO) -> GerenciamentoQualitativo | None:
         try:
@@ -268,3 +270,63 @@ class GerenciamentoQualitativoServices:
 
         except NotFoundError as e:
             raise e
+
+
+class GerenciamentoCaracterizacaoServices:
+    def __init__(self, repository_gerenciamento: GerenciamentoCaracterizacaoRepository, service_quantitativo: GerenciamentoQuantitativoServices):
+        self.repository = repository_gerenciamento
+        self.service_quantitativo = service_quantitativo
+
+    async def get_gerenciamento_caracterizacao(self) -> list[GerenciamentoCaracterizacao]:
+        gerenciamento_caracterizacoes = await self.repository.get_gerenciamento_caracterizacao()
+
+        return gerenciamento_caracterizacoes
+
+    async def get_gerenciamento_caracterizacao_by_id(self, gerenciamento_caracterizacao_id: int) -> GerenciamentoCaracterizacao:
+        gerenciamento_caracterizacao = await self.repository.get_gerenciamento_caracterizacao_by_id(gerenciamento_caracterizacao_id)
+
+        if not gerenciamento_caracterizacao:
+            raise NotFoundError(f'gerenciamento_caracterizacao with ID: {gerenciamento_caracterizacao_id} not found')
+
+        return gerenciamento_caracterizacao
+
+    async def create_gerenciamento_caracterizacao(self, gerenciamento_quantitativo_id: int, gerenciamento_caracterizacao: GerenciamentoCaracterizacaoDTO) -> GerenciamentoCaracterizacao:
+        await self.service_quantitativo.get_gerenciamento_quantitativo_by_id(gerenciamento_quantitativo_id)
+
+        UniqueViolationCheck = await self.repository.find_by_gerenciamento_quantitativo_id(gerenciamento_quantitativo_id)
+
+        if UniqueViolationCheck:
+            raise UniqueViolation(f'gerenciamento_caracterizacao already exist for gerenciamento_quantitativo ID: {gerenciamento_quantitativo_id}')
+
+        gerenciamento_caracterizacao.categorizacoes_ids = list(set(gerenciamento_caracterizacao.categorizacoes_ids))
+
+        categorizacao = await self.repository.find_categorizacoes_by_ids(gerenciamento_caracterizacao.categorizacoes_ids)
+
+        if not categorizacao:
+            raise NotFoundError('one or more categorizacoes not found')
+
+        gerenciamento_caracterizacao = GerenciamentoCaracterizacao(**gerenciamento_caracterizacao.model_dump())
+        gerenciamento_caracterizacao = await self.repository.create_gerenciamento_caracterizacao(gerenciamento_quantitativo_id, gerenciamento_caracterizacao)
+
+        return gerenciamento_caracterizacao
+
+    async def update_gerenciamento_caracterizacao(self, gerenciamento_caracterizacao_id: int, gerenciamento_caracterizacao: GerenciamentoCaracterizacaoDTO) -> GerenciamentoCaracterizacao:
+        await self.get_gerenciamento_caracterizacao_by_id(gerenciamento_caracterizacao_id)
+
+        gerenciamento_caracterizacao.categorizacoes_ids = list(set(gerenciamento_caracterizacao.categorizacoes_ids))
+        categorizacao = await self.repository.find_categorizacoes_by_ids(gerenciamento_caracterizacao.categorizacoes_ids)
+
+        if not categorizacao:
+            raise NotFoundError('one or more categorizacoes not found')
+
+        gerenciamento_caracterizacao = GerenciamentoCaracterizacao(**gerenciamento_caracterizacao.model_dump())
+        gerenciamento_caracterizacao = await self.repository.update_gerenciamento_caracterizacao(gerenciamento_caracterizacao_id, gerenciamento_caracterizacao)
+
+        return gerenciamento_caracterizacao
+
+    async def delete_gerenciamento_caracterizacao(self, gerenciamento_caracterizacao_id: int):
+        await self.get_gerenciamento_caracterizacao_by_id(gerenciamento_caracterizacao_id)
+
+        await self.repository.delete_gerenciamento_caracterizacao(gerenciamento_caracterizacao_id)
+
+        return {'message': f'gerenciamento_caracterizacao with ID {gerenciamento_caracterizacao_id} deleted'}

@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from gerenciamento_hexagonal.domain.models.gerenciamento import (
     # GerenciamentoBeneficiarioCategorizacao,
     # GerenciamentoCaracterizacao,
+    GerenciamentoCaracterizacao,
     GerenciamentoComentario,
     GerenciamentoMeta,
     # GerenciamentoContrapartida,
@@ -95,7 +96,7 @@ class GerenciamentoQuantitativoRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_gerenciamento_quantitativo_by_id(self, gerenciamento_quantitativo_id: int) -> GerenciamentoQuantitativo:
+    async def get_gerenciamento_quantitativo_by_id(self, gerenciamento_quantitativo_id: int) -> GerenciamentoQuantitativo | None:
         pass
 
     @abstractmethod
@@ -107,11 +108,19 @@ class GerenciamentoQuantitativoRepository(ABC):
         pass
 
     @abstractmethod
-    async def delete_gerenciamento_quantitativo(self, gerenciamento_quantitativo_id: int):
+    async def delete_gerenciamento_quantitativo(self, gerenciamento_quantitativo_id: int) -> bool:
         pass
 
     @abstractmethod
     async def create_gerenciamento_quantitativo_comentario(self, gerenciamento_quantitativo_id: int, gerenciamento_comentario: GerenciamentoComentario) -> GerenciamentoQuantitativo:
+        pass
+
+    @abstractmethod
+    async def find_by_gerenciamento_proposta_id(self, gerenciamento_proposta: int) -> bool:
+        pass
+
+    @abstractmethod
+    async def check_gerenciamento_caracterizacao_exist(self, gerenciamento_quantitativo_id: int) -> bool:
         pass
 
 
@@ -121,7 +130,7 @@ class GerenciamentoQualitativoRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_gerenciamento_qualitativo_by_id(self, gerenciamento_qualitativo_id: int) -> GerenciamentoQualitativo:
+    async def get_gerenciamento_qualitativo_by_id(self, gerenciamento_qualitativo_id: int) -> GerenciamentoQualitativo | None:
         pass
 
     @abstractmethod
@@ -129,7 +138,7 @@ class GerenciamentoQualitativoRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_gerenciamento_qualitativo(self, gerenciamento_qualitativo_id: int, gerenciamento_qualitativo: GerenciamentoQualitativo) -> GerenciamentoQualitativo | None:
+    async def update_gerenciamento_qualitativo(self, gerenciamento_qualitativo_id: int, gerenciamento_qualitativo: GerenciamentoQualitativo) -> GerenciamentoQualitativo:
         pass
 
     @abstractmethod
@@ -141,29 +150,37 @@ class GerenciamentoQualitativoRepository(ABC):
         pass
 
 
-"""
 class GerenciamentoCaracterizacaoRepository(ABC):
     @abstractmethod
-    def get_gerenciamentoCaracterizacao_by_id(self, gerenciamentoCaracterizacao_id: uuid) -> GerenciamentoCaracterizacao | None:
+    async def get_gerenciamento_caracterizacao(self) -> list[GerenciamentoCaracterizacao]:
         pass
 
     @abstractmethod
-    def create_gerenciamentoCaracterizacao(self, gerenciamentoCaracterizacao: GerenciamentoCaracterizacao) -> GerenciamentoCaracterizacao:
+    async def get_gerenciamento_caracterizacao_by_id(self, gerenciamento_caracterizacao_id: int) -> GerenciamentoCaracterizacao | None:
         pass
 
     @abstractmethod
-    def update_gerenciamentoCaracterizacao(self, gerenciamentoCaracterizacao: GerenciamentoCaracterizacao) -> GerenciamentoCaracterizacao | None:
+    async def create_gerenciamento_caracterizacao(self, gerenciamento_quantitativo_id: int, gerenciamento_caracterizacao: GerenciamentoCaracterizacao) -> GerenciamentoCaracterizacao:
         pass
 
     @abstractmethod
-    def delete_gerenciamentoCaracterizacao(self, gerenciamentoCaracterizacao_id: uuid):
+    async def update_gerenciamento_caracterizacao(self, gerenciamento_caracterizacao_id: int, gerenciamento_caracterizacao: GerenciamentoCaracterizacao) -> GerenciamentoCaracterizacao:
         pass
 
     @abstractmethod
-    def get_gerenciamentoCaracterizacao(self) -> list[GerenciamentoCaracterizacao]:
+    async def delete_gerenciamento_caracterizacao(self, gerenciamento_caracterizacao_id: int):
+        pass
+
+    @abstractmethod
+    async def find_by_gerenciamento_quantitativo_id(self, gerenciamento_quantitativo_id: int) -> bool:
+        pass
+
+    @abstractmethod
+    async def find_categorizacoes_by_ids(self, categorizacoes_ids: list[int]) -> bool:
         pass
 
 
+"""
 class GerenciamentoBeneficiarioCategorizacaoRepository(ABC):
     @abstractmethod
     def get_gerenciamentoBeneficiarioCategorizacao_by_id(self, gerenciamentoBeneficiarioCategorizacao_id: uuid) -> GerenciamentoBeneficiarioCategorizacao | None:

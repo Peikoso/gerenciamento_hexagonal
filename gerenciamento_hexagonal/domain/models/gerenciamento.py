@@ -50,8 +50,8 @@ class GerenciamentoQualitativo(BaseModel):
 
 
 class GerenciamentoCaracterizacao(BaseModel):
-    quantidade: int = Field(..., ge=0)
-    categorizacoes: list[int]
+    quantidade: int
+    categorizacoes_ids: list[int]
     gerenciamento_quantitativo_id: Optional[int] = None
     id: Optional[int] = None
 
@@ -59,6 +59,7 @@ class GerenciamentoCaracterizacao(BaseModel):
 class GerenciamentoBeneficiarioCategorizacao(BaseModel):
     gerenciamento_id: int
     categorizacoes_ids: list[int]
+
 
 """
 class GerenciamentoMetaArquivo(Arquivo, BaseModel):

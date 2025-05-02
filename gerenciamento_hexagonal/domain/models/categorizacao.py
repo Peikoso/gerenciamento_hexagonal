@@ -11,5 +11,5 @@ class TipoCategorizacaoBeneficiario(BaseModel):
 
 class CategorizacaoBeneficiario(BaseModel):
     tipo_categ_beneficiario_id: int
-    valor = str
+    valor: str
     id: Optional[int] = None

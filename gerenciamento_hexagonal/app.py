@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from gerenciamento_hexagonal.entrypoint.routerGerenciamentoCaracterizacao import router as gerenciamento_caracterizacao
 from gerenciamento_hexagonal.entrypoint.routerGerenciamentoComentario import router as gerenciamento_comentario_router
 from gerenciamento_hexagonal.entrypoint.routerGerenciamentoMeta import router as gerenciamento_meta_router
 from gerenciamento_hexagonal.entrypoint.routerGerenciamentoProposta import router as gerenciamento_proposta_router
@@ -15,6 +16,7 @@ app.include_router(gerenciamento_comentario_router, prefix='/GerenciamentoComent
 app.include_router(gerenciamento_meta_router, prefix='/GerenciamentoMeta', tags=['Gerenciamento Meta'])
 app.include_router(gerenciamento_quantitativo_router, prefix='/GerenciamentoQuantitativo', tags=['Gerenciamento Quantitativo'])
 app.include_router(gerenciamento_qualitativo_router, prefix='/GerenciamentoQualitativo', tags=['Gerenciamento Qualitativo'])
+app.include_router(gerenciamento_caracterizacao, prefix='/GerenciamentoCaracterizacao', tags=['Gerenciamento Caracterizacao'])
 
 
 @app.get('/')

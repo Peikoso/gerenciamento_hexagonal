@@ -1,31 +1,29 @@
 from http import HTTPStatus
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from gerenciamento_hexagonal.application.dependencies import get_gerenciamento_qualitativo__service
 from gerenciamento_hexagonal.application.services import GerenciamentoQualitativoServices
-from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
+from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError, UniqueViolation
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoQualitativo
 from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoQualitativoDTO
-from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy_repository import GerenciamentoComentarioRepository, GerenciamentoQualitativoRepository
 
 router = APIRouter()
 
 
-def get_gerenciamento_qualitativo__service() -> GerenciamentoQualitativoServices:
-    gerenciamento_comentario_repository = GerenciamentoComentarioRepository()
-    gerenciamento_qualitativo_repository = GerenciamentoQualitativoRepository(gerenciamento_comentario_repository)
-    return GerenciamentoQualitativoServices(gerenciamento_qualitativo_repository)
+Service = Annotated[GerenciamentoQualitativoServices, Depends(get_gerenciamento_qualitativo__service)]
 
 
 @router.get('/', response_model=list[GerenciamentoQualitativo])
-async def get_gerenciamento_qualitativo(service: GerenciamentoQualitativoServices = Depends(get_gerenciamento_qualitativo__service)):
+async def get_gerenciamento_qualitativo(service: Service):
     gerenciamento_qualitativo = await service.get_gerenciamento_qualitativo()
 
     return gerenciamento_qualitativo
 
 
 @router.get('/{gerenciamento_qualitativo_id}', response_model=GerenciamentoQualitativo)
-async def get_gerenciamento_qualitativo_by_id(gerenciamento_qualitativo_id: int, service: GerenciamentoQualitativoServices = Depends(get_gerenciamento_qualitativo__service)):
+async def get_gerenciamento_qualitativo_by_id(gerenciamento_qualitativo_id: int, service: Service):
     try:
         gerenciamento_qualitativo = await service.get_gerenciamento_qualitativo_by_id(gerenciamento_qualitativo_id)
 
@@ -36,7 +34,7 @@ async def get_gerenciamento_qualitativo_by_id(gerenciamento_qualitativo_id: int,
 
 
 @router.post('/{gerenciamento_proposta_id}', response_model=GerenciamentoQualitativo)
-async def create_gerenciamento_qualitativo(gerenciamento_proposta_id: int, gerenciamento_qualitativo: GerenciamentoQualitativoDTO, service: GerenciamentoQualitativoServices = Depends(get_gerenciamento_qualitativo__service)):
+async def create_gerenciamento_qualitativo(gerenciamento_proposta_id: int, gerenciamento_qualitativo: GerenciamentoQualitativoDTO, service: Service):
     try:
         gerenciamento_qualitativo = await service.create_gerenciamento_qualitativo(gerenciamento_proposta_id, gerenciamento_qualitativo)
 
@@ -45,9 +43,12 @@ async def create_gerenciamento_qualitativo(gerenciamento_proposta_id: int, geren
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
 
+    except UniqueViolation as e:
+        raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=str(e))
+
 
 @router.post('/Comentario/{gerenciamento_qualitativo_id}', response_model=GerenciamentoQualitativo)
-async def create_gerenciamento_qualitativo_comentario(gerenciamento_qualitativo_id: int, gerenciamento_comentario: GerenciamentoComentarioDTO, service: GerenciamentoQualitativoServices = Depends(get_gerenciamento_qualitativo__service)):
+async def create_gerenciamento_qualitativo_comentario(gerenciamento_qualitativo_id: int, gerenciamento_comentario: GerenciamentoComentarioDTO, service: Service):
     try:
         gerenciamento_qualitativo_comentario = await service.create_gerenciamento_qualitativo_comentario(gerenciamento_qualitativo_id, gerenciamento_comentario)
 
@@ -58,7 +59,7 @@ async def create_gerenciamento_qualitativo_comentario(gerenciamento_qualitativo_
 
 
 @router.put('/{gerenciamento_qualitativo_id}', response_model=GerenciamentoQualitativo)
-async def update_gerenciamento_qualitativo(gerenciamento_qualitativo_id: int, gerenciamento_qualitativo: GerenciamentoQualitativoDTO, service: GerenciamentoQualitativoServices = Depends(get_gerenciamento_qualitativo__service)):
+async def update_gerenciamento_qualitativo(gerenciamento_qualitativo_id: int, gerenciamento_qualitativo: GerenciamentoQualitativoDTO, service: Service):
     try:
         gerenciamento_qualitativo = await service.update_gerenciamento_qualitativo(gerenciamento_qualitativo_id, gerenciamento_qualitativo)
 
@@ -69,7 +70,7 @@ async def update_gerenciamento_qualitativo(gerenciamento_qualitativo_id: int, ge
 
 
 @router.delete('/{gerenciamento_qualitativo_id}')
-async def delete_gerenciamento_qualitativo(gerenciamento_qualitativo_id: int, service: GerenciamentoQualitativoServices = Depends(get_gerenciamento_qualitativo__service)):
+async def delete_gerenciamento_qualitativo(gerenciamento_qualitativo_id: int, service: Service):
     try:
         delete = await service.delete_gerenciamento_qualitativo(gerenciamento_qualitativo_id)
 

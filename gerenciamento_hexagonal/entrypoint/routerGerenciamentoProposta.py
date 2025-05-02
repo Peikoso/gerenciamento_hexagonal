@@ -1,7 +1,9 @@
 from http import HTTPStatus
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from gerenciamento_hexagonal.application.dependencies import get_gerenciamento_proposta__service
 from gerenciamento_hexagonal.application.services import (
     GerenciamentoPropostaServices,
 )
@@ -14,29 +16,22 @@ from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import (
     GerenciamentoPropostaDTO,
     GerenciamentoPropostaListResponse,
 )
-from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy_repository import (
-    GerenciamentoComentarioRepository,
-    GerenciamentoPropostaRepository,
-)
 
 router = APIRouter()
 
 
-def get_gerenciamento_proposta__service() -> GerenciamentoPropostaServices:
-    gerenciamento_comentario_repository = GerenciamentoComentarioRepository()
-    gerenciamento_proposta_repository = GerenciamentoPropostaRepository(gerenciamento_comentario_repository)
-    return GerenciamentoPropostaServices(gerenciamento_proposta_repository)
+Service = Annotated[GerenciamentoPropostaServices, Depends(get_gerenciamento_proposta__service)]
 
 
 @router.post('/', response_model=GerenciamentoProposta)
-async def create_gerenciamentoProposta(gerenciamento_proposta: GerenciamentoPropostaDTO, service: GerenciamentoPropostaServices = Depends(get_gerenciamento_proposta__service)):
+async def create_gerenciamentoProposta(gerenciamento_proposta: GerenciamentoPropostaDTO, service: Service):
     gerenciamento_proposta = await service.create_gerenciamento_proposta(gerenciamento_proposta)
 
     return gerenciamento_proposta
 
 
 @router.post('/Comentario/{gerenciamento_proposta_id}', response_model=GerenciamentoProposta)
-async def create_gerenciamentoPropostaComentario(gerenciamento_proposta_id: int, gerenciamento_comentario: GerenciamentoComentarioDTO, service: GerenciamentoPropostaServices = Depends(get_gerenciamento_proposta__service)):
+async def create_gerenciamentoPropostaComentario(gerenciamento_proposta_id: int, gerenciamento_comentario: GerenciamentoComentarioDTO, service: Service):
     try:
         gerenciamento_comentario = await service.create_gerenciamento_proposta_comentario(gerenciamento_proposta_id, gerenciamento_comentario)
 
@@ -47,14 +42,14 @@ async def create_gerenciamentoPropostaComentario(gerenciamento_proposta_id: int,
 
 
 @router.get('/', response_model=GerenciamentoPropostaListResponse)
-async def get_gerencimentoPropostas(service: GerenciamentoPropostaServices = Depends(get_gerenciamento_proposta__service)):
+async def get_gerencimentoPropostas(service: Service):
     gerenciamento_propostas = await service.get_gerenciamento_proposta()
 
     return {'Gerenciamento_Propostas': gerenciamento_propostas}
 
 
 @router.get('/{gerenciamento_proposta_id}', response_model=GerenciamentoProposta)
-async def get_by_id_gerenciamentoProposta(gerenciamento_proposta_id: int, service: GerenciamentoPropostaServices = Depends(get_gerenciamento_proposta__service)):
+async def get_by_id_gerenciamentoProposta(gerenciamento_proposta_id: int, service: Service):
     try:
         gerenciamento_proposta = await service.get_gerenciamento_proposta_by_id(gerenciamento_proposta_id)
 
@@ -65,7 +60,7 @@ async def get_by_id_gerenciamentoProposta(gerenciamento_proposta_id: int, servic
 
 
 @router.put('/{gerenciamento_proposta_id}', response_model=GerenciamentoProposta)
-async def update_gerenciamentoProposta(gerenciamento_proposta_id: int, gerenciamento_proposta: GerenciamentoPropostaDTO, service: GerenciamentoPropostaServices = Depends(get_gerenciamento_proposta__service)):
+async def update_gerenciamentoProposta(gerenciamento_proposta_id: int, gerenciamento_proposta: GerenciamentoPropostaDTO, service: Service):
     try:
         gerenciamento_proposta = await service.update_gerenciamento_proposta(gerenciamento_proposta_id, gerenciamento_proposta)
 
@@ -76,7 +71,7 @@ async def update_gerenciamentoProposta(gerenciamento_proposta_id: int, gerenciam
 
 
 @router.delete('/{gerenciamento_proposta_id}', response_model=str)
-async def delete_gerenciamentoProposta(gerenciamento_proposta_id: int, service: GerenciamentoPropostaServices = Depends(get_gerenciamento_proposta__service)):
+async def delete_gerenciamentoProposta(gerenciamento_proposta_id: int, service: Service):
     try:
         await service.delete_gerenciamento_proposta(gerenciamento_proposta_id)
 

@@ -1,8 +1,8 @@
-"""Postgres mais adições
+"""criando o banco
 
-Revision ID: 322f076d1da7
+Revision ID: 2d929bd848d5
 Revises: 
-Create Date: 2025-04-23 05:33:23.580295
+Create Date: 2025-05-01 19:27:16.111476
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '322f076d1da7'
+revision: str = '2d929bd848d5'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -49,13 +49,6 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('tipo_categ_beneficiario_id', 'valor', name='categorizacao_beneficiario_tipo_valor_uq')
     )
-    op.create_table('gerenciamentoProposta_comentario_association',
-    sa.Column('gerenciamentoProposta_id', sa.Integer(), nullable=False),
-    sa.Column('comentario_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['comentario_id'], ['gerenciamento_comentario.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['gerenciamentoProposta_id'], ['gerenciamento_proposta.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('gerenciamentoProposta_id', 'comentario_id')
-    )
     op.create_table('gerenciamento_meta',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('ordem', sa.SmallInteger(), nullable=True),
@@ -64,6 +57,13 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['gerenciamento_proposta_id'], ['gerenciamento_proposta.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('gerenciamento_proposta_comentario_association',
+    sa.Column('gerenciamentoProposta_id', sa.Integer(), nullable=False),
+    sa.Column('comentario_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['comentario_id'], ['gerenciamento_comentario.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['gerenciamentoProposta_id'], ['gerenciamento_proposta.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('gerenciamentoProposta_id', 'comentario_id')
+    )
     op.create_table('gerenciamento_qualitativo',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('acoes_realizadas', sa.String(length=500), nullable=False),
@@ -71,7 +71,8 @@ def upgrade() -> None:
     sa.Column('visao_proponente', sa.String(length=500), nullable=False),
     sa.Column('gerenciamento_proposta_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['gerenciamento_proposta_id'], ['gerenciamento_proposta.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('gerenciamento_proposta_id')
     )
     op.create_table('gerenciamento_quantitativo',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -83,34 +84,36 @@ def upgrade() -> None:
     sa.Column('pessoas_impactadas', sa.Integer(), nullable=False),
     sa.Column('gerenciamento_proposta_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['gerenciamento_proposta_id'], ['gerenciamento_proposta.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('gerenciamentoQualitativo_comentario_association',
-    sa.Column('gerenciamentoQualitativo_id', sa.Integer(), nullable=False),
-    sa.Column('comentario_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['comentario_id'], ['gerenciamento_comentario.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['gerenciamentoQualitativo_id'], ['gerenciamento_qualitativo.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('gerenciamentoQualitativo_id', 'comentario_id')
-    )
-    op.create_table('gerenciamentoQuantitativo_comentario_association',
-    sa.Column('gerenciamentoQuantitativo_id', sa.Integer(), nullable=False),
-    sa.Column('comentario_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['comentario_id'], ['gerenciamento_comentario.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['gerenciamentoQuantitativo_id'], ['gerenciamento_quantitativo.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('gerenciamentoQuantitativo_id', 'comentario_id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('gerenciamento_proposta_id')
     )
     op.create_table('gerenciamento_caracterizacao',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('quantidade', sa.Integer(), nullable=False),
     sa.Column('gerenciamento_quantitativo_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['gerenciamento_quantitativo_id'], ['gerenciamento_quantitativo.id'], ondelete='RESTRICT'),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('gerenciamento_quantitativo_id')
+    )
+    op.create_table('gerenciamento_qualitativo_comentario_association',
+    sa.Column('gerenciamentoQualitativo_id', sa.Integer(), nullable=False),
+    sa.Column('comentario_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['comentario_id'], ['gerenciamento_comentario.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['gerenciamentoQualitativo_id'], ['gerenciamento_qualitativo.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('gerenciamentoQualitativo_id', 'comentario_id')
+    )
+    op.create_table('gerenciamento_quantitativo_comentario_association',
+    sa.Column('gerenciamentoQuantitativo_id', sa.Integer(), nullable=False),
+    sa.Column('comentario_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['comentario_id'], ['gerenciamento_comentario.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['gerenciamentoQuantitativo_id'], ['gerenciamento_quantitativo.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('gerenciamentoQuantitativo_id', 'comentario_id')
     )
     op.create_table('gerenciamento_beneficiario_categorizacao',
     sa.Column('gerenciamento_beneficiario_id', sa.Integer(), nullable=False),
     sa.Column('categorizacao_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['categorizacao_id'], ['categorizacao_beneficiario.id'], ondelete='RESTRICT'),
-    sa.ForeignKeyConstraint(['gerenciamento_beneficiario_id'], ['gerenciamento_caracterizacao.id'], ondelete='RESTRICT'),
+    sa.ForeignKeyConstraint(['categorizacao_id'], ['categorizacao_beneficiario.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['gerenciamento_beneficiario_id'], ['gerenciamento_caracterizacao.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('gerenciamento_beneficiario_id', 'categorizacao_id'),
     sa.UniqueConstraint('gerenciamento_beneficiario_id', 'categorizacao_id', name='gerenciamento_beneficiario_categorizacao_uq')
     )
@@ -121,13 +124,13 @@ def downgrade() -> None:
     """Downgrade schema."""
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('gerenciamento_beneficiario_categorizacao')
+    op.drop_table('gerenciamento_quantitativo_comentario_association')
+    op.drop_table('gerenciamento_qualitativo_comentario_association')
     op.drop_table('gerenciamento_caracterizacao')
-    op.drop_table('gerenciamentoQuantitativo_comentario_association')
-    op.drop_table('gerenciamentoQualitativo_comentario_association')
     op.drop_table('gerenciamento_quantitativo')
     op.drop_table('gerenciamento_qualitativo')
+    op.drop_table('gerenciamento_proposta_comentario_association')
     op.drop_table('gerenciamento_meta')
-    op.drop_table('gerenciamentoProposta_comentario_association')
     op.drop_table('categorizacao_beneficiario')
     op.drop_table('tipo_categorizacao_beneficiario')
     op.drop_table('gerenciamento_proposta')
