@@ -1,9 +1,7 @@
 from typing import Optional
 
 from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
 
-from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError, UniqueViolation
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoCaracterizacao, GerenciamentoComentario, GerenciamentoMeta, GerenciamentoProposta, GerenciamentoQualitativo, GerenciamentoQuantitativo
 from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoMetaDTO, GerenciamentoQualitativoDTO, GerenciamentoQuantitativoDTO, RelatorioResponse
 from gerenciamento_hexagonal.domain.repositories.gerenciamento import (
@@ -64,7 +62,7 @@ class GerenciamentoComentarioRepository(GerenciamentoComentarioRepository):
 
             return result
 
-    async def get_gerenciamento_comentario_by_id(self, gerenciamento_comentario_id: int) -> GerenciamentoComentario:
+    async def get_gerenciamento_comentario_by_id(self, gerenciamento_comentario_id: int) -> GerenciamentoComentario | None:
         async with get_session() as session:
             db_gerenciamento_comentario = await session.scalar(select(GerenciamentoComentarioModel).where(GerenciamentoComentarioModel.id == gerenciamento_comentario_id))
             if db_gerenciamento_comentario:
@@ -85,25 +83,19 @@ class GerenciamentoComentarioRepository(GerenciamentoComentarioRepository):
         async with get_session() as session:
             db_gerenciamento_comentario = await session.scalar(select(GerenciamentoComentarioModel).where(GerenciamentoComentarioModel.id == gerenciamento_comentario_id))
 
-            if db_gerenciamento_comentario:
-                db_gerenciamento_comentario.comentario = gerenciamento_comentario.comentario
+            db_gerenciamento_comentario.comentario = gerenciamento_comentario.comentario
 
-                await session.commit()
-                await session.refresh(db_gerenciamento_comentario)
+            await session.commit()
+            await session.refresh(db_gerenciamento_comentario)
 
-                return GerenciamentoComentario.model_validate(vars(db_gerenciamento_comentario))
+            return GerenciamentoComentario.model_validate(vars(db_gerenciamento_comentario))
 
-    async def delete_gerenciamento_comentario(self, gerenciamento_comentario_id: int) -> bool:
+    async def delete_gerenciamento_comentario(self, gerenciamento_comentario_id: int):
         async with get_session() as session:
             db_gerenciamento_comentario = await session.scalar(select(GerenciamentoComentarioModel).where(GerenciamentoComentarioModel.id == gerenciamento_comentario_id))
 
-            if db_gerenciamento_comentario:
-                await session.delete(db_gerenciamento_comentario)
-                await session.commit()
-
-                return True
-
-            return False
+            await session.delete(db_gerenciamento_comentario)
+            await session.commit()
 
 
 class GerenciamentoPropostaRepository(GerenciamentoPropostaRepository):
@@ -149,16 +141,12 @@ class GerenciamentoPropostaRepository(GerenciamentoPropostaRepository):
 
             return None
 
-    async def delete_gerenciamento_proposta(self, gerenciamento_proposta_id: int) -> bool:
+    async def delete_gerenciamento_proposta(self, gerenciamento_proposta_id: int):
         async with get_session() as session:
             gerenciamento_proposta = await session.scalar(select(GerenciamentoPropostaModel).where(GerenciamentoPropostaModel.id == gerenciamento_proposta_id))
-            if gerenciamento_proposta:
-                await session.delete(gerenciamento_proposta)
-                await session.commit()
 
-                return True
-
-            return False
+            await session.delete(gerenciamento_proposta)
+            await session.commit()
 
     async def create_gerenciamento_proposta_comentario(self, gerenciamento_proposta_id: int, gerenciamento_comentario: GerenciamentoComentario) -> GerenciamentoProposta:
         async with get_session() as session:
@@ -180,6 +168,16 @@ class GerenciamentoPropostaRepository(GerenciamentoPropostaRepository):
 
             return None
 
+    async def checar_gerenciamento_caracterizacao_exists(self, gerenciamento_proposta_id: int) -> bool:
+        async with get_session() as session:
+            db_gerenciamento_quantitativo = await session.scalar(select(GerenciamentoQuantitativoModel).where(GerenciamentoQuantitativoModel.gerenciamento_proposta_id == gerenciamento_proposta_id))
+            db_gerenciamento_caracterizacao = await session.scalar(select(GerenciamentoCaracterizacaoModel).where(GerenciamentoCaracterizacaoModel.gerenciamento_quantitativo_id == db_gerenciamento_quantitativo.id))
+
+            if db_gerenciamento_caracterizacao:
+                return True
+
+            return False
+
 
 class GerenciamentoMetaRepository(GerenciamentoMetaRepository):
     async def get_gerenciamento_meta(self) -> list[GerenciamentoMeta]:
@@ -190,7 +188,7 @@ class GerenciamentoMetaRepository(GerenciamentoMetaRepository):
 
             return result
 
-    async def get_gerenciamento_meta_by_id(self, gerenciamento_meta_id: int) -> GerenciamentoMeta:
+    async def get_gerenciamento_meta_by_id(self, gerenciamento_meta_id: int) -> GerenciamentoMeta | None:
         async with get_session() as session:
             db_gerenciamento_meta = await session.scalar(select(GerenciamentoMetaModel).where(GerenciamentoMetaModel.id == gerenciamento_meta_id))
 
@@ -201,11 +199,6 @@ class GerenciamentoMetaRepository(GerenciamentoMetaRepository):
 
     async def create_gerenciamento_meta(self, gerenciamento_proposta_id: int, gerenciamento_meta: GerenciamentoMeta) -> GerenciamentoMeta:
         async with get_session() as session:
-            db_gerenciamento_proposta = await session.scalar(select(GerenciamentoPropostaModel).where(GerenciamentoPropostaModel.id == gerenciamento_proposta_id))
-
-            if not db_gerenciamento_proposta:
-                raise NotFoundError(f'gerenciamento_proposta with ID {gerenciamento_proposta_id} not found')
-
             db_gerenciamento_meta = GerenciamentoMetaModel(ordem=gerenciamento_meta.ordem, alcancado=gerenciamento_meta.alcancado, gerenciamento_proposta_id=gerenciamento_proposta_id)
             session.add(db_gerenciamento_meta)
             await session.commit()
@@ -217,28 +210,20 @@ class GerenciamentoMetaRepository(GerenciamentoMetaRepository):
         async with get_session() as session:
             db_gerenciamento_meta = await session.scalar(select(GerenciamentoMetaModel).where(GerenciamentoMetaModel.id == gerenciamento_meta_id))
 
-            if db_gerenciamento_meta:
-                db_gerenciamento_meta.alcancado = gerenciamento_meta.alcancado
-                db_gerenciamento_meta.ordem = gerenciamento_meta.ordem
+            db_gerenciamento_meta.alcancado = gerenciamento_meta.alcancado
+            db_gerenciamento_meta.ordem = gerenciamento_meta.ordem
 
-                await session.commit()
-                await session.refresh(db_gerenciamento_meta)
+            await session.commit()
+            await session.refresh(db_gerenciamento_meta)
 
-                return GerenciamentoMeta.model_validate(vars(db_gerenciamento_meta))
+            return GerenciamentoMeta.model_validate(vars(db_gerenciamento_meta))
 
-            return None
-
-    async def delete_gerenciamento_meta(self, gerenciamento_meta_id: int) -> bool:
+    async def delete_gerenciamento_meta(self, gerenciamento_meta_id: int):
         async with get_session() as session:
             db_gerenciamento_meta = await session.scalar(select(GerenciamentoMetaModel).where(GerenciamentoMetaModel.id == gerenciamento_meta_id))
 
-            if db_gerenciamento_meta:
-                await session.delete(db_gerenciamento_meta)
-                await session.commit()
-
-                return True
-
-            return False
+            await session.delete(db_gerenciamento_meta)
+            await session.commit()
 
 
 class GerenciamentoQuantitativoRepository(GerenciamentoQuantitativoRepository):
@@ -322,16 +307,16 @@ class GerenciamentoQuantitativoRepository(GerenciamentoQuantitativoRepository):
 
             return GerenciamentoQuantitativo.model_validate({**vars(db_gerenciamento_quantitativo), 'comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamento_comentario)) for gerenciamento_comentario in db_gerenciamento_quantitativo.comentarios]})
 
-    async def find_by_gerenciamento_proposta_id(self, gerenciamento_proposta: int) -> bool:
+    async def checar_associacao_existente(self, gerenciamento_proposta_id: int) -> bool:
         async with get_session() as session:
-            db_gerenciamento_quantitativo = await session.scalar(select(GerenciamentoQuantitativoModel).where(GerenciamentoQuantitativoModel.gerenciamento_proposta_id == gerenciamento_proposta))
+            db_gerenciamento_quantitativo = await session.scalar(select(GerenciamentoQuantitativoModel).where(GerenciamentoQuantitativoModel.gerenciamento_proposta_id == gerenciamento_proposta_id))
 
             if db_gerenciamento_quantitativo:
                 return True
 
             return False
 
-    async def check_gerenciamento_caracterizacao_exist(self, gerenciamento_quantitativo_id: int) -> bool:
+    async def checar_gerenciamento_caracterizacao_exists(self, gerenciamento_quantitativo_id: int) -> bool:
         async with get_session() as session:
             db_gerenciamento_caracterizacao = await session.scalar(select(GerenciamentoCaracterizacaoModel).where(GerenciamentoCaracterizacaoModel.gerenciamento_quantitativo_id == gerenciamento_quantitativo_id))
 
@@ -353,12 +338,12 @@ class GerenciamentoQualitativoRepository(GerenciamentoQualitativoRepository):
 
             return result
 
-    async def get_gerenciamento_qualitativo_by_id(self, gerenciamento_qualitativo_id: int) -> GerenciamentoQualitativo:
+    async def get_gerenciamento_qualitativo_by_id(self, gerenciamento_qualitativo_id: int) -> GerenciamentoQualitativo | None:
         async with get_session() as session:
             db_gerenciamento_qualitativo = await session.scalar(select(GerenciamentoQualitativoModel).where(GerenciamentoQualitativoModel.id == gerenciamento_qualitativo_id))
 
             if not db_gerenciamento_qualitativo:
-                raise NotFoundError()
+                return None
 
             result = GerenciamentoQualitativo.model_validate({**vars(db_gerenciamento_qualitativo), 'comentarios': [GerenciamentoComentario.model_validate(vars(comentario)) for comentario in db_gerenciamento_qualitativo.comentarios]})
 
@@ -366,30 +351,17 @@ class GerenciamentoQualitativoRepository(GerenciamentoQualitativoRepository):
 
     async def create_gerenciamento_qualitativo(self, gerenciamento_proposta_id: int, gerenciamento_qualitativo: GerenciamentoQualitativo) -> GerenciamentoQualitativo:
         async with get_session() as session:
-            try:
-                db_gerenciamento_proposta = await session.scalar(select(GerenciamentoPropostaModel).where(GerenciamentoPropostaModel.id == gerenciamento_proposta_id))
+            db_gerenciamento_qualitativo = GerenciamentoQualitativoModel(acoes_previstas=gerenciamento_qualitativo.acoes_previstas, acoes_realizadas=gerenciamento_qualitativo.acoes_realizadas, visao_proponente=gerenciamento_qualitativo.visao_proponente, gerenciamento_proposta_id=gerenciamento_proposta_id)
 
-                if not db_gerenciamento_proposta:
-                    raise NotFoundError
+            session.add(db_gerenciamento_qualitativo)
+            await session.commit()
+            await session.refresh(db_gerenciamento_qualitativo)
 
-                db_gerenciamento_qualitativo = GerenciamentoQualitativoModel(acoes_previstas=gerenciamento_qualitativo.acoes_previstas, acoes_realizadas=gerenciamento_qualitativo.acoes_realizadas, visao_proponente=gerenciamento_qualitativo.visao_proponente, gerenciamento_proposta_id=gerenciamento_proposta_id)
+            return GerenciamentoQualitativo.model_validate(vars(db_gerenciamento_qualitativo))
 
-                session.add(db_gerenciamento_qualitativo)
-                await session.commit()
-                await session.refresh(db_gerenciamento_qualitativo)
-
-                return GerenciamentoQualitativo.model_validate(vars(db_gerenciamento_qualitativo))
-
-            except IntegrityError as e:
-                if 'UniqueViolationError' in str(e.orig):
-                    raise UniqueViolation
-
-    async def update_gerenciamento_qualitativo(self, gerenciamento_qualitativo_id: int, gerenciamento_qualitativo: GerenciamentoQualitativo) -> GerenciamentoQualitativo | None:
+    async def update_gerenciamento_qualitativo(self, gerenciamento_qualitativo_id: int, gerenciamento_qualitativo: GerenciamentoQualitativo) -> GerenciamentoQualitativo:
         async with get_session() as session:
             db_gerenciamento_qualitativo = await session.scalar(select(GerenciamentoQualitativoModel).where(GerenciamentoQualitativoModel.id == gerenciamento_qualitativo_id))
-
-            if not db_gerenciamento_qualitativo:
-                raise NotFoundError(f'gerenciamento_qualitativo with ID: {gerenciamento_qualitativo_id} not found')
 
             db_gerenciamento_qualitativo.acoes_previstas = gerenciamento_qualitativo.acoes_previstas
             db_gerenciamento_qualitativo.acoes_realizadas = gerenciamento_qualitativo.acoes_realizadas
@@ -406,20 +378,12 @@ class GerenciamentoQualitativoRepository(GerenciamentoQualitativoRepository):
         async with get_session() as session:
             db_gerenciamento_qualitativo = await session.scalar(select(GerenciamentoQualitativoModel).where(GerenciamentoQualitativoModel.id == gerenciamento_qualitativo_id))
 
-            if not db_gerenciamento_qualitativo:
-                raise NotFoundError(f'gerenciamento_qualitativo with ID: {gerenciamento_qualitativo_id} not found')
-
             await session.delete(db_gerenciamento_qualitativo)
             await session.commit()
-
-            return {'message': f'gerenciamento_qualitativo with ID {gerenciamento_qualitativo_id} deleted'}
 
     async def create_gerenciamento_qualitativo_comentario(self, gerenciamento_qualitativo_id: int, gerenciamento_comentario: GerenciamentoComentario) -> GerenciamentoQualitativo:
         async with get_session() as session:
             db_gerenciamento_qualitativo = await session.scalar(select(GerenciamentoQualitativoModel).where(GerenciamentoQualitativoModel.id == gerenciamento_qualitativo_id))
-
-            if not db_gerenciamento_qualitativo:
-                raise NotFoundError(f'gerenciamento_qualitativo with ID: {gerenciamento_qualitativo_id} not found')
 
             db_gerenciamento_comentario = await self.gerenciamento_comentario_repository.create_gerenciamento_comentario(gerenciamento_comentario)
 
@@ -435,6 +399,15 @@ class GerenciamentoQualitativoRepository(GerenciamentoQualitativoRepository):
             result = GerenciamentoQualitativo.model_validate({**vars(db_gerenciamento_qualitativo), 'comentarios': [GerenciamentoComentario.model_validate(vars(comentario)) for comentario in db_gerenciamento_qualitativo.comentarios]})
 
             return result
+
+    async def checar_associacao_existente(self, gerenciamento_proposta_id: int) -> bool:
+        async with get_session() as session:
+            db_gerenciamento_quantitativo = await session.scalar(select(GerenciamentoQualitativoModel).where(GerenciamentoQualitativoModel.gerenciamento_proposta_id == gerenciamento_proposta_id))
+
+            if db_gerenciamento_quantitativo:
+                return True
+
+            return False
 
 
 class GerenciamentoCaracterizacaoRepository(GerenciamentoCaracterizacaoRepository):
@@ -500,7 +473,7 @@ class GerenciamentoCaracterizacaoRepository(GerenciamentoCaracterizacaoRepositor
             await session.delete(db_gerenciamento_caracterizacao)
             await session.commit()
 
-    async def find_by_gerenciamento_quantitativo_id(self, gerenciamento_quantitativo_id: int) -> bool:
+    async def checar_associacao_existente(self, gerenciamento_quantitativo_id: int) -> bool:
         async with get_session() as session:
             db_gerenciamento_caracterizacao = await session.scalar(select(GerenciamentoCaracterizacaoModel).where(GerenciamentoCaracterizacaoModel.gerenciamento_quantitativo_id == gerenciamento_quantitativo_id))
 

@@ -61,9 +61,9 @@ async def update_gerenciamento_caracterizacao(gerenciamento_caracterizacao_id: i
 @router.delete('/{gerenciamento_caracterizacao_id}')
 async def delete_gerenciamento_caracterizacao(gerenciamento_caracterizacao_id: int, service: Service):
     try:
-        gerenciamento_caracterizacao = await service.delete_gerenciamento_caracterizacao(gerenciamento_caracterizacao_id)
+        result = await service.delete_gerenciamento_caracterizacao(gerenciamento_caracterizacao_id)
 
-        return gerenciamento_caracterizacao
+        return result
 
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))

@@ -44,11 +44,12 @@ async def update_gerenciamento_comentario(gerenciamento_comentario_id: int, gere
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
 
 
-@router.delete('/{gerenciamento_comentario_id}', response_model=str)
+@router.delete('/{gerenciamento_comentario_id}')
 async def delete_gerenciamento_comentario(gerenciamento_comentario_id: int, service: Service):
     try:
-        await service.delete_gerenciamento_comentario(gerenciamento_comentario_id)
+        result = await service.delete_gerenciamento_comentario(gerenciamento_comentario_id)
 
-        return 'message: gerenciamento_comentario deleted'
+        return result
+
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))

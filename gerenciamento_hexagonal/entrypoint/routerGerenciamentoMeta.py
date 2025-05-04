@@ -55,12 +55,12 @@ async def update_gerenciamento_meta(gerenciamento_meta_id: int, gerenciamento_me
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
 
 
-@router.delete('/{gerenciamento_meta_id}', response_model=str)
+@router.delete('/{gerenciamento_meta_id}')
 async def delete_gerenciamento_meta(gerenciamento_meta_id: int, service: Service):
     try:
-        await service.delete_gerenciamento_meta(gerenciamento_meta_id)
+        result = await service.delete_gerenciamento_meta(gerenciamento_meta_id)
 
-        return 'message: gerenciamento_meta deleted'
+        return result
 
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))

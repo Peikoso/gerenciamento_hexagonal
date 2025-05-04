@@ -72,9 +72,9 @@ async def update_gerenciamento_qualitativo(gerenciamento_qualitativo_id: int, ge
 @router.delete('/{gerenciamento_qualitativo_id}')
 async def delete_gerenciamento_qualitativo(gerenciamento_qualitativo_id: int, service: Service):
     try:
-        delete = await service.delete_gerenciamento_qualitativo(gerenciamento_qualitativo_id)
+        result = await service.delete_gerenciamento_qualitativo(gerenciamento_qualitativo_id)
 
-        return delete
+        return result
 
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))

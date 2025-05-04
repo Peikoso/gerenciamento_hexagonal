@@ -14,8 +14,9 @@ def get_gerenciamento_comentario__service() -> GerenciamentoComentarioServices:
 
 
 def get_gerenciamento_meta__service() -> GerenciamentoMetaServices:
+    gerenciamento_proposta_service = get_gerenciamento_proposta__service()
     gerenciamento_meta_repository = GerenciamentoMetaRepository()
-    return GerenciamentoMetaServices(gerenciamento_meta_repository)
+    return GerenciamentoMetaServices(gerenciamento_meta_repository, gerenciamento_proposta_service)
 
 
 def get_gerenciamento_quantitativo__service() -> GerenciamentoQuantitativoServices:
@@ -26,9 +27,10 @@ def get_gerenciamento_quantitativo__service() -> GerenciamentoQuantitativoServic
 
 
 def get_gerenciamento_qualitativo__service() -> GerenciamentoQualitativoServices:
+    gerenciamento_proposta__service = get_gerenciamento_proposta__service()
     gerenciamento_comentario_repository = GerenciamentoComentarioRepository()
     gerenciamento_qualitativo_repository = GerenciamentoQualitativoRepository(gerenciamento_comentario_repository)
-    return GerenciamentoQualitativoServices(gerenciamento_qualitativo_repository)
+    return GerenciamentoQualitativoServices(gerenciamento_qualitativo_repository, gerenciamento_proposta__service)
 
 
 def get_gerenciamento_caracterizacao_services() -> GerenciamentoCaracterizacaoServices:

@@ -9,6 +9,7 @@ from gerenciamento_hexagonal.application.services import (
 )
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import (
     NotFoundError,
+    NotNullViolationError,
 )
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoProposta
 from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import (
@@ -70,12 +71,15 @@ async def update_gerenciamentoProposta(gerenciamento_proposta_id: int, gerenciam
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
 
 
-@router.delete('/{gerenciamento_proposta_id}', response_model=str)
+@router.delete('/{gerenciamento_proposta_id}')
 async def delete_gerenciamentoProposta(gerenciamento_proposta_id: int, service: Service):
     try:
-        await service.delete_gerenciamento_proposta(gerenciamento_proposta_id)
+        result = await service.delete_gerenciamento_proposta(gerenciamento_proposta_id)
 
-        return 'message: gerenciamento_proposta deleted'
+        return result
 
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
+
+    except NotNullViolationError as e:
+        raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=str(e))
