@@ -3,7 +3,14 @@ from typing import Optional
 from sqlalchemy import select
 
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoCaracterizacao, GerenciamentoComentario, GerenciamentoMeta, GerenciamentoProposta, GerenciamentoQualitativo, GerenciamentoQuantitativo
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoMetaDTO, GerenciamentoQualitativoDTO, GerenciamentoQuantitativoDTO, RelatorioResponse
+from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import (
+    GerenciamentoCaracterizacaoRelatorioResponse,
+    GerenciamentoComentarioDTO,
+    GerenciamentoMetaRelatorioResponse,
+    GerenciamentoQualitativoRelatorioResponse,
+    GerenciamentoQuantitativoRelatorioResponse,
+    RelatorioResponse,
+)
 from gerenciamento_hexagonal.domain.repositories.gerenciamento import (
     GerenciamentoCaracterizacaoRepository,
     GerenciamentoComentarioRepository,
@@ -24,30 +31,38 @@ class RelatorioRepository:
             if not relatorio:
                 return None
 
-            gerenciamento_qualitativo: Optional[GerenciamentoQuantitativoDTO] = None
+            gerenciamento_qualitativo: Optional[GerenciamentoQualitativoRelatorioResponse] = None
             if relatorio.gerenciamento_qualitativo:
-                gerenciamento_qualitativo = GerenciamentoQualitativoDTO(
+                gerenciamento_qualitativo = GerenciamentoQualitativoRelatorioResponse(
+                    id=relatorio.gerenciamento_qualitativo.id,
                     acoes_previstas=relatorio.gerenciamento_qualitativo.acoes_previstas,
                     acoes_realizadas=relatorio.gerenciamento_qualitativo.acoes_realizadas,
                     visao_proponente=relatorio.gerenciamento_qualitativo.visao_proponente,
                 )
 
-            gerenciamento_quantitativo: Optional[GerenciamentoQuantitativoDTO] = None
+            gerenciamento_quantitativo: Optional[GerenciamentoQuantitativoRelatorioResponse] = None
             if relatorio.gerenciamento_quantitativo:
-                gerenciamento_quantitativo = GerenciamentoQuantitativoDTO(
+                gerenciamento_caracterizacao: Optional[GerenciamentoCaracterizacaoRelatorioResponse] = None
+
+                if relatorio.gerenciamento_quantitativo.gerenciamento_caracterizacao:
+                    gerenciamento_caracterizacao = GerenciamentoCaracterizacaoRelatorioResponse(id=relatorio.gerenciamento_quantitativo.gerenciamento_caracterizacao.id, quantidade=relatorio.gerenciamento_quantitativo.gerenciamento_caracterizacao.quantidade, categorizacoes_ids=[c.id for c in relatorio.gerenciamento_quantitativo.gerenciamento_caracterizacao.categorizacoes])
+
+                gerenciamento_quantitativo = GerenciamentoQuantitativoRelatorioResponse(
+                    id=relatorio.gerenciamento_quantitativo.id,
                     educacao_financeira_alcancados=relatorio.gerenciamento_quantitativo.educacao_financeira_alcancados,
                     educacao_financeira_impactados=relatorio.gerenciamento_quantitativo.educacao_financeira_impactados,
                     geracao_renda_postos_trabalho_gerados=relatorio.gerenciamento_quantitativo.geracao_renda_postos_trabalho_gerados,
                     alcance_marca_pessoas_alcancadas_publicacao_digitais=relatorio.gerenciamento_quantitativo.alcance_marca_pessoas_alcancadas_publicacao_digitais,
                     pessoas_alcancadas=relatorio.gerenciamento_quantitativo.pessoas_alcancadas,
                     pessoas_impactadas=relatorio.gerenciamento_quantitativo.pessoas_impactadas,
+                    gerenciamento_caracterizacao=gerenciamento_caracterizacao,
                 )
 
         return RelatorioResponse(
             proposta_id=relatorio.proposta_id,
             trimestre_de_referencia=relatorio.trimestre_de_referencia,
             tipo=relatorio.tipo,
-            gerenciamento_metas=[GerenciamentoMetaDTO(id=gerenciamento_meta.id, ordem=gerenciamento_meta.ordem, alcancado=gerenciamento_meta.alcancado) for gerenciamento_meta in relatorio.gerenciamento_metas],
+            gerenciamento_metas=[GerenciamentoMetaRelatorioResponse(id=gerenciamento_meta.id, ordem=gerenciamento_meta.ordem, alcancado=gerenciamento_meta.alcancado) for gerenciamento_meta in relatorio.gerenciamento_metas],
             gerenciamento_qualitativo=gerenciamento_qualitativo,
             gerenciamento_quantitativo=gerenciamento_quantitativo,
         )
@@ -482,11 +497,11 @@ class GerenciamentoCaracterizacaoRepository(GerenciamentoCaracterizacaoRepositor
 
             return False
 
-    async def find_categorizacoes_by_ids(self, categorizacoes_ids: list[int]) -> bool:
+    async def find_categorizacoes_by_ids(self, categorizacoes_ids: list[int]) -> int | None:
         async with get_session() as session:
             for categorizacao_id in categorizacoes_ids:
                 categorizacao = await session.scalar(select(CategorizacaoBeneficiarioModel).where(CategorizacaoBeneficiarioModel.id == categorizacao_id))
                 if not categorizacao:
-                    return False
+                    return categorizacao_id
 
-            return True
+            return None

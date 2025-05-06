@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Optional
+from typing import Annotated, Optional
 
 from pydantic import BaseModel, Field
 
@@ -10,6 +10,8 @@ from gerenciamento_hexagonal.domain.models.gerenciamento import (
     GerenciamentoQuantitativo,
     TipoGerenciamento,
 )
+
+PositiveInt = Annotated[int, Field(gt=0)]
 
 
 class GerenciamentoPropostaDTO(BaseModel):
@@ -59,17 +61,47 @@ class GerenciamentoQualitativoDTO(BaseModel):
 
 
 class GerenciamentoCaracterizacaoDTO(BaseModel):
-    quantidade: int = Field(..., ge=0)
-    categorizacoes_ids: list[int]
+    quantidade: int = Field(..., gt=0)
+    categorizacoes_ids: list[PositiveInt]
+
+
+class GerenciamentoMetaRelatorioResponse(BaseModel):
+    id: int
+    alcancado: int
+    ordem: Optional[int] = None
+
+
+class GerenciamentoQualitativoRelatorioResponse(BaseModel):
+    id: int
+    acoes_realizadas: Optional[str] = None
+    acoes_previstas: Optional[str] = None
+    visao_proponente: Optional[str] = None
+
+
+class GerenciamentoCaracterizacaoRelatorioResponse(BaseModel):
+    id: int
+    quantidade: int = Field(..., gt=0)
+    categorizacoes_ids: list[PositiveInt]
+
+
+class GerenciamentoQuantitativoRelatorioResponse(BaseModel):
+    id: int
+    educacao_financeira_impactados: int
+    educacao_financeira_alcancados: int
+    geracao_renda_postos_trabalho_gerados: int
+    alcance_marca_pessoas_alcancadas_publicacao_digitais: int
+    pessoas_alcancadas: int
+    pessoas_impactadas: int
+    gerenciamento_caracterizacao: Optional[GerenciamentoCaracterizacaoRelatorioResponse]
 
 
 class RelatorioResponse(BaseModel):
     proposta_id: int
     trimestre_de_referencia: date
-    tipo: TipoGerenciamento = Field(default_factory=TipoGerenciamento.TRIMESTRAL)
-    gerenciamento_metas: list[GerenciamentoMetaDTO]
-    gerenciamento_qualitativo: Optional[GerenciamentoQualitativoDTO]
-    gerenciamento_quantitativo: Optional[GerenciamentoQuantitativoDTO]
+    tipo: TipoGerenciamento
+    gerenciamento_metas: list[GerenciamentoMetaRelatorioResponse]
+    gerenciamento_qualitativo: Optional[GerenciamentoQualitativoRelatorioResponse]
+    gerenciamento_quantitativo: Optional[GerenciamentoQuantitativoRelatorioResponse]
 
 
 class WrappedRelatorioResponse(BaseModel):

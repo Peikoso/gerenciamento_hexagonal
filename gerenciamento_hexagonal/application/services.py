@@ -63,9 +63,9 @@ class GerenciamentoPropostaServices:
     async def delete_gerenciamento_proposta(self, gerenciamento_proposta_id: int):
         await self.get_gerenciamento_proposta_by_id(gerenciamento_proposta_id)
 
-        NotNullViolation = await self.repository.checar_gerenciamento_caracterizacao_exists(gerenciamento_proposta_id)
+        not_null_violation = await self.repository.checar_gerenciamento_caracterizacao_exists(gerenciamento_proposta_id)
 
-        if NotNullViolation:
+        if not_null_violation:
             raise NotNullViolationError('cannot delete a gerenciamento_proposta when there is an associated gerenciamento_caracterizacao')
 
         await self.repository.delete_gerenciamento_proposta(gerenciamento_proposta_id)
@@ -111,7 +111,7 @@ class GerenciamentoComentarioServices:
 
         await self.repository.delete_gerenciamento_comentario(gerenciamento_comentario_id)
 
-        return {'message': 'gerenciamento_comentario with ID {gerenciamento_comentario_id} deleted'}
+        return {'message': f'gerenciamento_comentario with ID {gerenciamento_comentario_id} deleted'}
 
 
 class GerenciamentoMetaServices:
@@ -176,9 +176,9 @@ class GerenciamentoQuantitativoServices:
     async def create_gerenciamento_quantitativo(self, gerenciamento_proposta_id: int, gerenciamento_quantitativo: GerenciamentoQuantitativoDTO) -> GerenciamentoQuantitativo:
         await self.service_proposta.get_gerenciamento_proposta_by_id(gerenciamento_proposta_id)
 
-        UniqueViolationCheck = await self.repository.checar_associacao_existente(gerenciamento_proposta_id)
+        unique_violation_check = await self.repository.checar_associacao_existente(gerenciamento_proposta_id)
 
-        if UniqueViolationCheck:
+        if unique_violation_check:
             raise UniqueViolation(f'gerenciamento_quantitativo already exist for gerenciamento_proposta ID: {gerenciamento_proposta_id}')
 
         gerenciamento_quantitativo = GerenciamentoQuantitativo(**gerenciamento_quantitativo.model_dump())
@@ -186,7 +186,7 @@ class GerenciamentoQuantitativoServices:
 
         return gerenciamento_quantitativo
 
-    async def update_gerenciamento_quantitativo(self, gerenciamento_quantitativo_id: int, gerenciamento_quantitativo: GerenciamentoQuantitativo) -> GerenciamentoQuantitativo:
+    async def update_gerenciamento_quantitativo(self, gerenciamento_quantitativo_id: int, gerenciamento_quantitativo: GerenciamentoQuantitativoDTO) -> GerenciamentoQuantitativo:
         await self.get_gerenciamento_quantitativo_by_id(gerenciamento_quantitativo_id)
 
         gerenciamento_quantitativo = GerenciamentoQuantitativo(**gerenciamento_quantitativo.model_dump())
@@ -197,9 +197,9 @@ class GerenciamentoQuantitativoServices:
     async def delete_gerenciamento_quantitativo(self, gerenciamento_quantitativo_id: int):
         await self.get_gerenciamento_quantitativo_by_id(gerenciamento_quantitativo_id)
 
-        NotNullViolation = await self.repository.checar_gerenciamento_caracterizacao_exists(gerenciamento_quantitativo_id)
+        not_null_violation = await self.repository.checar_gerenciamento_caracterizacao_exists(gerenciamento_quantitativo_id)
 
-        if NotNullViolation:
+        if not_null_violation:
             raise NotNullViolationError('cannot delete a gerenciamento_quantitativo when there is an associated gerenciamento_caracterizacao')
 
         await self.repository.delete_gerenciamento_quantitativo(gerenciamento_quantitativo_id)
@@ -236,9 +236,9 @@ class GerenciamentoQualitativoServices:
     async def create_gerenciamento_qualitativo(self, gerenciamento_proposta_id: int, gerenciamento_qualitativo: GerenciamentoQualitativoDTO) -> GerenciamentoQualitativo:
         await self.service_proposta.get_gerenciamento_proposta_by_id(gerenciamento_proposta_id)
 
-        UniqueViolationCheck = await self.repository.checar_associacao_existente(gerenciamento_proposta_id)
+        unique_violation_check = await self.repository.checar_associacao_existente(gerenciamento_proposta_id)
 
-        if UniqueViolationCheck:
+        if unique_violation_check:
             raise UniqueViolation(f'gerenciamento_qualitativo already exist for gerenciamento_proposta ID: {gerenciamento_proposta_id}')
 
         gerenciamento_qualitativo = GerenciamentoQualitativo(**gerenciamento_qualitativo.model_dump())
@@ -291,17 +291,17 @@ class GerenciamentoCaracterizacaoServices:
     async def create_gerenciamento_caracterizacao(self, gerenciamento_quantitativo_id: int, gerenciamento_caracterizacao: GerenciamentoCaracterizacaoDTO) -> GerenciamentoCaracterizacao:
         await self.service_quantitativo.get_gerenciamento_quantitativo_by_id(gerenciamento_quantitativo_id)
 
-        UniqueViolationCheck = await self.repository.checar_associacao_existente(gerenciamento_quantitativo_id)
+        unique_violation_check = await self.repository.checar_associacao_existente(gerenciamento_quantitativo_id)
 
-        if UniqueViolationCheck:
+        if unique_violation_check:
             raise UniqueViolation(f'gerenciamento_caracterizacao already exist for gerenciamento_quantitativo ID: {gerenciamento_quantitativo_id}')
 
         gerenciamento_caracterizacao.categorizacoes_ids = list(set(gerenciamento_caracterizacao.categorizacoes_ids))
 
         categorizacao = await self.repository.find_categorizacoes_by_ids(gerenciamento_caracterizacao.categorizacoes_ids)
 
-        if not categorizacao:
-            raise NotFoundError('one or more categorizacoes not found')
+        if categorizacao:
+            raise NotFoundError(f'categorizacao with ID: {categorizacao} not found')
 
         gerenciamento_caracterizacao = GerenciamentoCaracterizacao(**gerenciamento_caracterizacao.model_dump())
         gerenciamento_caracterizacao = await self.repository.create_gerenciamento_caracterizacao(gerenciamento_quantitativo_id, gerenciamento_caracterizacao)
@@ -314,8 +314,8 @@ class GerenciamentoCaracterizacaoServices:
         gerenciamento_caracterizacao.categorizacoes_ids = list(set(gerenciamento_caracterizacao.categorizacoes_ids))
         categorizacao = await self.repository.find_categorizacoes_by_ids(gerenciamento_caracterizacao.categorizacoes_ids)
 
-        if not categorizacao:
-            raise NotFoundError('one or more categorizacoes not found')
+        if categorizacao:
+            raise NotFoundError(f'categorizacao with ID: {categorizacao} not found')
 
         gerenciamento_caracterizacao = GerenciamentoCaracterizacao(**gerenciamento_caracterizacao.model_dump())
         gerenciamento_caracterizacao = await self.repository.update_gerenciamento_caracterizacao(gerenciamento_caracterizacao_id, gerenciamento_caracterizacao)

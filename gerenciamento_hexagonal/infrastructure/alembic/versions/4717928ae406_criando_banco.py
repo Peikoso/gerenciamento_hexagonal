@@ -1,8 +1,8 @@
-"""criando o banco
+"""criando banco
 
-Revision ID: 2d929bd848d5
+Revision ID: 4717928ae406
 Revises: 
-Create Date: 2025-05-01 19:27:16.111476
+Create Date: 2025-05-06 16:16:36.083098
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '2d929bd848d5'
+revision: str = '4717928ae406'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -48,6 +48,17 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['tipo_categ_beneficiario_id'], ['tipo_categorizacao_beneficiario.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('tipo_categ_beneficiario_id', 'valor', name='categorizacao_beneficiario_tipo_valor_uq')
+    )
+    op.create_table('gerenciamento_contrapartida',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('quantidade', sa.Integer(), nullable=False),
+    sa.Column('observacao', sa.String(length=300), nullable=False),
+    sa.Column('data', sa.Date(), nullable=False),
+    sa.Column('status', sa.Enum('PLANEJADO', 'EM_APROVACAO', 'EM_AJUSTE', 'ENTREGUE', 'JUSTIFICADA', 'NAO_ENTREGUE', name='statusgereciamentocontrapartida'), nullable=False),
+    sa.Column('proposta_contrapartida_id', sa.Integer(), nullable=False),
+    sa.Column('gerenciamento_proposta_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['gerenciamento_proposta_id'], ['gerenciamento_proposta.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('gerenciamento_meta',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -95,6 +106,15 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('gerenciamento_quantitativo_id')
     )
+    op.create_table('gerenciamento_contrapartida_admin',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('quantidade', sa.Integer(), nullable=False),
+    sa.Column('justificativa', sa.String(length=150), nullable=False),
+    sa.Column('data', sa.Date(), nullable=False),
+    sa.Column('gerenciamento_contrapartida_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['gerenciamento_contrapartida_id'], ['gerenciamento_contrapartida.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('gerenciamento_qualitativo_comentario_association',
     sa.Column('gerenciamentoQualitativo_id', sa.Integer(), nullable=False),
     sa.Column('comentario_id', sa.Integer(), nullable=False),
@@ -126,11 +146,13 @@ def downgrade() -> None:
     op.drop_table('gerenciamento_beneficiario_categorizacao')
     op.drop_table('gerenciamento_quantitativo_comentario_association')
     op.drop_table('gerenciamento_qualitativo_comentario_association')
+    op.drop_table('gerenciamento_contrapartida_admin')
     op.drop_table('gerenciamento_caracterizacao')
     op.drop_table('gerenciamento_quantitativo')
     op.drop_table('gerenciamento_qualitativo')
     op.drop_table('gerenciamento_proposta_comentario_association')
     op.drop_table('gerenciamento_meta')
+    op.drop_table('gerenciamento_contrapartida')
     op.drop_table('categorizacao_beneficiario')
     op.drop_table('tipo_categorizacao_beneficiario')
     op.drop_table('gerenciamento_proposta')

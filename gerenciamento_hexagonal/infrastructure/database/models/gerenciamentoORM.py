@@ -4,7 +4,7 @@ from typing import Optional
 from sqlalchemy import Column, Date, DateTime, Enum, ForeignKey, Integer, SmallInteger, String, Table, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
 
-from gerenciamento_hexagonal.domain.models.enums_specs import GerenciamentoBeneficiarioCategorizacaoSpec
+from gerenciamento_hexagonal.domain.models.enums_specs import GerenciamentoBeneficiarioCategorizacaoSpec, StatusGereciamentoContrapartida
 from gerenciamento_hexagonal.domain.models.gerenciamento import TipoGerenciamento
 
 table_registry = registry()
@@ -20,9 +20,10 @@ class GerenciamentoPropostaModel:
     criado_em: Mapped[datetime] = mapped_column(DateTime, init=False, nullable=False, server_default=func.now())
     proposta_id: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    gerenciamento_quantitativo: Mapped['GerenciamentoQuantitativoModel'] = relationship('GerenciamentoQuantitativoModel', cascade='all, delete-orphan', uselist=False, lazy='selectin', init=False)
-    gerenciamento_qualitativo: Mapped['GerenciamentoQualitativoModel'] = relationship('GerenciamentoQualitativoModel', cascade='all, delete-orphan', uselist=False, lazy='selectin', init=False)
-    gerenciamento_metas: Mapped[list['GerenciamentoMetaModel']] = relationship('GerenciamentoMetaModel', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
+    gerenciamento_quantitativo: Mapped['GerenciamentoQuantitativoModel'] = relationship('GerenciamentoQuantitativoModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', uselist=False, lazy='selectin', init=False)
+    gerenciamento_qualitativo: Mapped['GerenciamentoQualitativoModel'] = relationship('GerenciamentoQualitativoModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', uselist=False, lazy='selectin', init=False)
+    gerenciamento_metas: Mapped[list['GerenciamentoMetaModel']] = relationship('GerenciamentoMetaModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
+    gerenciamento_contrapartida: Mapped[list['GerenciamentoContrapartidaModel']] = relationship('GerenciamentoContrapartidaModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
 
     metas_comentarios: Mapped[list['GerenciamentoComentarioModel']] = relationship(secondary='gerenciamento_proposta_comentario_association', back_populates='comentario_gerenciamento_propostas', cascade='all, delete', default_factory=list, lazy='selectin')
 
@@ -57,6 +58,7 @@ class GerenciamentoMetaModel:
     alcancado: Mapped[int] = mapped_column(Integer, nullable=False)
 
     gerenciamento_proposta_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_proposta.id', ondelete='CASCADE'), nullable=False)
+    gerenciamento_proposta: Mapped['GerenciamentoPropostaModel'] = relationship(back_populates='gerenciamento_metas', lazy='selectin', init=False)
 
 
 @table_registry.mapped_as_dataclass
@@ -148,3 +150,33 @@ gerenciamento_beneficiario_categorizacao = Table(
     Column('categorizacao_id', ForeignKey('categorizacao_beneficiario.id', ondelete='CASCADE'), primary_key=True),
     UniqueConstraint(GerenciamentoBeneficiarioCategorizacaoSpec.FIELD_GERENCIAMENTO_BENEFICIARIO, GerenciamentoBeneficiarioCategorizacaoSpec.FIELD_CATEGORIZACAO, name=GerenciamentoBeneficiarioCategorizacaoSpec.CONSTRAINT_GERENCIAMENTO_BENEFICIARIO_CATEGORIZACAO_UQ),
 )
+
+
+@table_registry.mapped_as_dataclass
+class GerenciamentoContrapartidaModel:
+    __tablename__ = 'gerenciamento_contrapartida'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False, autoincrement=True, init=False)
+    quantidade: Mapped[int] = mapped_column(Integer, nullable=False)
+    observacao: Mapped[str] = mapped_column(String(300), nullable=False)
+    data: Mapped[Date] = mapped_column(Date, nullable=False)
+    status: Mapped[StatusGereciamentoContrapartida] = mapped_column(Enum(StatusGereciamentoContrapartida), nullable=False)
+    proposta_contrapartida_id: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    gerenciamento_proposta_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_proposta.id', ondelete='CASCADE'), nullable=False)
+    gerenciamento_proposta: Mapped['GerenciamentoPropostaModel'] = relationship(back_populates='gerenciamento_contrapartida', lazy='selectin', init=False)
+
+    gerenciamento_contrapartida_admin: Mapped[list['GerenciamentoContrapartidaAdminModel']] = relationship('GerenciamentoContrapartidaAdminModel', back_populates='gerenciamento_contrapartida', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
+
+
+@table_registry.mapped_as_dataclass
+class GerenciamentoContrapartidaAdminModel:
+    __tablename__ = 'gerenciamento_contrapartida_admin'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False, autoincrement=True, init=False)
+    quantidade: Mapped[int] = mapped_column(Integer, nullable=False)
+    justificativa: Mapped[str] = mapped_column(String(150), nullable=False)
+    data: Mapped[Date] = mapped_column(Date, nullable=False)
+
+    gerenciamento_contrapartida_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_contrapartida.id', ondelete='CASCADE'), nullable=False)
+    gerenciamento_contrapartida: Mapped['GerenciamentoContrapartidaModel'] = relationship(back_populates='gerenciamento_contrapartida_admin', lazy='selectin', init=False)

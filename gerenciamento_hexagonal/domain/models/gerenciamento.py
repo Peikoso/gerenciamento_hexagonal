@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from gerenciamento_hexagonal.domain.models.enums_specs import TipoGerenciamento
+from gerenciamento_hexagonal.domain.models.enums_specs import StatusGereciamentoContrapartida, TipoGerenciamento
 
 
 class GerenciamentoComentario(BaseModel):
@@ -61,6 +61,24 @@ class GerenciamentoBeneficiarioCategorizacao(BaseModel):
     categorizacoes_ids: list[int]
 
 
+class GerenciamentoContrapartida(BaseModel):
+    gerenciamento_proposta_id: int
+    proposta_contrapartida_id: int
+    quantidade: int
+    observacao: str = Field(..., max_length=300)
+    data: date
+    status: StatusGereciamentoContrapartida = Field(default=StatusGereciamentoContrapartida.EM_APROVACAO)
+    id: Optional[int]
+
+
+class GerenciamentoContrapartidaAdmin(BaseModel):
+    gerenciamento_contrapartida_id: int
+    quantidade: int
+    justificativa: str = Field(..., max_length=150)
+    data: date
+    id: Optional[int]
+
+
 """
 class GerenciamentoMetaArquivo(Arquivo, BaseModel):
     gerenciamento_meta: GerenciamentoMeta
@@ -102,15 +120,6 @@ class GerenciamentoQualitativoArquivo(Arquivo, BaseModel):
         pass
 
 
-class GerenciamentoContrapartida(BaseModel):
-    gerenciamento_proposta: GerenciamentoProposta
-    proposta_contrapartida: str
-    quantidade: int
-    observacao: str = ''
-    id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    data: datetime.datetime = Field(default_factory=datetime.datetime.now)
-    status: StatusGereciamentoContrapartida = Field(default=StatusGereciamentoContrapartida.PLANEJADO)
-    # TODO:falta arquivo
 
 
 class GerenciamentoContrapartidaArquivo(Arquivo, BaseModel):
@@ -133,11 +142,4 @@ class GerenciamentoContrapartidaArquivo(Arquivo, BaseModel):
         pass
 
 
-class GerenciamentoContrapartidaAdmin(BaseModel):
-    # campo usuario em um futuro não muito distante
-    gerenciamento_contrapartida: GerenciamentoContrapartida
-    quantidade: int
-    justificativa: str  # O campo é obrigatório
-    data: datetime.date = Field(default_factory=datetime.datetime.now)
-    id: uuid.UUID = Field(default_factory=uuid.uuid4)
 """
