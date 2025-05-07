@@ -2,10 +2,11 @@ from typing import Optional
 
 from sqlalchemy import select
 
-from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoCaracterizacao, GerenciamentoComentario, GerenciamentoMeta, GerenciamentoProposta, GerenciamentoQualitativo, GerenciamentoQuantitativo
+from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoCaracterizacao, GerenciamentoComentario, GerenciamentoContrapartida, GerenciamentoContrapartidaAdmin, GerenciamentoMeta, GerenciamentoProposta, GerenciamentoQualitativo, GerenciamentoQuantitativo
 from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import (
     GerenciamentoCaracterizacaoRelatorioResponse,
     GerenciamentoComentarioDTO,
+    GerenciamentoContrapartidaRelatorioResponse,
     GerenciamentoMetaRelatorioResponse,
     GerenciamentoQualitativoRelatorioResponse,
     GerenciamentoQuantitativoRelatorioResponse,
@@ -18,8 +19,10 @@ from gerenciamento_hexagonal.domain.repositories.gerenciamento import (
     GerenciamentoPropostaRepository,
     GerenciamentoQualitativoRepository,
     GerenciamentoQuantitativoRepository,
+    GerenciamentoContrapartidaRepository,
+    GerenciamentoContrapartidaAdminRepository
 )
-from gerenciamento_hexagonal.infrastructure.database.models.gerenciamentoORM import CategorizacaoBeneficiarioModel, GerenciamentoCaracterizacaoModel, GerenciamentoComentarioModel, GerenciamentoMetaModel, GerenciamentoPropostaModel, GerenciamentoQualitativoModel, GerenciamentoQuantitativoModel
+from gerenciamento_hexagonal.infrastructure.database.models.gerenciamentoORM import CategorizacaoBeneficiarioModel, GerenciamentoCaracterizacaoModel, GerenciamentoComentarioModel, GerenciamentoContrapartidaAdminModel, GerenciamentoContrapartidaModel, GerenciamentoMetaModel, GerenciamentoPropostaModel, GerenciamentoQualitativoModel, GerenciamentoQuantitativoModel
 from gerenciamento_hexagonal.infrastructure.database.sqlalchemyConfig import get_session
 
 
@@ -31,40 +34,66 @@ class RelatorioRepository:
             if not relatorio:
                 return None
 
-            gerenciamento_qualitativo: Optional[GerenciamentoQualitativoRelatorioResponse] = None
-            if relatorio.gerenciamento_qualitativo:
-                gerenciamento_qualitativo = GerenciamentoQualitativoRelatorioResponse(
-                    id=relatorio.gerenciamento_qualitativo.id,
-                    acoes_previstas=relatorio.gerenciamento_qualitativo.acoes_previstas,
-                    acoes_realizadas=relatorio.gerenciamento_qualitativo.acoes_realizadas,
-                    visao_proponente=relatorio.gerenciamento_qualitativo.visao_proponente,
-                )
+            gerenciamento_metas = [
+                GerenciamentoMetaRelatorioResponse(
+                    id=gerenciamento_meta.id, 
+                    ordem=gerenciamento_meta.ordem, 
+                    alcancado=gerenciamento_meta.alcancado
+                    ) for gerenciamento_meta in relatorio.gerenciamento_metas
+                ]
+            
+            gerenciamento_qualitativos = [
+                GerenciamentoQualitativoRelatorioResponse(
+                    id=gerenciamento_qualitativo.id,
+                    acoes_previstas=gerenciamento_qualitativo.acoes_previstas,
+                    acoes_realizadas=gerenciamento_qualitativo.acoes_realizadas,
+                    visao_proponente=gerenciamento_qualitativo.visao_proponente,
+                ) for gerenciamento_qualitativo in relatorio.gerenciamento_qualitativo
+            ]
 
-            gerenciamento_quantitativo: Optional[GerenciamentoQuantitativoRelatorioResponse] = None
-            if relatorio.gerenciamento_quantitativo:
-                gerenciamento_caracterizacao: Optional[GerenciamentoCaracterizacaoRelatorioResponse] = None
+            gerenciamento_caracterizacoes = [
+                GerenciamentoCaracterizacaoRelatorioResponse(
+                    id=gerenciamento_caracterizacao.id, 
+                    quantidade=gerenciamento_caracterizacao.quantidade, 
+                    categorizacoes_ids=[c.id for c in gerenciamento_caracterizacao.categorizacoes]
+                ) 
+                for gerenciamento_quantitativo in relatorio.gerenciamento_quantitativo
+                for gerenciamento_caracterizacao in gerenciamento_quantitativo.gerenciamento_caracterizacao
+                
+            ]
 
-                if relatorio.gerenciamento_quantitativo.gerenciamento_caracterizacao:
-                    gerenciamento_caracterizacao = GerenciamentoCaracterizacaoRelatorioResponse(id=relatorio.gerenciamento_quantitativo.gerenciamento_caracterizacao.id, quantidade=relatorio.gerenciamento_quantitativo.gerenciamento_caracterizacao.quantidade, categorizacoes_ids=[c.id for c in relatorio.gerenciamento_quantitativo.gerenciamento_caracterizacao.categorizacoes])
+            gerenciamento_quantitativos = [
+                GerenciamentoQuantitativoRelatorioResponse(
+                    id=gerenciamento_quantitativo.id,
+                    educacao_financeira_alcancados=gerenciamento_quantitativo.educacao_financeira_alcancados,
+                    educacao_financeira_impactados=gerenciamento_quantitativo.educacao_financeira_impactados,
+                    geracao_renda_postos_trabalho_gerados=gerenciamento_quantitativo.geracao_renda_postos_trabalho_gerados,
+                    alcance_marca_pessoas_alcancadas_publicacao_digitais=gerenciamento_quantitativo.alcance_marca_pessoas_alcancadas_publicacao_digitais,
+                    pessoas_alcancadas=gerenciamento_quantitativo.pessoas_alcancadas,
+                    pessoas_impactadas=gerenciamento_quantitativo.pessoas_impactadas,
+                    gerenciamento_caracterizacao=gerenciamento_caracterizacoes,
+                ) for gerenciamento_quantitativo in relatorio.gerenciamento_quantitativo
+            ]
 
-                gerenciamento_quantitativo = GerenciamentoQuantitativoRelatorioResponse(
-                    id=relatorio.gerenciamento_quantitativo.id,
-                    educacao_financeira_alcancados=relatorio.gerenciamento_quantitativo.educacao_financeira_alcancados,
-                    educacao_financeira_impactados=relatorio.gerenciamento_quantitativo.educacao_financeira_impactados,
-                    geracao_renda_postos_trabalho_gerados=relatorio.gerenciamento_quantitativo.geracao_renda_postos_trabalho_gerados,
-                    alcance_marca_pessoas_alcancadas_publicacao_digitais=relatorio.gerenciamento_quantitativo.alcance_marca_pessoas_alcancadas_publicacao_digitais,
-                    pessoas_alcancadas=relatorio.gerenciamento_quantitativo.pessoas_alcancadas,
-                    pessoas_impactadas=relatorio.gerenciamento_quantitativo.pessoas_impactadas,
-                    gerenciamento_caracterizacao=gerenciamento_caracterizacao,
-                )
-
+            gerenciamento_contrapartidas = [
+                GerenciamentoContrapartidaRelatorioResponse(
+                    id=gerenciamento_contrapartida.id,
+                    proposta_contrapartida_id=gerenciamento_contrapartida.proposta_contrapartida_id,
+                    quantidade=gerenciamento_contrapartida.quantidade,
+                    observacao=gerenciamento_contrapartida.observacao,
+                    data=gerenciamento_contrapartida.data,
+                    status=gerenciamento_contrapartida.status
+                ) for gerenciamento_contrapartida in relatorio.gerenciamento_contrapartida
+            ]
+            
         return RelatorioResponse(
             proposta_id=relatorio.proposta_id,
             trimestre_de_referencia=relatorio.trimestre_de_referencia,
             tipo=relatorio.tipo,
-            gerenciamento_metas=[GerenciamentoMetaRelatorioResponse(id=gerenciamento_meta.id, ordem=gerenciamento_meta.ordem, alcancado=gerenciamento_meta.alcancado) for gerenciamento_meta in relatorio.gerenciamento_metas],
-            gerenciamento_qualitativo=gerenciamento_qualitativo,
-            gerenciamento_quantitativo=gerenciamento_quantitativo,
+            gerenciamento_metas=gerenciamento_metas,
+            gerenciamento_qualitativo=gerenciamento_qualitativos,
+            gerenciamento_quantitativo=gerenciamento_quantitativos,
+            gerenciamento_contrapartida=gerenciamento_contrapartidas
         )
 
 
@@ -144,17 +173,16 @@ class GerenciamentoPropostaRepository(GerenciamentoPropostaRepository):
     async def update_gerenciamento_proposta(self, gerenciamento_proposta_id: int, gerenciamento_proposta: GerenciamentoProposta) -> GerenciamentoProposta:
         async with get_session() as session:
             db_gerenciamento_proposta = await session.scalar(select(GerenciamentoPropostaModel).where(GerenciamentoPropostaModel.id == gerenciamento_proposta_id))
-            if db_gerenciamento_proposta:
-                db_gerenciamento_proposta.proposta_id = gerenciamento_proposta.proposta_id
-                db_gerenciamento_proposta.trimestre_de_referencia = gerenciamento_proposta.trimestre_de_referencia
-                db_gerenciamento_proposta.tipo = gerenciamento_proposta.tipo
+            
+            db_gerenciamento_proposta.proposta_id = gerenciamento_proposta.proposta_id
+            db_gerenciamento_proposta.trimestre_de_referencia = gerenciamento_proposta.trimestre_de_referencia
+            db_gerenciamento_proposta.tipo = gerenciamento_proposta.tipo
 
-                await session.commit()
-                await session.refresh(db_gerenciamento_proposta)
+            await session.commit()
+            await session.refresh(db_gerenciamento_proposta)
 
-                return GerenciamentoProposta.model_validate({**vars(db_gerenciamento_proposta), 'metas_comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamento_comentario)) for gerenciamento_comentario in db_gerenciamento_proposta.metas_comentarios]})
+            return GerenciamentoProposta.model_validate({**vars(db_gerenciamento_proposta), 'metas_comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamento_comentario)) for gerenciamento_comentario in db_gerenciamento_proposta.metas_comentarios]})
 
-            return None
 
     async def delete_gerenciamento_proposta(self, gerenciamento_proposta_id: int):
         async with get_session() as session:
@@ -199,7 +227,7 @@ class GerenciamentoMetaRepository(GerenciamentoMetaRepository):
         async with get_session() as session:
             db_gerenciamento_metas = await session.scalars(select(GerenciamentoMetaModel))
 
-            result = [GerenciamentoMeta.model_validate(vars(db_gerenciamento_meta)) for db_gerenciamento_meta in db_gerenciamento_metas if db_gerenciamento_meta is not None]
+            result = [GerenciamentoMeta.model_validate(vars(db_gerenciamento_meta)) for db_gerenciamento_meta in db_gerenciamento_metas]
 
             return result
 
@@ -322,15 +350,6 @@ class GerenciamentoQuantitativoRepository(GerenciamentoQuantitativoRepository):
 
             return GerenciamentoQuantitativo.model_validate({**vars(db_gerenciamento_quantitativo), 'comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamento_comentario)) for gerenciamento_comentario in db_gerenciamento_quantitativo.comentarios]})
 
-    async def checar_associacao_existente(self, gerenciamento_proposta_id: int) -> bool:
-        async with get_session() as session:
-            db_gerenciamento_quantitativo = await session.scalar(select(GerenciamentoQuantitativoModel).where(GerenciamentoQuantitativoModel.gerenciamento_proposta_id == gerenciamento_proposta_id))
-
-            if db_gerenciamento_quantitativo:
-                return True
-
-            return False
-
     async def checar_gerenciamento_caracterizacao_exists(self, gerenciamento_quantitativo_id: int) -> bool:
         async with get_session() as session:
             db_gerenciamento_caracterizacao = await session.scalar(select(GerenciamentoCaracterizacaoModel).where(GerenciamentoCaracterizacaoModel.gerenciamento_quantitativo_id == gerenciamento_quantitativo_id))
@@ -415,15 +434,6 @@ class GerenciamentoQualitativoRepository(GerenciamentoQualitativoRepository):
 
             return result
 
-    async def checar_associacao_existente(self, gerenciamento_proposta_id: int) -> bool:
-        async with get_session() as session:
-            db_gerenciamento_quantitativo = await session.scalar(select(GerenciamentoQualitativoModel).where(GerenciamentoQualitativoModel.gerenciamento_proposta_id == gerenciamento_proposta_id))
-
-            if db_gerenciamento_quantitativo:
-                return True
-
-            return False
-
 
 class GerenciamentoCaracterizacaoRepository(GerenciamentoCaracterizacaoRepository):
     async def get_gerenciamento_caracterizacao(self) -> list[GerenciamentoCaracterizacao]:
@@ -488,15 +498,6 @@ class GerenciamentoCaracterizacaoRepository(GerenciamentoCaracterizacaoRepositor
             await session.delete(db_gerenciamento_caracterizacao)
             await session.commit()
 
-    async def checar_associacao_existente(self, gerenciamento_quantitativo_id: int) -> bool:
-        async with get_session() as session:
-            db_gerenciamento_caracterizacao = await session.scalar(select(GerenciamentoCaracterizacaoModel).where(GerenciamentoCaracterizacaoModel.gerenciamento_quantitativo_id == gerenciamento_quantitativo_id))
-
-            if db_gerenciamento_caracterizacao:
-                return True
-
-            return False
-
     async def find_categorizacoes_by_ids(self, categorizacoes_ids: list[int]) -> int | None:
         async with get_session() as session:
             for categorizacao_id in categorizacoes_ids:
@@ -505,3 +506,113 @@ class GerenciamentoCaracterizacaoRepository(GerenciamentoCaracterizacaoRepositor
                     return categorizacao_id
 
             return None
+
+
+class GerenciamentoContrapartidaRepository(GerenciamentoContrapartidaRepository):
+    
+    async def get_gerenciamento_contrapartida(self) -> list[GerenciamentoContrapartida]:
+        async with get_session() as session:
+            db_gerenciamento_contrapartidas = await session.scalars(select(GerenciamentoContrapartidaModel))
+            
+            return [GerenciamentoContrapartida.model_validate(vars(db_gerenciamento_contrapartida)) for db_gerenciamento_contrapartida in db_gerenciamento_contrapartidas]
+    
+    async def get_gerenciamento_contrapartida_by_id(self, gerenciamento_contrapartida_id: int) -> GerenciamentoContrapartida | None:
+        async with get_session() as session:
+            db_gerenciamento_contrapartida = await session.scalar(select(GerenciamentoContrapartidaModel).where(GerenciamentoContrapartidaModel.id == gerenciamento_contrapartida_id))
+            
+            if not db_gerenciamento_contrapartida:
+                return None
+            
+            return GerenciamentoContrapartida.model_validate(vars(db_gerenciamento_contrapartida))
+
+    async def create_gerenciamento_contrapartida(self, gerenciamento_contrapartida: GerenciamentoContrapartida) -> GerenciamentoContrapartida:
+        async with get_session() as session:
+            db_gerenciamento_contrapartida = GerenciamentoContrapartidaModel(
+            quantidade=gerenciamento_contrapartida.quantidade,
+            observacao=gerenciamento_contrapartida.observacao,
+            data=gerenciamento_contrapartida.data,
+            status=gerenciamento_contrapartida.status,
+            proposta_contrapartida_id=gerenciamento_contrapartida.proposta_contrapartida_id,
+            gerenciamento_proposta_id=gerenciamento_contrapartida.gerenciamento_proposta_id
+            )
+            
+            session.add(db_gerenciamento_contrapartida)
+            await session.commit()
+            await session.refresh(db_gerenciamento_contrapartida)
+            
+            return GerenciamentoContrapartida.model_validate(vars(db_gerenciamento_contrapartida))
+    
+    async def update_gerenciamento_contrapartida(self, gerenciamento_contrapartida_id: int, gerenciamento_contrapartida: GerenciamentoContrapartida) -> GerenciamentoContrapartida:
+        async with get_session() as session:
+            db_gerenciamento_contrapartida = await session.scalar(select(GerenciamentoContrapartidaModel).where(GerenciamentoContrapartidaModel.id == gerenciamento_contrapartida_id))
+            
+            db_gerenciamento_contrapartida.quantidade=gerenciamento_contrapartida.quantidade
+            db_gerenciamento_contrapartida.observacao=gerenciamento_contrapartida.observacao
+            db_gerenciamento_contrapartida.data=gerenciamento_contrapartida.data
+            db_gerenciamento_contrapartida.status=gerenciamento_contrapartida.status
+            db_gerenciamento_contrapartida.proposta_contrapartida_id=gerenciamento_contrapartida.proposta_contrapartida_id
+            
+            await session.commit()
+            await session.refresh(db_gerenciamento_contrapartida)
+            
+            return GerenciamentoContrapartida.model_validate(vars(db_gerenciamento_contrapartida))
+    
+    async def delete_gerenciamento_contrapartida(self, gerenciamento_contrapartida_id: int):
+        async with get_session() as session:
+            db_gerenciamento_contrapartida = await session.scalar(select(GerenciamentoContrapartidaModel).where(GerenciamentoContrapartidaModel.id == gerenciamento_contrapartida_id))
+            
+            await session.delete(db_gerenciamento_contrapartida)
+            await session.commit()
+         
+
+class GerenciamentoContrapartidaAdminRepository(GerenciamentoContrapartidaAdminRepository):
+    
+    async def get_gerenciamento_contrapartida_admin(self) -> list[GerenciamentoContrapartidaAdmin]:
+        async with get_session() as session:
+            db_gerenciamento_contrapartida_admins = await session.scalars(select(GerenciamentoContrapartidaAdminModel))
+            
+            return [GerenciamentoContrapartidaAdmin.model_validate(vars(db_gerenciamento_contrapartida_admin)) for db_gerenciamento_contrapartida_admin in db_gerenciamento_contrapartida_admins]
+    
+    async def get_gerenciamento_contrapartida_admin_by_id(self, gerenciamento_contrapartida_admin_id: int) -> GerenciamentoContrapartidaAdmin | None:
+        async with get_session() as session:
+            db_gerenciamento_contrapartida_admin = await session.scalar(select(GerenciamentoContrapartidaAdminModel).where(GerenciamentoContrapartidaAdminModel.id == gerenciamento_contrapartida_admin_id))
+            
+            if not db_gerenciamento_contrapartida_admin:
+                return None
+            
+            return GerenciamentoContrapartidaAdmin.model_validate(vars(db_gerenciamento_contrapartida_admin))
+
+    async def create_gerenciamento_contrapartida_admin(self, gerenciamento_contrapartida_admin: GerenciamentoContrapartidaAdmin) -> GerenciamentoContrapartidaAdmin:
+        async with get_session() as session:
+            db_gerenciamento_contrapartida_admin = GerenciamentoContrapartidaAdminModel(
+                quantidade=gerenciamento_contrapartida_admin.quantidade,
+                justificativa=gerenciamento_contrapartida_admin.justificativa,
+                data=gerenciamento_contrapartida_admin.data,
+                gerenciamento_contrapartida_id=gerenciamento_contrapartida_admin.gerenciamento_contrapartida_id
+            )
+           
+            session.add(db_gerenciamento_contrapartida_admin)
+            await session.commit()
+            await session.refresh(db_gerenciamento_contrapartida_admin)
+            
+            return GerenciamentoContrapartidaAdmin.model_validate(vars(db_gerenciamento_contrapartida_admin))
+        
+    async def update_gerenciamento_contrapartida_admin(self, gerenciamento_contrapartida_admin_id: int, gerenciamento_contrapartida_admin: GerenciamentoContrapartidaAdmin) -> GerenciamentoContrapartidaAdmin:
+        async with get_session() as session:
+            db_gerenciamento_contrapartida_admin = await session.scalar(select(GerenciamentoContrapartidaAdminModel).where(GerenciamentoContrapartidaAdminModel.id == gerenciamento_contrapartida_admin_id))
+            
+            db_gerenciamento_contrapartida_admin.quantidade=gerenciamento_contrapartida_admin.quantidade
+            db_gerenciamento_contrapartida_admin.justificativa=gerenciamento_contrapartida_admin.justificativa
+            db_gerenciamento_contrapartida_admin.data=gerenciamento_contrapartida_admin.data
+            
+            await session.commit()
+            await session.refresh(db_gerenciamento_contrapartida_admin)
+
+            return GerenciamentoContrapartidaAdmin.model_validate(vars(db_gerenciamento_contrapartida_admin))
+    
+    async def delete_gerenciamento_contrapartida_admin(self, gerenciamento_contrapartida_admin_id: int):
+        async with get_session() as session:
+            db_gerenciamento_contrapartida_admin = await session.scalar(select(GerenciamentoContrapartidaAdminModel).where(GerenciamentoContrapartidaAdminModel.id == gerenciamento_contrapartida_admin_id))
+            
+            await session.delete(db_gerenciamento_contrapartida_admin)
+            await session.commit()

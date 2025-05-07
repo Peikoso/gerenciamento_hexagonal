@@ -3,23 +3,23 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from gerenciamento_hexagonal.application.dependencies import get_gerenciamento_quantitativo__service
+from gerenciamento_hexagonal.application.dependencies import get_gerenciamento_quantitativo_service
 from gerenciamento_hexagonal.application.services import GerenciamentoQuantitativoServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError, NotNullViolationError, UniqueViolation
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoQuantitativo
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoQuantitativoDTO, GerenciamentoQuantitativoListResponse
+from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoQuantitativoDTO
 
 router = APIRouter()
 
 
-Service = Annotated[GerenciamentoQuantitativoServices, Depends(get_gerenciamento_quantitativo__service)]
+Service = Annotated[GerenciamentoQuantitativoServices, Depends(get_gerenciamento_quantitativo_service)]
 
 
-@router.get('/', response_model=GerenciamentoQuantitativoListResponse)
+@router.get('/', response_model=list[GerenciamentoQuantitativo])
 async def get_gerenciamento_quantitativos(service: Service):
     gerenciamento_quantitativos = await service.get_gerenciamento_quantitativo()
 
-    return {'Gerenciamento_Quantitativos': gerenciamento_quantitativos}
+    return gerenciamento_quantitativos
 
 
 @router.get('/{gerenciamento_quantitativo_id}', response_model=GerenciamentoQuantitativo)

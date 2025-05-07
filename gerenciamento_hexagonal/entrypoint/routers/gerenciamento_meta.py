@@ -3,23 +3,23 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from gerenciamento_hexagonal.application.dependencies import get_gerenciamento_meta__service
+from gerenciamento_hexagonal.application.dependencies import get_gerenciamento_meta_service
 from gerenciamento_hexagonal.application.services import GerenciamentoMetaServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoMeta
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoMetaDTO, GerenciamentoMetaListResponse
+from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoMetaDTO
 
 router = APIRouter()
 
 
-Service = Annotated[GerenciamentoMetaServices, Depends(get_gerenciamento_meta__service)]
+Service = Annotated[GerenciamentoMetaServices, Depends(get_gerenciamento_meta_service)]
 
 
-@router.get('/', response_model=GerenciamentoMetaListResponse)
+@router.get('/', response_model=list[GerenciamentoMeta])
 async def get_gerenciamento_metas(service: Service):
     gerenciamento_meta = await service.get_gerenciamento_meta()
 
-    return {'Gerenciamento_Metas': gerenciamento_meta}
+    return gerenciamento_meta
 
 
 @router.get('/{gerenciamento_meta_id}', response_model=GerenciamentoMeta)

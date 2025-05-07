@@ -3,6 +3,7 @@ from typing import Annotated, Optional
 
 from pydantic import BaseModel, Field
 
+from gerenciamento_hexagonal.domain.models.enums_specs import StatusGereciamentoContrapartida
 from gerenciamento_hexagonal.domain.models.gerenciamento import (
     GerenciamentoComentario,
     GerenciamentoMeta,
@@ -20,25 +21,13 @@ class GerenciamentoPropostaDTO(BaseModel):
     tipo: TipoGerenciamento = Field(default_factory=TipoGerenciamento.TRIMESTRAL)
 
 
-class GerenciamentoPropostaListResponse(BaseModel):
-    Gerenciamento_Propostas: list[GerenciamentoProposta]
-
-
 class GerenciamentoComentarioDTO(BaseModel):
     comentario: str
-
-
-class GerenciamentoComentarioListResponse(BaseModel):
-    Gerenciamento_Comentarios: list[GerenciamentoComentario]
 
 
 class GerenciamentoMetaDTO(BaseModel):
     alcancado: int
     ordem: Optional[int] = None
-
-
-class GerenciamentoMetaListResponse(BaseModel):
-    Gerenciamento_Metas: list[GerenciamentoMeta]
 
 
 class GerenciamentoQuantitativoDTO(BaseModel):
@@ -50,10 +39,6 @@ class GerenciamentoQuantitativoDTO(BaseModel):
     pessoas_impactadas: int
 
 
-class GerenciamentoQuantitativoListResponse(BaseModel):
-    Gerenciamento_Quantitativos: list[GerenciamentoQuantitativo]
-
-
 class GerenciamentoQualitativoDTO(BaseModel):
     acoes_realizadas: Optional[str] = None
     acoes_previstas: Optional[str] = None
@@ -63,6 +48,20 @@ class GerenciamentoQualitativoDTO(BaseModel):
 class GerenciamentoCaracterizacaoDTO(BaseModel):
     quantidade: int = Field(..., gt=0)
     categorizacoes_ids: list[PositiveInt]
+
+
+class GerenciamentoContrapartidaDTO(BaseModel):
+    proposta_contrapartida_id: int
+    quantidade: int
+    observacao: str = Field(..., max_length=300)
+    data: date
+    status: StatusGereciamentoContrapartida = Field(default_factory=StatusGereciamentoContrapartida.EM_APROVACAO)
+
+
+class GerenciamentoContrapartidaAdminDTO(BaseModel):
+    quantidade: int
+    justificativa: str = Field(..., max_length=150)
+    data: date
 
 
 class GerenciamentoMetaRelatorioResponse(BaseModel):
@@ -92,7 +91,15 @@ class GerenciamentoQuantitativoRelatorioResponse(BaseModel):
     alcance_marca_pessoas_alcancadas_publicacao_digitais: int
     pessoas_alcancadas: int
     pessoas_impactadas: int
-    gerenciamento_caracterizacao: Optional[GerenciamentoCaracterizacaoRelatorioResponse]
+    gerenciamento_caracterizacao: list[GerenciamentoCaracterizacaoRelatorioResponse]
+
+class GerenciamentoContrapartidaRelatorioResponse(BaseModel):
+    id: int
+    proposta_contrapartida_id: int
+    quantidade: int
+    observacao: str 
+    data: date
+    status: StatusGereciamentoContrapartida
 
 
 class RelatorioResponse(BaseModel):
@@ -100,9 +107,9 @@ class RelatorioResponse(BaseModel):
     trimestre_de_referencia: date
     tipo: TipoGerenciamento
     gerenciamento_metas: list[GerenciamentoMetaRelatorioResponse]
-    gerenciamento_qualitativo: Optional[GerenciamentoQualitativoRelatorioResponse]
-    gerenciamento_quantitativo: Optional[GerenciamentoQuantitativoRelatorioResponse]
-
+    gerenciamento_qualitativo: list[GerenciamentoQualitativoRelatorioResponse]
+    gerenciamento_quantitativo: list[GerenciamentoQuantitativoRelatorioResponse]
+    gerenciamento_contrapartida: list[GerenciamentoContrapartidaRelatorioResponse]
 
 class WrappedRelatorioResponse(BaseModel):
     gerenciamento_proposta: RelatorioResponse

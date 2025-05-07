@@ -17,7 +17,7 @@ class TipoGerenciamento(str, Enum):
 
 
 class StatusGereciamentoContrapartida(str, Enum):
-    PLANEJADO = 'Planejado'  # padrão
+    PLANEJADO = 'Planejado' 
     EM_APROVACAO = 'Em aprovação'
     EM_AJUSTE = 'Em ajuste'
     ENTREGUE = 'Entregue'

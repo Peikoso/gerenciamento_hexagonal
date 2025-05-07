@@ -3,23 +3,23 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from gerenciamento_hexagonal.application.dependencies import get_gerenciamento_comentario__service
+from gerenciamento_hexagonal.application.dependencies import get_gerenciamento_comentario_service
 from gerenciamento_hexagonal.application.services import GerenciamentoComentarioServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoComentarioListResponse
+from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO
 
 router = APIRouter()
 
 
-Service = Annotated[GerenciamentoComentarioServices, Depends(get_gerenciamento_comentario__service)]
+Service = Annotated[GerenciamentoComentarioServices, Depends(get_gerenciamento_comentario_service)]
 
 
-@router.get('/', response_model=GerenciamentoComentarioListResponse)
+@router.get('/', response_model=list[GerenciamentoComentario])
 async def get_gerenciamento_comentarios(service: Service):
     gerenciamento_comentarios = await service.get_gerenciamento_comentario()
 
-    return {'Gerenciamento_Comentarios': gerenciamento_comentarios}
+    return gerenciamento_comentarios
 
 
 @router.get('/{gerenciamento_comentario_id}', response_model=GerenciamentoComentario)

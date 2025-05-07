@@ -41,7 +41,7 @@ class GerenciamentoQuantitativo(BaseModel):
 
 
 class GerenciamentoQualitativo(BaseModel):
-    acoes_realizadas: Optional[str] = None  # 500
+    acoes_realizadas: Optional[str] = None
     acoes_previstas: Optional[str] = None
     visao_proponente: Optional[str] = None
     gerenciamento_proposta_id: Optional[int] = None
@@ -62,21 +62,21 @@ class GerenciamentoBeneficiarioCategorizacao(BaseModel):
 
 
 class GerenciamentoContrapartida(BaseModel):
-    gerenciamento_proposta_id: int
     proposta_contrapartida_id: int
     quantidade: int
-    observacao: str = Field(..., max_length=300)
+    observacao: str
     data: date
-    status: StatusGereciamentoContrapartida = Field(default=StatusGereciamentoContrapartida.EM_APROVACAO)
-    id: Optional[int]
+    status: StatusGereciamentoContrapartida
+    gerenciamento_proposta_id: Optional[int] = None
+    id: Optional[int] = None
 
 
 class GerenciamentoContrapartidaAdmin(BaseModel):
-    gerenciamento_contrapartida_id: int
     quantidade: int
-    justificativa: str = Field(..., max_length=150)
+    justificativa: str
     data: date
-    id: Optional[int]
+    gerenciamento_contrapartida_id: Optional[int] = None
+    id: Optional[int] = None
 
 
 """

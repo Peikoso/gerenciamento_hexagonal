@@ -5,17 +5,19 @@ from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import (
     NotNullViolationError,
     UniqueViolation,
 )
-from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoCaracterizacao, GerenciamentoComentario, GerenciamentoMeta, GerenciamentoProposta, GerenciamentoQualitativo, GerenciamentoQuantitativo
+from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoCaracterizacao, GerenciamentoComentario, GerenciamentoContrapartida, GerenciamentoContrapartidaAdmin, GerenciamentoMeta, GerenciamentoProposta, GerenciamentoQualitativo, GerenciamentoQuantitativo
 from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import (
     GerenciamentoCaracterizacaoDTO,
     GerenciamentoComentarioDTO,
+    GerenciamentoContrapartidaAdminDTO,
+    GerenciamentoContrapartidaDTO,
     GerenciamentoMetaDTO,
     GerenciamentoPropostaDTO,
     GerenciamentoQualitativoDTO,
     GerenciamentoQuantitativoDTO,
     RelatorioResponse,
 )
-from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy_repository import GerenciamentoCaracterizacaoRepository, GerenciamentoComentarioRepository, GerenciamentoMetaRepository, GerenciamentoPropostaRepository, GerenciamentoQualitativoRepository, GerenciamentoQuantitativoRepository, RelatorioRepository
+from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy_repository import GerenciamentoCaracterizacaoRepository, GerenciamentoComentarioRepository, GerenciamentoContrapartidaAdminRepository, GerenciamentoContrapartidaRepository, GerenciamentoMetaRepository, GerenciamentoPropostaRepository, GerenciamentoQualitativoRepository, GerenciamentoQuantitativoRepository, RelatorioRepository
 
 
 class RelatorioServices:
@@ -31,8 +33,8 @@ class RelatorioServices:
 
 
 class GerenciamentoPropostaServices:
-    def __init__(self, repository_gerenciamento: GerenciamentoPropostaRepository):
-        self.repository = repository_gerenciamento
+    def __init__(self, repository: GerenciamentoPropostaRepository):
+        self.repository = repository
 
     async def get_gerenciamento_proposta(self) -> List[GerenciamentoProposta]:
         gerenciamento_propostas = await self.repository.get_gerenciamento_proposta()
@@ -82,8 +84,8 @@ class GerenciamentoPropostaServices:
 
 
 class GerenciamentoComentarioServices:
-    def __init__(self, repository_gerenciamento: GerenciamentoComentarioRepository):
-        self.repository = repository_gerenciamento
+    def __init__(self, repository: GerenciamentoComentarioRepository):
+        self.repository = repository
 
     async def get_gerenciamento_comentario(self) -> list[GerenciamentoComentario]:
         gerenciamento_comentarios = await self.repository.get_gerenciamento_comentario()
@@ -115,8 +117,8 @@ class GerenciamentoComentarioServices:
 
 
 class GerenciamentoMetaServices:
-    def __init__(self, repository_gerenciamento: GerenciamentoMetaRepository, service_proposta: GerenciamentoPropostaServices):
-        self.repository = repository_gerenciamento
+    def __init__(self, repository: GerenciamentoMetaRepository, service_proposta: GerenciamentoPropostaServices):
+        self.repository = repository
         self.service_proposta = service_proposta
 
     async def get_gerenciamento_meta(self) -> list[GerenciamentoMeta]:
@@ -156,8 +158,8 @@ class GerenciamentoMetaServices:
 
 
 class GerenciamentoQuantitativoServices:
-    def __init__(self, repository_gerenciamento: GerenciamentoQuantitativoRepository, service_proposta: GerenciamentoPropostaServices):
-        self.repository = repository_gerenciamento
+    def __init__(self, repository: GerenciamentoQuantitativoRepository, service_proposta: GerenciamentoPropostaServices):
+        self.repository = repository
         self.service_proposta = service_proposta
 
     async def get_gerenciamento_quantitativo(self) -> list[GerenciamentoQuantitativo]:
@@ -175,11 +177,6 @@ class GerenciamentoQuantitativoServices:
 
     async def create_gerenciamento_quantitativo(self, gerenciamento_proposta_id: int, gerenciamento_quantitativo: GerenciamentoQuantitativoDTO) -> GerenciamentoQuantitativo:
         await self.service_proposta.get_gerenciamento_proposta_by_id(gerenciamento_proposta_id)
-
-        unique_violation_check = await self.repository.checar_associacao_existente(gerenciamento_proposta_id)
-
-        if unique_violation_check:
-            raise UniqueViolation(f'gerenciamento_quantitativo already exist for gerenciamento_proposta ID: {gerenciamento_proposta_id}')
 
         gerenciamento_quantitativo = GerenciamentoQuantitativo(**gerenciamento_quantitativo.model_dump())
         gerenciamento_quantitativo = await self.repository.create_gerenciamento_quantitativo(gerenciamento_proposta_id, gerenciamento_quantitativo)
@@ -216,8 +213,8 @@ class GerenciamentoQuantitativoServices:
 
 
 class GerenciamentoQualitativoServices:
-    def __init__(self, repository_gerenciamento: GerenciamentoQualitativoRepository, service_proposta: GerenciamentoPropostaServices):
-        self.repository = repository_gerenciamento
+    def __init__(self, repository: GerenciamentoQualitativoRepository, service_proposta: GerenciamentoPropostaServices):
+        self.repository = repository
         self.service_proposta = service_proposta
 
     async def get_gerenciamento_qualitativo(self) -> list[GerenciamentoQualitativo]:
@@ -235,11 +232,6 @@ class GerenciamentoQualitativoServices:
 
     async def create_gerenciamento_qualitativo(self, gerenciamento_proposta_id: int, gerenciamento_qualitativo: GerenciamentoQualitativoDTO) -> GerenciamentoQualitativo:
         await self.service_proposta.get_gerenciamento_proposta_by_id(gerenciamento_proposta_id)
-
-        unique_violation_check = await self.repository.checar_associacao_existente(gerenciamento_proposta_id)
-
-        if unique_violation_check:
-            raise UniqueViolation(f'gerenciamento_qualitativo already exist for gerenciamento_proposta ID: {gerenciamento_proposta_id}')
 
         gerenciamento_qualitativo = GerenciamentoQualitativo(**gerenciamento_qualitativo.model_dump())
         gerenciamento_qualitativo = await self.repository.create_gerenciamento_qualitativo(gerenciamento_proposta_id, gerenciamento_qualitativo)
@@ -271,8 +263,8 @@ class GerenciamentoQualitativoServices:
 
 
 class GerenciamentoCaracterizacaoServices:
-    def __init__(self, repository_gerenciamento: GerenciamentoCaracterizacaoRepository, service_quantitativo: GerenciamentoQuantitativoServices):
-        self.repository = repository_gerenciamento
+    def __init__(self, repository: GerenciamentoCaracterizacaoRepository, service_quantitativo: GerenciamentoQuantitativoServices):
+        self.repository = repository
         self.service_quantitativo = service_quantitativo
 
     async def get_gerenciamento_caracterizacao(self) -> list[GerenciamentoCaracterizacao]:
@@ -291,13 +283,7 @@ class GerenciamentoCaracterizacaoServices:
     async def create_gerenciamento_caracterizacao(self, gerenciamento_quantitativo_id: int, gerenciamento_caracterizacao: GerenciamentoCaracterizacaoDTO) -> GerenciamentoCaracterizacao:
         await self.service_quantitativo.get_gerenciamento_quantitativo_by_id(gerenciamento_quantitativo_id)
 
-        unique_violation_check = await self.repository.checar_associacao_existente(gerenciamento_quantitativo_id)
-
-        if unique_violation_check:
-            raise UniqueViolation(f'gerenciamento_caracterizacao already exist for gerenciamento_quantitativo ID: {gerenciamento_quantitativo_id}')
-
         gerenciamento_caracterizacao.categorizacoes_ids = list(set(gerenciamento_caracterizacao.categorizacoes_ids))
-
         categorizacao = await self.repository.find_categorizacoes_by_ids(gerenciamento_caracterizacao.categorizacoes_ids)
 
         if categorizacao:
@@ -328,3 +314,89 @@ class GerenciamentoCaracterizacaoServices:
         await self.repository.delete_gerenciamento_caracterizacao(gerenciamento_caracterizacao_id)
 
         return {'message': f'gerenciamento_caracterizacao with ID {gerenciamento_caracterizacao_id} deleted'}
+
+
+class GerenciamentoContrapartidaServices:
+    def __init__(self, repository: GerenciamentoContrapartidaRepository, service_proposta: GerenciamentoPropostaServices):
+        self.repository = repository
+        self.service_proposta = service_proposta
+    
+    async def get_gerenciamento_contrapartida(self) -> list[GerenciamentoContrapartida]:
+        gerenciamento_contrapartidas = await self.repository.get_gerenciamento_contrapartida()
+        
+        return gerenciamento_contrapartidas
+    
+    async def get_gerenciamento_contrapartida_by_id(self, gerenciamento_contrapartida_id: int) -> GerenciamentoContrapartida | None:
+        gerenciamento_contrapartida = await self.repository.get_gerenciamento_contrapartida_by_id(gerenciamento_contrapartida_id)
+        
+        if not gerenciamento_contrapartida:
+            raise NotFoundError(f'gerenciamento_contrapartida with ID: {gerenciamento_contrapartida_id} not found')
+        
+        return gerenciamento_contrapartida
+
+    
+    async def create_gerenciamento_contrapartida(self, gerenciamento_proposta_id: int, gerenciamento_contrapartida: GerenciamentoContrapartidaDTO) -> GerenciamentoContrapartida:
+        await self.service_proposta.get_gerenciamento_proposta_by_id(gerenciamento_proposta_id)
+        
+        gerenciamento_contrapartida = GerenciamentoContrapartida(gerenciamento_proposta_id=gerenciamento_proposta_id, **gerenciamento_contrapartida.model_dump())
+        gerenciamento_contrapartida = await self.repository.create_gerenciamento_contrapartida(gerenciamento_contrapartida)
+        
+        return gerenciamento_contrapartida
+    
+    async def update_gerenciamento_contrapartida(self, gerenciamento_contrapartida_id: int, gerenciamento_contrapartida: GerenciamentoContrapartidaDTO) -> GerenciamentoContrapartida:
+        await self.get_gerenciamento_contrapartida_by_id(gerenciamento_contrapartida_id)
+        
+        gerenciamento_contrapartida = GerenciamentoContrapartida(**gerenciamento_contrapartida.model_dump())
+        gerenciamento_contrapartida = await self.repository.update_gerenciamento_contrapartida(gerenciamento_contrapartida_id, gerenciamento_contrapartida)
+        
+        return gerenciamento_contrapartida
+
+    
+    async def delete_gerenciamento_contrapartida(self, gerenciamento_contrapartida_id: int):
+        await self.get_gerenciamento_contrapartida_by_id(gerenciamento_contrapartida_id)
+        
+        await self.repository.delete_gerenciamento_contrapartida(gerenciamento_contrapartida_id)
+        
+        return {'message': f'gerenciamento_contrapartida with ID {gerenciamento_contrapartida_id} deleted'}
+
+
+class GerenciamentoContrapartidaAdminServices:
+    def __init__(self, repository: GerenciamentoContrapartidaAdminRepository, service_contrapartida: GerenciamentoContrapartidaServices):
+        self.repository = repository
+        self.service_contrapartida = service_contrapartida
+    
+    async def get_gerenciamento_contrapartida_admin(self) -> list[GerenciamentoContrapartidaAdmin]:
+        gerenciamento_contrapartida_admins = await self.repository.get_gerenciamento_contrapartida_admin()
+        
+        return gerenciamento_contrapartida_admins
+    
+    async def get_gerenciamento_contrapartida_admin_by_id(self, gerenciamento_contrapartida_admin_id: int) -> GerenciamentoContrapartidaAdmin | None:
+        gerenciamento_contrapartida_admin = await self.repository.get_gerenciamento_contrapartida_admin_by_id(gerenciamento_contrapartida_admin_id)
+        
+        if not gerenciamento_contrapartida_admin:
+            raise NotFoundError(f'gerenciamento_contrapartida_admin with ID: {gerenciamento_contrapartida_admin_id} not found')
+        
+        return gerenciamento_contrapartida_admin
+
+    async def create_gerenciamento_contrapartida_admin(self, gerenciamento_contrapartida_id: int, gerenciamento_contrapartida_admin: GerenciamentoContrapartidaAdminDTO) -> GerenciamentoContrapartidaAdmin:
+        await self.service_contrapartida.get_gerenciamento_contrapartida_by_id(gerenciamento_contrapartida_id)
+        
+        gerenciamento_contrapartida_admin = GerenciamentoContrapartidaAdmin(gerenciamento_contrapartida_id=gerenciamento_contrapartida_id, **gerenciamento_contrapartida_admin.model_dump())
+        gerenciamento_contrapartida_admin = await self.repository.create_gerenciamento_contrapartida_admin(gerenciamento_contrapartida_admin)
+        
+        return gerenciamento_contrapartida_admin
+    
+    async def update_gerenciamento_contrapartida_admin(self, gerenciamento_contrapartida_admin_id: int, gerenciamento_contrapartida_admin: GerenciamentoContrapartidaAdmin) -> GerenciamentoContrapartidaAdmin:
+        await self.service_contrapartida.get_gerenciamento_contrapartida_by_id(gerenciamento_contrapartida_admin_id)
+        
+        gerenciamento_contrapartida_admin = GerenciamentoContrapartidaAdmin(**gerenciamento_contrapartida_admin.model_dump())
+        gerenciamento_contrapartida_admin = await self.repository.update_gerenciamento_contrapartida_admin(gerenciamento_contrapartida_admin_id, gerenciamento_contrapartida_admin)
+        
+        return gerenciamento_contrapartida_admin
+
+    async def delete_gerenciamento_contrapartida_admin(self, gerenciamento_contrapartida_admin_id: int):
+        await self.service_contrapartida.get_gerenciamento_contrapartida_by_id(gerenciamento_contrapartida_admin_id)
+        
+        await self.repository.delete_gerenciamento_contrapartida_admin(gerenciamento_contrapartida_admin_id)
+
+        return {'message': f'gerenciamento_contrapartida with ID {gerenciamento_contrapartida_admin_id} deleted'}

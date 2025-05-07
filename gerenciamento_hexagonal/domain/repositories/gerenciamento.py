@@ -3,14 +3,14 @@ from abc import ABC, abstractmethod
 from gerenciamento_hexagonal.domain.models.gerenciamento import (
     GerenciamentoCaracterizacao,
     GerenciamentoComentario,
+    GerenciamentoContrapartida,
+    GerenciamentoContrapartidaAdmin,
     GerenciamentoMeta,
-    # GerenciamentoContrapartida,
-    # GerenciamentoContrapartidaAdmin,
-    # GerenciamentoContrapartidaArquivo,
-    # GerenciamentoMetaArquivo,
     GerenciamentoProposta,
     GerenciamentoQualitativo,
     GerenciamentoQuantitativo,
+    # GerenciamentoMetaArquivo,
+    # GerenciamentoContrapartidaArquivo,
     # GerenciamentoQualitativoArquivo,
 )
 
@@ -115,10 +115,6 @@ class GerenciamentoQuantitativoRepository(ABC):
         pass
 
     @abstractmethod
-    async def checar_associacao_existente(self, gerenciamento_proposta_id: int) -> bool:
-        pass
-
-    @abstractmethod
     async def checar_gerenciamento_caracterizacao_exists(self, gerenciamento_quantitativo_id: int) -> bool:
         pass
 
@@ -148,10 +144,6 @@ class GerenciamentoQualitativoRepository(ABC):
     async def create_gerenciamento_qualitativo_comentario(self, gerenciamento_qualitativo_id: int, gerenciamento_comentario: GerenciamentoComentario) -> GerenciamentoQualitativo:
         pass
 
-    @abstractmethod
-    async def checar_associacao_existente(self, gerenciamento_proposta_id: int) -> bool:
-        pass
-
 
 class GerenciamentoCaracterizacaoRepository(ABC):
     @abstractmethod
@@ -175,13 +167,54 @@ class GerenciamentoCaracterizacaoRepository(ABC):
         pass
 
     @abstractmethod
-    async def checar_associacao_existente(self, gerenciamento_quantitativo_id: int) -> bool:
-        pass
-
-    @abstractmethod
     async def find_categorizacoes_by_ids(self, categorizacoes_ids: list[int]) -> bool:
         pass
 
+
+class GerenciamentoContrapartidaRepository(ABC):
+    @abstractmethod
+    async def get_gerenciamento_contrapartida(self) -> list[GerenciamentoContrapartida]:
+        pass
+    
+    @abstractmethod
+    async def get_gerenciamento_contrapartida_by_id(self, gerenciamento_contrapartida_id: int) -> GerenciamentoContrapartida | None:
+        pass
+
+    @abstractmethod
+    async def create_gerenciamento_contrapartida(self, gerenciamento_proposta_id: int, gerenciamento_contrapartida: GerenciamentoContrapartida) -> GerenciamentoContrapartida:
+        pass
+
+    @abstractmethod
+    async def update_gerenciamento_contrapartida(self, gerenciamento_contrapartida_id: int, gerenciamento_contrapartida: GerenciamentoContrapartida) -> GerenciamentoContrapartida:
+        pass
+
+    @abstractmethod
+    async def delete_gerenciamento_contrapartida(self, gerenciamento_contrapartida_id: int):
+        pass
+
+
+class GerenciamentoContrapartidaAdminRepository(ABC):
+    @abstractmethod
+    async def get_gerenciamento_contrapartida_admin(self) -> list[GerenciamentoContrapartidaAdmin]:
+        pass
+    
+    @abstractmethod
+    async def get_gerenciamento_contrapartida_admin_by_id(self, gerenciamento_contrapartida_admin_id: int) -> GerenciamentoContrapartidaAdmin | None:
+        pass
+
+    @abstractmethod
+    async def create_gerenciamento_contrapartida_admin(self, gerenciamento_contrapartida_id: int, gerenciamento_contrapartida_admin: GerenciamentoContrapartidaAdmin) -> GerenciamentoContrapartidaAdmin:
+        pass
+
+    @abstractmethod
+    async def update_gerenciamento_contrapartida_admin(self, gerenciamento_contrapartida_admin_id: int, gerenciamento_contrapartida_admin: GerenciamentoContrapartidaAdmin) -> GerenciamentoContrapartidaAdmin:
+        pass
+
+    @abstractmethod
+    async def delete_gerenciamento_contrapartida_admin(self, gerenciamento_contrapartida_admin_id: int):
+        pass
+
+    
 
 """
 class GerenciamentoMetaArquivoRepository(ABC):
@@ -228,68 +261,28 @@ class GerenciamentoQualitativoArquivoRepository(ABC):
         pass
 
 
-class GerenciamentoContrapartidaRepository(ABC):
-    @abstractmethod
-    def get_gerenciamentoContrapartida_by_id(self, gerenciamentoContrapartida_id: uuid) -> GerenciamentoContrapartida | None:
-        pass
-
-    @abstractmethod
-    def create_gerenciamentoContrapartida(self, gerenciamentoContrapartida: GerenciamentoContrapartida) -> GerenciamentoContrapartida:
-        pass
-
-    @abstractmethod
-    def update_gerenciamentoContrapartida(self, gerenciamentoContrapartida: GerenciamentoContrapartida) -> GerenciamentoContrapartida | None:
-        pass
-
-    @abstractmethod
-    def delete_gerenciamentoContrapartida(self, gerenciamentoContrapartida_id: uuid):
-        pass
-
-    @abstractmethod
-    def get_gerenciamentoContrapartida(self) -> list[GerenciamentoContrapartida]:
-        pass
 
 
 class GerenciamentoContrapartidaArquivoRepository(ABC):
     @abstractmethod
-    def get_gerenciamentoContrapartidaArquivo_by_id(self, gerenciamentoContrapartidaArquivo_id: uuid) -> GerenciamentoContrapartidaArquivo | None:
+    def get_gerenciamento_contrapartida_arquivo_by_id(self, gerenciamento_contrapartida_arquivo_id: uuid) -> GerenciamentoContrapartidaArquivo | None:
         pass
 
     @abstractmethod
-    def create_gerenciamentoContrapartidaArquivo(self, gerenciamentoContrapartidaArquivo: GerenciamentoContrapartidaArquivo) -> GerenciamentoContrapartidaArquivo:
+    def create_gerenciamento_contrapartida_arquivo(self, gerenciamento_contrapartida_arquivo: GerenciamentoContrapartidaArquivo) -> GerenciamentoContrapartidaArquivo:
         pass
 
     @abstractmethod
-    def update_gerenciamentoContrapartidaArquivo(self, gerenciamentoContrapartidaArquivo: GerenciamentoContrapartidaArquivo) -> GerenciamentoContrapartidaArquivo | None:
+    def update_gerenciamento_contrapartida_arquivo(self, gerenciamento_contrapartida_arquivo: GerenciamentoContrapartidaArquivo) -> GerenciamentoContrapartidaArquivo | None:
         pass
 
     @abstractmethod
-    def delete_gerenciamentoContrapartidaArquivo(self, gerenciamentoContrapartidaArquivo_id: uuid):
+    def delete_gerenciamento_contrapartida_arquivo(self, gerenciamento_contrapartida_arquivo_id: uuid):
         pass
 
     @abstractmethod
-    def get_gerenciamentoContrapartidaArquivo(self) -> list[GerenciamentoContrapartidaArquivo]:
+    def get_gerenciamento_contrapartida_arquivo(self) -> list[GerenciamentoContrapartidaArquivo]:
         pass
 
 
-class GerenciamentoContrapartidaAdminRepository(ABC):
-    @abstractmethod
-    def get_gerenciamentoContrapartidaAdmin_by_id(self, gerenciamentoContrapartidaAdmin_id: uuid) -> GerenciamentoContrapartidaAdmin | None:
-        pass
-
-    @abstractmethod
-    def create_gerenciamentoContrapartidaAdmin(self, gerenciamentoContrapartidaAdmin: GerenciamentoContrapartidaAdmin) -> GerenciamentoContrapartidaAdmin:
-        pass
-
-    @abstractmethod
-    def update_gerenciamentoContrapartidaAdmin(self, gerenciamentoContrapartidaAdmin: GerenciamentoContrapartidaAdmin) -> GerenciamentoContrapartidaAdmin | None:
-        pass
-
-    @abstractmethod
-    def delete_gerenciamentoContrapartidaAdmin(self, gerenciamentoContrapartidaAdmin_id: uuid):
-        pass
-
-    @abstractmethod
-    def get_gerenciamentoContrapartidaAdmin(self) -> list[GerenciamentoContrapartidaAdmin]:
-        pass
 """

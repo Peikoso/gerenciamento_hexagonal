@@ -20,8 +20,8 @@ class GerenciamentoPropostaModel:
     criado_em: Mapped[datetime] = mapped_column(DateTime, init=False, nullable=False, server_default=func.now())
     proposta_id: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    gerenciamento_quantitativo: Mapped['GerenciamentoQuantitativoModel'] = relationship('GerenciamentoQuantitativoModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', uselist=False, lazy='selectin', init=False)
-    gerenciamento_qualitativo: Mapped['GerenciamentoQualitativoModel'] = relationship('GerenciamentoQualitativoModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', uselist=False, lazy='selectin', init=False)
+    gerenciamento_quantitativo: Mapped[list['GerenciamentoQuantitativoModel']] = relationship('GerenciamentoQuantitativoModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
+    gerenciamento_qualitativo: Mapped[list['GerenciamentoQualitativoModel']] = relationship('GerenciamentoQualitativoModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
     gerenciamento_metas: Mapped[list['GerenciamentoMetaModel']] = relationship('GerenciamentoMetaModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
     gerenciamento_contrapartida: Mapped[list['GerenciamentoContrapartidaModel']] = relationship('GerenciamentoContrapartidaModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
 
@@ -72,12 +72,12 @@ class GerenciamentoQuantitativoModel:
     alcance_marca_pessoas_alcancadas_publicacao_digitais: Mapped[int] = mapped_column(Integer, nullable=False)
     pessoas_alcancadas: Mapped[int] = mapped_column(Integer, nullable=False)
     pessoas_impactadas: Mapped[int] = mapped_column(Integer, nullable=False)
+    
+    gerenciamento_proposta_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_proposta.id', ondelete='CASCADE'), nullable=False)
+    gerenciamento_proposta: Mapped['GerenciamentoPropostaModel'] = relationship(back_populates='gerenciamento_quantitativo', lazy='selectin', init=False)
 
-    gerenciamento_caracterizacao: Mapped['GerenciamentoCaracterizacaoModel'] = relationship('GerenciamentoCaracterizacaoModel', back_populates='gerenciamento_quantitativo', uselist=False, lazy='selectin', init=False)
-
-    gerenciamento_proposta_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_proposta.id', ondelete='CASCADE'), nullable=False, unique=True)
-    gerenciamento_proposta: Mapped['GerenciamentoPropostaModel'] = relationship('GerenciamentoPropostaModel', back_populates='gerenciamento_quantitativo', lazy='selectin', init=False)
-
+    gerenciamento_caracterizacao: Mapped[list['GerenciamentoCaracterizacaoModel']] = relationship('GerenciamentoCaracterizacaoModel', back_populates='gerenciamento_quantitativo', default_factory=list, lazy='selectin')
+    
     comentarios: Mapped[list['GerenciamentoComentarioModel']] = relationship(secondary='gerenciamento_quantitativo_comentario_association', back_populates='comentario_gerenciamento_quantitativos', cascade='all, delete', default_factory=list, lazy='selectin')
 
 
@@ -97,9 +97,9 @@ class GerenciamentoQualitativoModel:
     acoes_realizadas: Mapped[str] = mapped_column(String(500))
     acoes_previstas: Mapped[str] = mapped_column(String(500))
     visao_proponente: Mapped[str] = mapped_column(String(500))
-
-    gerenciamento_proposta_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_proposta.id', ondelete='CASCADE'), nullable=False, unique=True)
-    gerenciamento_proposta: Mapped['GerenciamentoPropostaModel'] = relationship('GerenciamentoPropostaModel', back_populates='gerenciamento_qualitativo', lazy='selectin', init=False)
+    
+    gerenciamento_proposta_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_proposta.id', ondelete='CASCADE'), nullable=False)
+    gerenciamento_proposta: Mapped['GerenciamentoPropostaModel'] = relationship(back_populates='gerenciamento_qualitativo', lazy='selectin', init=False)
 
     comentarios: Mapped[list['GerenciamentoComentarioModel']] = relationship(secondary='gerenciamento_qualitativo_comentario_association', back_populates='comentario_gerenciamento_qualitativos', cascade='all, delete', default_factory=list, lazy='selectin')
 
@@ -136,10 +136,10 @@ class GerenciamentoCaracterizacaoModel:
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False, autoincrement=True, init=False)
     quantidade: Mapped[int] = mapped_column(Integer, nullable=False)
-
-    gerenciamento_quantitativo_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_quantitativo.id', ondelete='RESTRICT'), nullable=False, unique=True)
-    gerenciamento_quantitativo: Mapped['GerenciamentoQuantitativoModel'] = relationship('GerenciamentoQuantitativoModel', back_populates='gerenciamento_caracterizacao', lazy='selectin', init=False)
-
+    
+    gerenciamento_quantitativo_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_quantitativo.id', ondelete='RESTRICT'), nullable=False)
+    gerenciamento_quantitativo: Mapped['GerenciamentoQuantitativoModel'] = relationship(back_populates='gerenciamento_caracterizacao', lazy='selectin', init=False)
+    
     categorizacoes: Mapped[list['CategorizacaoBeneficiarioModel']] = relationship(secondary=GerenciamentoBeneficiarioCategorizacaoSpec.MODEL_NAME, back_populates='gerenciamentos', default_factory=list, lazy='selectin')
 
 

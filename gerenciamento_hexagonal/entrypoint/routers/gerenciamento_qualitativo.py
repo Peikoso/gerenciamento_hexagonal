@@ -3,7 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from gerenciamento_hexagonal.application.dependencies import get_gerenciamento_qualitativo__service
+from gerenciamento_hexagonal.application.dependencies import get_gerenciamento_qualitativo_service
 from gerenciamento_hexagonal.application.services import GerenciamentoQualitativoServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError, UniqueViolation
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoQualitativo
@@ -12,7 +12,7 @@ from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import Gere
 router = APIRouter()
 
 
-Service = Annotated[GerenciamentoQualitativoServices, Depends(get_gerenciamento_qualitativo__service)]
+Service = Annotated[GerenciamentoQualitativoServices, Depends(get_gerenciamento_qualitativo_service)]
 
 
 @router.get('/', response_model=list[GerenciamentoQualitativo])
