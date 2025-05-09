@@ -3,6 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from gerenciamento_hexagonal.domain.models.arquivo import Arquivo
 from gerenciamento_hexagonal.domain.models.enums_specs import StatusGereciamentoContrapartida, TipoGerenciamento
 
 
@@ -79,67 +80,16 @@ class GerenciamentoContrapartidaAdmin(BaseModel):
     id: Optional[int] = None
 
 
-"""
-class GerenciamentoMetaArquivo(Arquivo, BaseModel):
-    gerenciamento_meta: GerenciamentoMeta
-
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def _get_id(self):
-        return self.id
-
-    @abstractmethod
-    def _get_rel_id(self):
-        return self.gerenciamento_meta.id
-
-    @abstractmethod
-    def _get_arquivo(self):
-        pass
+class GerenciamentoMetaArquivo(Arquivo):
+    gerenciamento_meta_id: int
+    id: Optional[int] = None
 
 
-class GerenciamentoQualitativoArquivo(Arquivo, BaseModel):
-    gerenciamento_qualitativo: GerenciamentoQualitativo
-
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def _get_id(self):
-        return self.id
-
-    @abstractmethod
-    def _get_rel_id(self):
-        return self.gerenciamento_qualitativo.id
-
-    @abstractmethod
-    def _get_arquivo(self):
-        pass
+class GerenciamentoQualitativoArquivo(Arquivo):
+    gerenciamento_qualitativo_id: int
+    id: Optional[int] = None
 
 
-
-
-class GerenciamentoContrapartidaArquivo(Arquivo, BaseModel):
-    gerenciamento_contrapartida: GerenciamentoContrapartida
-
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def _get_id(self):
-        return self.id
-
-    @abstractmethod
-    def _get_rel_id(self):
-        return self.gerenciamento_contrapartida.id
-
-    @abstractmethod
-    def _get_arquivo(self):
-        pass
-
-
-"""
+class GerenciamentoContrapartidaArquivo(Arquivo):
+    gerenciamento_contrapartida_id: int
+    id: Optional[int] = None

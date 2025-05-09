@@ -4,7 +4,7 @@ from typing import Optional
 from sqlalchemy import Column, Date, DateTime, Enum, ForeignKey, Integer, SmallInteger, String, Table, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
 
-from gerenciamento_hexagonal.domain.models.enums_specs import GerenciamentoBeneficiarioCategorizacaoSpec, StatusGereciamentoContrapartida
+from gerenciamento_hexagonal.domain.models.enums_specs import GerenciamentoBeneficiarioCategorizacaoSpec, StatusGereciamentoContrapartida, TipoArquivoContexto
 from gerenciamento_hexagonal.domain.models.gerenciamento import TipoGerenciamento
 
 table_registry = registry()
@@ -60,6 +60,8 @@ class GerenciamentoMetaModel:
     gerenciamento_proposta_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_proposta.id', ondelete='CASCADE'), nullable=False)
     gerenciamento_proposta: Mapped['GerenciamentoPropostaModel'] = relationship(back_populates='gerenciamento_metas', lazy='selectin', init=False)
 
+    arquivos: Mapped[list['GerenciamentoMetaArquivoModel']] = relationship(back_populates='gerenciamento_meta', cascade='all, delete-orphan', lazy='selectin', init=False)
+
 
 @table_registry.mapped_as_dataclass
 class GerenciamentoQuantitativoModel:
@@ -72,12 +74,12 @@ class GerenciamentoQuantitativoModel:
     alcance_marca_pessoas_alcancadas_publicacao_digitais: Mapped[int] = mapped_column(Integer, nullable=False)
     pessoas_alcancadas: Mapped[int] = mapped_column(Integer, nullable=False)
     pessoas_impactadas: Mapped[int] = mapped_column(Integer, nullable=False)
-    
+
     gerenciamento_proposta_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_proposta.id', ondelete='CASCADE'), nullable=False)
     gerenciamento_proposta: Mapped['GerenciamentoPropostaModel'] = relationship(back_populates='gerenciamento_quantitativo', lazy='selectin', init=False)
 
     gerenciamento_caracterizacao: Mapped[list['GerenciamentoCaracterizacaoModel']] = relationship('GerenciamentoCaracterizacaoModel', back_populates='gerenciamento_quantitativo', default_factory=list, lazy='selectin')
-    
+
     comentarios: Mapped[list['GerenciamentoComentarioModel']] = relationship(secondary='gerenciamento_quantitativo_comentario_association', back_populates='comentario_gerenciamento_quantitativos', cascade='all, delete', default_factory=list, lazy='selectin')
 
 
@@ -97,11 +99,13 @@ class GerenciamentoQualitativoModel:
     acoes_realizadas: Mapped[str] = mapped_column(String(500))
     acoes_previstas: Mapped[str] = mapped_column(String(500))
     visao_proponente: Mapped[str] = mapped_column(String(500))
-    
+
     gerenciamento_proposta_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_proposta.id', ondelete='CASCADE'), nullable=False)
     gerenciamento_proposta: Mapped['GerenciamentoPropostaModel'] = relationship(back_populates='gerenciamento_qualitativo', lazy='selectin', init=False)
 
     comentarios: Mapped[list['GerenciamentoComentarioModel']] = relationship(secondary='gerenciamento_qualitativo_comentario_association', back_populates='comentario_gerenciamento_qualitativos', cascade='all, delete', default_factory=list, lazy='selectin')
+
+    arquivos: Mapped[list['GerenciamentoQualitativoArquivoModel']] = relationship(back_populates='gerenciamento_qualitativo', cascade='all, delete-orphan', lazy='selectin', init=False)
 
 
 gerenciamento_qualitativo_comentario_association = Table('gerenciamento_qualitativo_comentario_association', table_registry.metadata, Column('gerenciamentoQualitativo_id', ForeignKey('gerenciamento_qualitativo.id', ondelete='CASCADE'), primary_key=True), Column('comentario_id', ForeignKey('gerenciamento_comentario.id', ondelete='CASCADE'), primary_key=True))
@@ -136,10 +140,10 @@ class GerenciamentoCaracterizacaoModel:
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False, autoincrement=True, init=False)
     quantidade: Mapped[int] = mapped_column(Integer, nullable=False)
-    
+
     gerenciamento_quantitativo_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_quantitativo.id', ondelete='RESTRICT'), nullable=False)
     gerenciamento_quantitativo: Mapped['GerenciamentoQuantitativoModel'] = relationship(back_populates='gerenciamento_caracterizacao', lazy='selectin', init=False)
-    
+
     categorizacoes: Mapped[list['CategorizacaoBeneficiarioModel']] = relationship(secondary=GerenciamentoBeneficiarioCategorizacaoSpec.MODEL_NAME, back_populates='gerenciamentos', default_factory=list, lazy='selectin')
 
 
@@ -168,6 +172,8 @@ class GerenciamentoContrapartidaModel:
 
     gerenciamento_contrapartida_admin: Mapped[list['GerenciamentoContrapartidaAdminModel']] = relationship('GerenciamentoContrapartidaAdminModel', back_populates='gerenciamento_contrapartida', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
 
+    arquivos: Mapped[list['GerenciamentoContrapartidaArquivoModel']] = relationship(back_populates='gerenciamento_contrapartida', cascade='all, delete-orphan', lazy='selectin', init=False)
+
 
 @table_registry.mapped_as_dataclass
 class GerenciamentoContrapartidaAdminModel:
@@ -180,3 +186,66 @@ class GerenciamentoContrapartidaAdminModel:
 
     gerenciamento_contrapartida_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_contrapartida.id', ondelete='CASCADE'), nullable=False)
     gerenciamento_contrapartida: Mapped['GerenciamentoContrapartidaModel'] = relationship(back_populates='gerenciamento_contrapartida_admin', lazy='selectin', init=False)
+
+
+@table_registry.mapped_as_dataclass
+class TipoArquivoModel:
+    __tablename__ = 'tipo_arquivo'
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, nullable=False)
+    contexto: Mapped[TipoArquivoContexto] = mapped_column(Enum(TipoArquivoContexto), nullable=False)
+    descricao: Mapped[str] = mapped_column(String(120), nullable=False, unique=True)
+    info: Mapped[str] = mapped_column(String(1000), nullable=False, default=None)
+
+
+@table_registry.mapped_as_dataclass
+class ArquivoModel:
+    __tablename__ = 'arquivo'
+
+    arquivo_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, init=False)
+    nome: Mapped[str] = mapped_column(String(255), nullable=False)
+    extensao: Mapped[str] = mapped_column(String(4), nullable=False)
+    tamanho: Mapped[int] = mapped_column(Integer, nullable=False)
+    uri: Mapped[str] = mapped_column(String(250), nullable=False)
+
+    tipo_arquivo_id: Mapped[str] = mapped_column(String(32), ForeignKey('tipo_arquivo.id'), nullable=False)
+    tipo_arquivo: Mapped['TipoArquivoModel'] = relationship(lazy='selectin', init=False)
+
+
+@table_registry.mapped_as_dataclass
+class GerenciamentoMetaArquivoModel:
+    __tablename__ = 'gerenciamento_meta_arquivo'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, init=False)
+
+    gerenciamento_meta_id: Mapped[int] = mapped_column(ForeignKey('gerenciamento_meta.id', ondelete='CASCADE'), nullable=False)
+    gerenciamento_meta: Mapped['GerenciamentoMetaModel'] = relationship(back_populates='arquivos', lazy='selectin', init=False)
+
+    arquivo_id: Mapped[int] = mapped_column(ForeignKey('arquivo.arquivo_id', ondelete='CASCADE'), nullable=False)
+    arquivo: Mapped['ArquivoModel'] = relationship(lazy='selectin', init=False)
+
+
+@table_registry.mapped_as_dataclass
+class GerenciamentoQualitativoArquivoModel:
+    __tablename__ = 'gerenciamento_qualitativo_arquivo'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, init=False)
+
+    gerenciamento_qualitativo_id: Mapped[int] = mapped_column(ForeignKey('gerenciamento_qualitativo.id', ondelete='CASCADE'), nullable=False)
+    gerenciamento_qualitativo: Mapped['GerenciamentoQualitativoModel'] = relationship(back_populates='arquivos', lazy='selectin', init=False)
+
+    arquivo_id: Mapped[int] = mapped_column(ForeignKey('arquivo.arquivo_id', ondelete='CASCADE'), nullable=False)
+    arquivo: Mapped['ArquivoModel'] = relationship(lazy='selectin', init=False)
+
+
+@table_registry.mapped_as_dataclass
+class GerenciamentoContrapartidaArquivoModel:
+    __tablename__ = 'gerenciamento_contrapartida_arquivo'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, init=False)
+
+    gerenciamento_contrapartida_id: Mapped[int] = mapped_column(ForeignKey('gerenciamento_contrapartida.id', ondelete='CASCADE'), nullable=False)
+    gerenciamento_contrapartida: Mapped['GerenciamentoContrapartidaModel'] = relationship(back_populates='arquivos', lazy='selectin', init=False)
+
+    arquivo_id: Mapped[int] = mapped_column(ForeignKey('arquivo.arquivo_id', ondelete='CASCADE'), nullable=False)
+    arquivo: Mapped['ArquivoModel'] = relationship(lazy='selectin', init=False)

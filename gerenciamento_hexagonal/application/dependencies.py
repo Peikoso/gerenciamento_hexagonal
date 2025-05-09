@@ -1,4 +1,14 @@
-from gerenciamento_hexagonal.application.services import GerenciamentoCaracterizacaoServices, GerenciamentoComentarioServices, GerenciamentoContrapartidaAdminServices, GerenciamentoContrapartidaServices, GerenciamentoMetaServices, GerenciamentoPropostaServices, GerenciamentoQualitativoServices, GerenciamentoQuantitativoServices
+from gerenciamento_hexagonal.application.services.arquivo.arquivo_service import ArquivoServices, ValidacaoArquivoService
+from gerenciamento_hexagonal.application.services.arquivo.gerenciamento_arquivo import GerenciamentoArquivoServices
+from gerenciamento_hexagonal.application.services.gerenciamento.caracterizacao import GerenciamentoCaracterizacaoServices
+from gerenciamento_hexagonal.application.services.gerenciamento.comentario import GerenciamentoComentarioServices
+from gerenciamento_hexagonal.application.services.gerenciamento.contrapartida import GerenciamentoContrapartidaServices
+from gerenciamento_hexagonal.application.services.gerenciamento.contrapartida_admin import GerenciamentoContrapartidaAdminServices
+from gerenciamento_hexagonal.application.services.gerenciamento.meta import GerenciamentoMetaServices
+from gerenciamento_hexagonal.application.services.gerenciamento.proposta import GerenciamentoPropostaServices
+from gerenciamento_hexagonal.application.services.gerenciamento.qualitativo import GerenciamentoQualitativoServices
+from gerenciamento_hexagonal.application.services.gerenciamento.quantitativo import GerenciamentoQuantitativoServices
+from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy.arquivo import GerenciamentoArquivoRepository
 from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy_repository import GerenciamentoCaracterizacaoRepository, GerenciamentoComentarioRepository, GerenciamentoContrapartidaAdminRepository, GerenciamentoContrapartidaRepository, GerenciamentoMetaRepository, GerenciamentoPropostaRepository, GerenciamentoQualitativoRepository, GerenciamentoQuantitativoRepository
 
 
@@ -49,3 +59,14 @@ def get_gerenciamento_contrapartida_admin_service() -> GerenciamentoContrapartid
     gerenciamento_contrapartida_service = get_gerenciamento_contrapartida_service()
     gerenciamento_contrapartida_admin_repository = GerenciamentoContrapartidaAdminRepository()
     return GerenciamentoContrapartidaAdminServices(gerenciamento_contrapartida_admin_repository, gerenciamento_contrapartida_service)
+
+
+def get_arquivo_service() -> GerenciamentoArquivoServices:
+    gerenciamento_meta_service = get_gerenciamento_meta_service()
+    gerenciamento_meta_repository = GerenciamentoArquivoRepository()
+    service_meta_arquivo = ArquivoServices()
+    return GerenciamentoArquivoServices(repository=gerenciamento_meta_repository, service_meta=gerenciamento_meta_service, service_meta_arquivo=service_meta_arquivo)
+
+
+def get_validacao_arquivo_service() -> ValidacaoArquivoService:
+    return ValidacaoArquivoService()

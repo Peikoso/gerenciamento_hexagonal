@@ -5,10 +5,6 @@ from pydantic import BaseModel, Field
 
 from gerenciamento_hexagonal.domain.models.enums_specs import StatusGereciamentoContrapartida
 from gerenciamento_hexagonal.domain.models.gerenciamento import (
-    GerenciamentoComentario,
-    GerenciamentoMeta,
-    GerenciamentoProposta,
-    GerenciamentoQuantitativo,
     TipoGerenciamento,
 )
 
@@ -93,11 +89,12 @@ class GerenciamentoQuantitativoRelatorioResponse(BaseModel):
     pessoas_impactadas: int
     gerenciamento_caracterizacao: list[GerenciamentoCaracterizacaoRelatorioResponse]
 
+
 class GerenciamentoContrapartidaRelatorioResponse(BaseModel):
     id: int
     proposta_contrapartida_id: int
     quantidade: int
-    observacao: str 
+    observacao: str
     data: date
     status: StatusGereciamentoContrapartida
 
@@ -110,6 +107,7 @@ class RelatorioResponse(BaseModel):
     gerenciamento_qualitativo: list[GerenciamentoQualitativoRelatorioResponse]
     gerenciamento_quantitativo: list[GerenciamentoQuantitativoRelatorioResponse]
     gerenciamento_contrapartida: list[GerenciamentoContrapartidaRelatorioResponse]
+
 
 class WrappedRelatorioResponse(BaseModel):
     gerenciamento_proposta: RelatorioResponse
