@@ -1,6 +1,6 @@
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO
+from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoComentarioDTO
 from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoComentarioRepository
 
 

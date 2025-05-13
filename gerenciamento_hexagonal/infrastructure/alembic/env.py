@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 import asyncio
 
 
-from gerenciamento_hexagonal.infrastructure.database.models.gerenciamentoORM import (
+from gerenciamento_hexagonal.infrastructure.database.models.gerenciamento_orm import (
     table_registry,
 )
 from gerenciamento_hexagonal.infrastructure.settings import Settings

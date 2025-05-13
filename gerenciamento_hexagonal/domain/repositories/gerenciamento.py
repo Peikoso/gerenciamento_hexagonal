@@ -13,10 +13,8 @@ from gerenciamento_hexagonal.domain.models.gerenciamento import (
     GerenciamentoQualitativo,
     GerenciamentoQualitativoArquivo,
     GerenciamentoQuantitativo,
-    # GerenciamentoMetaArquivo,
-    # GerenciamentoContrapartidaArquivo,
-    # GerenciamentoQualitativoArquivo,
 )
+from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoPropostaResponse
 
 
 class GerenciamentoComentarioRepository(ABC):
@@ -43,7 +41,7 @@ class GerenciamentoComentarioRepository(ABC):
 
 class GerenciamentoPropostaRepository(ABC):
     @abstractmethod
-    async def get_gerenciamento_proposta(self) -> list[GerenciamentoProposta]:
+    async def get_gerenciamento_proposta(self) -> list[GerenciamentoPropostaResponse]:
         pass
 
     @abstractmethod
@@ -51,11 +49,11 @@ class GerenciamentoPropostaRepository(ABC):
         pass
 
     @abstractmethod
-    async def create_gerenciamento_proposta(self, gerenciamento_proposta: GerenciamentoProposta) -> GerenciamentoProposta:
+    async def create_gerenciamento_proposta(self, gerenciamento_proposta: GerenciamentoProposta) -> GerenciamentoPropostaResponse:
         pass
 
     @abstractmethod
-    async def update_gerenciamento_proposta(self, gerenciamento_proposta_id: int, gerenciamento_proposta: GerenciamentoProposta) -> GerenciamentoProposta:
+    async def update_gerenciamento_proposta(self, gerenciamento_proposta_id: int, gerenciamento_proposta: GerenciamentoProposta) -> GerenciamentoPropostaResponse:
         pass
 
     @abstractmethod
@@ -63,7 +61,7 @@ class GerenciamentoPropostaRepository(ABC):
         pass
 
     @abstractmethod
-    async def create_gerenciamento_proposta_comentario(self, gerenciamento_proposta_id: int, gerenciamento_comentario: GerenciamentoComentario) -> GerenciamentoProposta:
+    async def create_gerenciamento_proposta_comentario(self, gerenciamento_proposta_id: int, gerenciamento_comentario: GerenciamentoComentario) -> GerenciamentoComentario:
         pass
 
     @abstractmethod
@@ -242,4 +240,26 @@ class GerenciamentoArquivoRepository(ABC):
 
     @abstractmethod
     async def delete_gerenciamento_arquivo(self, gerenciamentoMetaArquivo_id: int):
+        pass
+
+
+class VerifyGerenciamentoExistsRepository(ABC):
+    @abstractmethod
+    async def gerencimento_proposta_exists(self, gerenciamento_proposta_id: int) -> bool:
+        pass
+
+    @abstractmethod
+    async def gerenciamento_meta_exists(self, gerenciamento_meta_id: int) -> bool:
+        pass
+
+    @abstractmethod
+    async def gerenciamento_quantitativo_exists(self, gerenciamento_quantitativo_id: int) -> bool:
+        pass
+
+    @abstractmethod
+    async def gerenciamento_qualitativo_exists(self, gerenciamento_qualitativo_id: int) -> bool:
+        pass
+
+    @abstractmethod
+    async def gerenciamento_contrapartida_exists(self, gerenciamento_contrapartida_id: int) -> bool:
         pass

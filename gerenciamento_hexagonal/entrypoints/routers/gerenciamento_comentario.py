@@ -1,29 +1,24 @@
 from http import HTTPStatus
-from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 
-from gerenciamento_hexagonal.application.dependencies import get_gerenciamento_comentario_service
-from gerenciamento_hexagonal.application.services.gerenciamento.comentario import GerenciamentoComentarioServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO
+from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoComentarioDTO
+from gerenciamento_hexagonal.entrypoints.annotated import Service_Comentario
 
 router = APIRouter()
 
 
-Service = Annotated[GerenciamentoComentarioServices, Depends(get_gerenciamento_comentario_service)]
-
-
 @router.get('/', response_model=list[GerenciamentoComentario])
-async def get_gerenciamento_comentarios(service: Service):
+async def get_gerenciamento_comentarios(service: Service_Comentario):
     gerenciamento_comentarios = await service.get_gerenciamento_comentario()
 
     return gerenciamento_comentarios
 
 
 @router.get('/{gerenciamento_comentario_id}', response_model=GerenciamentoComentario)
-async def get_by_id_gerenciamento_comentario(gerenciamento_comentario_id: int, service: Service):
+async def get_by_id_gerenciamento_comentario(gerenciamento_comentario_id: int, service: Service_Comentario):
     try:
         gerenciamento_comentario = await service.get_gerenciamento_comentario_by_id(gerenciamento_comentario_id)
 
@@ -34,7 +29,7 @@ async def get_by_id_gerenciamento_comentario(gerenciamento_comentario_id: int, s
 
 
 @router.put('/{gerenciamento_comentario_id}', response_model=GerenciamentoComentario)
-async def update_gerenciamento_comentario(gerenciamento_comentario_id: int, gerenciamento_comentario: GerenciamentoComentarioDTO, service: Service):
+async def update_gerenciamento_comentario(gerenciamento_comentario_id: int, gerenciamento_comentario: GerenciamentoComentarioDTO, service: Service_Comentario):
     try:
         gerenciamento_comentario = await service.update_gerenciamento_comentario(gerenciamento_comentario_id, gerenciamento_comentario)
 
@@ -45,7 +40,7 @@ async def update_gerenciamento_comentario(gerenciamento_comentario_id: int, gere
 
 
 @router.delete('/{gerenciamento_comentario_id}')
-async def delete_gerenciamento_comentario(gerenciamento_comentario_id: int, service: Service):
+async def delete_gerenciamento_comentario(gerenciamento_comentario_id: int, service: Service_Comentario):
     try:
         result = await service.delete_gerenciamento_comentario(gerenciamento_comentario_id)
 

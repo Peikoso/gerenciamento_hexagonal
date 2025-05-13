@@ -1,6 +1,6 @@
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError, NotNullViolationError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario, GerenciamentoProposta
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoPropostaDTO
+from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoComentarioDTO, GerenciamentoPropostaDTO
 from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoPropostaRepository
 
 
@@ -35,7 +35,10 @@ class GerenciamentoPropostaServices:
         return gerenciamento_proposta
 
     async def delete_gerenciamento_proposta(self, gerenciamento_proposta_id: int):
-        await self.get_gerenciamento_proposta_by_id(gerenciamento_proposta_id)
+        gerenciamento_proposta = await self.get_gerenciamento_proposta_by_id(gerenciamento_proposta_id)
+
+        if gerenciamento_proposta.arquivos_ids:
+            raise NotNullViolationError('Cannot delete a gerenciamento_proposta because there are associated files.')
 
         not_null_violation = await self.repository.checar_gerenciamento_caracterizacao_exists(gerenciamento_proposta_id)
 

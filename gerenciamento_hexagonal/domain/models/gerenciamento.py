@@ -20,12 +20,14 @@ class GerenciamentoProposta(BaseModel):
     id: Optional[int] = None
     criado_em: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     metas_comentarios: list[GerenciamentoComentario] = Field(default_factory=list)
+    arquivos_ids: list[int] = Field(default_factory=list)
 
 
 class GerenciamentoMeta(BaseModel):
     alcancado: int
     gerenciamento_proposta_id: Optional[int] = None
     ordem: Optional[int] = None
+    arquivos_ids: list[int] = Field(default_factory=list)
     id: Optional[int] = None
 
 
@@ -47,6 +49,7 @@ class GerenciamentoQualitativo(BaseModel):
     visao_proponente: Optional[str] = None
     gerenciamento_proposta_id: Optional[int] = None
     id: Optional[int] = None
+    arquivos_ids: list[int] = Field(default_factory=list)
     comentarios: list[GerenciamentoComentario] = Field(default_factory=list)
 
 
@@ -70,6 +73,7 @@ class GerenciamentoContrapartida(BaseModel):
     status: StatusGereciamentoContrapartida
     gerenciamento_proposta_id: Optional[int] = None
     id: Optional[int] = None
+    arquivos_ids: list[int] = Field(default_factory=list)
 
 
 class GerenciamentoContrapartidaAdmin(BaseModel):

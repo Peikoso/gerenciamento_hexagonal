@@ -1,14 +1,14 @@
-from gerenciamento_hexagonal.application.services.gerenciamento.proposta import GerenciamentoPropostaServices
+from gerenciamento_hexagonal.application.services.interfaces.verify_gerenciamento import VerifyGerenciamentoExists
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError, NotNullViolationError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario, GerenciamentoQuantitativo
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoQuantitativoDTO
-from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy_repository import GerenciamentoQuantitativoRepository
+from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoComentarioDTO, GerenciamentoQuantitativoDTO
+from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoQuantitativoRepository
 
 
 class GerenciamentoQuantitativoServices:
-    def __init__(self, repository: GerenciamentoQuantitativoRepository, service_proposta: GerenciamentoPropostaServices):
+    def __init__(self, repository: GerenciamentoQuantitativoRepository, verify: VerifyGerenciamentoExists):
         self.repository = repository
-        self.service_proposta = service_proposta
+        self.verify = verify
 
     async def get_gerenciamento_quantitativo(self) -> list[GerenciamentoQuantitativo]:
         gerenciamento_quantitativos = await self.repository.get_gerenciamento_quantitativo()
@@ -24,7 +24,7 @@ class GerenciamentoQuantitativoServices:
         return gerenciamento_quantitativo
 
     async def create_gerenciamento_quantitativo(self, gerenciamento_proposta_id: int, gerenciamento_quantitativo: GerenciamentoQuantitativoDTO) -> GerenciamentoQuantitativo:
-        await self.service_proposta.get_gerenciamento_proposta_by_id(gerenciamento_proposta_id)
+        await self.verify.gerencimento_proposta_exists(gerenciamento_proposta_id)
 
         gerenciamento_quantitativo = GerenciamentoQuantitativo(**gerenciamento_quantitativo.model_dump())
         gerenciamento_quantitativo = await self.repository.create_gerenciamento_quantitativo(gerenciamento_proposta_id, gerenciamento_quantitativo)

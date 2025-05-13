@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Annotated, Optional
 
 from pydantic import BaseModel, Field
@@ -15,6 +15,11 @@ class GerenciamentoPropostaDTO(BaseModel):
     proposta_id: int
     trimestre_de_referencia: date
     tipo: TipoGerenciamento = Field(default_factory=TipoGerenciamento.TRIMESTRAL)
+
+
+class GerenciamentoPropostaResponse(GerenciamentoPropostaDTO):
+    id: int
+    criado_em: datetime
 
 
 class GerenciamentoComentarioDTO(BaseModel):
@@ -46,6 +51,16 @@ class GerenciamentoCaracterizacaoDTO(BaseModel):
     categorizacoes_ids: list[PositiveInt]
 
 
+class GerenciamentoQuantitativoCaracterozacaoDTO(BaseModel):
+    educacao_financeira_impactados: int
+    educacao_financeira_alcancados: int
+    geracao_renda_postos_trabalho_gerados: int
+    alcance_marca_pessoas_alcancadas_publicacao_digitais: int
+    pessoas_alcancadas: int
+    pessoas_impactadas: int
+    gerenciamento_caracterizacao: list[GerenciamentoCaracterizacaoDTO] = Field(default_factory=list)
+
+
 class GerenciamentoContrapartidaDTO(BaseModel):
     proposta_contrapartida_id: int
     quantidade: int
@@ -64,6 +79,7 @@ class GerenciamentoMetaRelatorioResponse(BaseModel):
     id: int
     alcancado: int
     ordem: Optional[int] = None
+    arquivos_ids: list[int] = Field(default_factory=list)
 
 
 class GerenciamentoQualitativoRelatorioResponse(BaseModel):
@@ -71,6 +87,7 @@ class GerenciamentoQualitativoRelatorioResponse(BaseModel):
     acoes_realizadas: Optional[str] = None
     acoes_previstas: Optional[str] = None
     visao_proponente: Optional[str] = None
+    arquivos_ids: list[int] = Field(default_factory=list)
 
 
 class GerenciamentoCaracterizacaoRelatorioResponse(BaseModel):
@@ -97,9 +114,18 @@ class GerenciamentoContrapartidaRelatorioResponse(BaseModel):
     observacao: str
     data: date
     status: StatusGereciamentoContrapartida
+    arquivos_ids: list[int] = Field(default_factory=list)
+
+
+class RelatorioDTO(GerenciamentoPropostaDTO):
+    gerenciamento_metas: list[GerenciamentoMetaDTO]
+    gerenciamento_qualitativo: list[GerenciamentoQualitativoDTO]
+    gerenciamento_quantitativo: list[GerenciamentoQuantitativoCaracterozacaoDTO]
+    gerenciamento_contrapartida: list[GerenciamentoContrapartidaDTO]
 
 
 class RelatorioResponse(BaseModel):
+    id: int
     proposta_id: int
     trimestre_de_referencia: date
     tipo: TipoGerenciamento

@@ -1,8 +1,8 @@
-"""criando o banco
+"""criando banco
 
-Revision ID: 618493c62f60
+Revision ID: b04e37797f78
 Revises: 
-Create Date: 2025-05-09 01:56:50.899096
+Create Date: 2025-05-12 16:03:32.318164
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '618493c62f60'
+revision: str = 'b04e37797f78'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -135,7 +135,7 @@ def upgrade() -> None:
     sa.Column('gerenciamento_contrapartida_id', sa.Integer(), nullable=False),
     sa.Column('arquivo_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['arquivo_id'], ['arquivo.arquivo_id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['gerenciamento_contrapartida_id'], ['gerenciamento_contrapartida.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['gerenciamento_contrapartida_id'], ['gerenciamento_contrapartida.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('gerenciamento_meta_arquivo',
@@ -143,7 +143,7 @@ def upgrade() -> None:
     sa.Column('gerenciamento_meta_id', sa.Integer(), nullable=False),
     sa.Column('arquivo_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['arquivo_id'], ['arquivo.arquivo_id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['gerenciamento_meta_id'], ['gerenciamento_meta.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['gerenciamento_meta_id'], ['gerenciamento_meta.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('gerenciamento_qualitativo_arquivo',
@@ -151,7 +151,7 @@ def upgrade() -> None:
     sa.Column('gerenciamento_qualitativo_id', sa.Integer(), nullable=False),
     sa.Column('arquivo_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['arquivo_id'], ['arquivo.arquivo_id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['gerenciamento_qualitativo_id'], ['gerenciamento_qualitativo.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['gerenciamento_qualitativo_id'], ['gerenciamento_qualitativo.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('gerenciamento_qualitativo_comentario_association',

@@ -1,29 +1,24 @@
 from http import HTTPStatus
-from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 
-from gerenciamento_hexagonal.application.dependencies import get_gerenciamento_quantitativo_service
-from gerenciamento_hexagonal.application.services.gerenciamento.quantitativo import GerenciamentoQuantitativoServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError, NotNullViolationError, UniqueViolation
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoQuantitativo
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoQuantitativoDTO
+from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoComentarioDTO, GerenciamentoQuantitativoDTO
+from gerenciamento_hexagonal.entrypoints.annotated import Service_Quantitativo
 
 router = APIRouter()
 
 
-Service = Annotated[GerenciamentoQuantitativoServices, Depends(get_gerenciamento_quantitativo_service)]
-
-
 @router.get('/', response_model=list[GerenciamentoQuantitativo])
-async def get_gerenciamento_quantitativos(service: Service):
+async def get_gerenciamento_quantitativos(service: Service_Quantitativo):
     gerenciamento_quantitativos = await service.get_gerenciamento_quantitativo()
 
     return gerenciamento_quantitativos
 
 
 @router.get('/{gerenciamento_quantitativo_id}', response_model=GerenciamentoQuantitativo)
-async def get_gerenciamento_quantitativo_by_id(gerenciamento_quantitativo_id: int, service: Service):
+async def get_gerenciamento_quantitativo_by_id(gerenciamento_quantitativo_id: int, service: Service_Quantitativo):
     try:
         gerenciamento_quantitativo = await service.get_gerenciamento_quantitativo_by_id(gerenciamento_quantitativo_id)
 
@@ -34,7 +29,7 @@ async def get_gerenciamento_quantitativo_by_id(gerenciamento_quantitativo_id: in
 
 
 @router.post('/{gerenciamentoProposta_id}', response_model=GerenciamentoQuantitativo)
-async def create_gerenciamento_quantitativo(gerenciamentoProposta_id: int, gerenciamento_quantitativo: GerenciamentoQuantitativoDTO, service: Service):
+async def create_gerenciamento_quantitativo(gerenciamentoProposta_id: int, gerenciamento_quantitativo: GerenciamentoQuantitativoDTO, service: Service_Quantitativo):
     try:
         gerenciamento_quantitativo = await service.create_gerenciamento_quantitativo(gerenciamentoProposta_id, gerenciamento_quantitativo)
 
@@ -48,7 +43,7 @@ async def create_gerenciamento_quantitativo(gerenciamentoProposta_id: int, geren
 
 
 @router.post('/Comentario/{gerenciamento_quantitativo_id}', response_model=GerenciamentoQuantitativo)
-async def create_gerenciamento_quantitativo_comentario(gerenciamento_quantitativo_id: int, gerenciamento_comentario: GerenciamentoComentarioDTO, service: Service):
+async def create_gerenciamento_quantitativo_comentario(gerenciamento_quantitativo_id: int, gerenciamento_comentario: GerenciamentoComentarioDTO, service: Service_Quantitativo):
     try:
         gerenciamento_quantitativo_comentario = await service.create_gerenciamento_quantitativo_comentario(gerenciamento_quantitativo_id, gerenciamento_comentario)
 
@@ -59,7 +54,7 @@ async def create_gerenciamento_quantitativo_comentario(gerenciamento_quantitativ
 
 
 @router.put('/{gerenciamento_quantitativo_id}', response_model=GerenciamentoQuantitativo)
-async def update_gerenciamento_quantitativo(gerenciamento_quantitativo_id: int, gerenciamento_quantitativo: GerenciamentoQuantitativoDTO, service: Service):
+async def update_gerenciamento_quantitativo(gerenciamento_quantitativo_id: int, gerenciamento_quantitativo: GerenciamentoQuantitativoDTO, service: Service_Quantitativo):
     try:
         gerenciamento_quantitativo = await service.update_gerenciamento_quantitativo(gerenciamento_quantitativo_id, gerenciamento_quantitativo)
 
@@ -70,7 +65,7 @@ async def update_gerenciamento_quantitativo(gerenciamento_quantitativo_id: int, 
 
 
 @router.delete('/{gerenciamento_quantitativo_id}')
-async def delete_gerenciamento_quantitativo(gerenciamento_quantitativo_id: int, service: Service):
+async def delete_gerenciamento_quantitativo(gerenciamento_quantitativo_id: int, service: Service_Quantitativo):
     try:
         result = await service.delete_gerenciamento_quantitativo(gerenciamento_quantitativo_id)
 

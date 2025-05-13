@@ -60,7 +60,7 @@ class GerenciamentoMetaModel:
     gerenciamento_proposta_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_proposta.id', ondelete='CASCADE'), nullable=False)
     gerenciamento_proposta: Mapped['GerenciamentoPropostaModel'] = relationship(back_populates='gerenciamento_metas', lazy='selectin', init=False)
 
-    arquivos: Mapped[list['GerenciamentoMetaArquivoModel']] = relationship(back_populates='gerenciamento_meta', cascade='all, delete-orphan', lazy='selectin', init=False)
+    arquivos: Mapped[list['GerenciamentoMetaArquivoModel']] = relationship(back_populates='gerenciamento_meta', lazy='selectin', init=False)
 
 
 @table_registry.mapped_as_dataclass
@@ -105,7 +105,7 @@ class GerenciamentoQualitativoModel:
 
     comentarios: Mapped[list['GerenciamentoComentarioModel']] = relationship(secondary='gerenciamento_qualitativo_comentario_association', back_populates='comentario_gerenciamento_qualitativos', cascade='all, delete', default_factory=list, lazy='selectin')
 
-    arquivos: Mapped[list['GerenciamentoQualitativoArquivoModel']] = relationship(back_populates='gerenciamento_qualitativo', cascade='all, delete-orphan', lazy='selectin', init=False)
+    arquivos: Mapped[list['GerenciamentoQualitativoArquivoModel']] = relationship(back_populates='gerenciamento_qualitativo', lazy='selectin', init=False)
 
 
 gerenciamento_qualitativo_comentario_association = Table('gerenciamento_qualitativo_comentario_association', table_registry.metadata, Column('gerenciamentoQualitativo_id', ForeignKey('gerenciamento_qualitativo.id', ondelete='CASCADE'), primary_key=True), Column('comentario_id', ForeignKey('gerenciamento_comentario.id', ondelete='CASCADE'), primary_key=True))
@@ -172,7 +172,7 @@ class GerenciamentoContrapartidaModel:
 
     gerenciamento_contrapartida_admin: Mapped[list['GerenciamentoContrapartidaAdminModel']] = relationship('GerenciamentoContrapartidaAdminModel', back_populates='gerenciamento_contrapartida', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
 
-    arquivos: Mapped[list['GerenciamentoContrapartidaArquivoModel']] = relationship(back_populates='gerenciamento_contrapartida', cascade='all, delete-orphan', lazy='selectin', init=False)
+    arquivos: Mapped[list['GerenciamentoContrapartidaArquivoModel']] = relationship(back_populates='gerenciamento_contrapartida', lazy='selectin', init=False)
 
 
 @table_registry.mapped_as_dataclass
@@ -218,7 +218,7 @@ class GerenciamentoMetaArquivoModel:
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, init=False)
 
-    gerenciamento_meta_id: Mapped[int] = mapped_column(ForeignKey('gerenciamento_meta.id', ondelete='CASCADE'), nullable=False)
+    gerenciamento_meta_id: Mapped[int] = mapped_column(ForeignKey('gerenciamento_meta.id', ondelete='RESTRICT'), nullable=False)
     gerenciamento_meta: Mapped['GerenciamentoMetaModel'] = relationship(back_populates='arquivos', lazy='selectin', init=False)
 
     arquivo_id: Mapped[int] = mapped_column(ForeignKey('arquivo.arquivo_id', ondelete='CASCADE'), nullable=False)
@@ -231,7 +231,7 @@ class GerenciamentoQualitativoArquivoModel:
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, init=False)
 
-    gerenciamento_qualitativo_id: Mapped[int] = mapped_column(ForeignKey('gerenciamento_qualitativo.id', ondelete='CASCADE'), nullable=False)
+    gerenciamento_qualitativo_id: Mapped[int] = mapped_column(ForeignKey('gerenciamento_qualitativo.id', ondelete='RESTRICT'), nullable=False)
     gerenciamento_qualitativo: Mapped['GerenciamentoQualitativoModel'] = relationship(back_populates='arquivos', lazy='selectin', init=False)
 
     arquivo_id: Mapped[int] = mapped_column(ForeignKey('arquivo.arquivo_id', ondelete='CASCADE'), nullable=False)
@@ -244,7 +244,7 @@ class GerenciamentoContrapartidaArquivoModel:
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, init=False)
 
-    gerenciamento_contrapartida_id: Mapped[int] = mapped_column(ForeignKey('gerenciamento_contrapartida.id', ondelete='CASCADE'), nullable=False)
+    gerenciamento_contrapartida_id: Mapped[int] = mapped_column(ForeignKey('gerenciamento_contrapartida.id', ondelete='RESTRICT'), nullable=False)
     gerenciamento_contrapartida: Mapped['GerenciamentoContrapartidaModel'] = relationship(back_populates='arquivos', lazy='selectin', init=False)
 
     arquivo_id: Mapped[int] = mapped_column(ForeignKey('arquivo.arquivo_id', ondelete='CASCADE'), nullable=False)

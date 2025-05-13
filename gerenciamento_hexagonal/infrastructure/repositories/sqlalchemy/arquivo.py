@@ -1,7 +1,7 @@
 from gerenciamento_hexagonal.domain.models.arquivo import Arquivo
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoContrapartidaArquivo, GerenciamentoMetaArquivo, GerenciamentoQualitativoArquivo
 from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoArquivoRepository
-from gerenciamento_hexagonal.infrastructure.database.models.gerenciamentoORM import ArquivoModel, GerenciamentoContrapartidaArquivoModel, GerenciamentoMetaArquivoModel, GerenciamentoQualitativoArquivoModel
+from gerenciamento_hexagonal.infrastructure.database.models.gerenciamento_orm import ArquivoModel, GerenciamentoContrapartidaArquivoModel, GerenciamentoMetaArquivoModel, GerenciamentoQualitativoArquivoModel
 from gerenciamento_hexagonal.infrastructure.database.sqlalchemyConfig import get_session
 from sqlalchemy import select
 
@@ -60,7 +60,7 @@ class GerenciamentoArquivoRepository(GerenciamentoArquivoRepository):
 
             return db_arquivo.arquivo_id
 
-    async def create_gerenciamento_meta_arquivo(self, gerenciamento_meta_id: int, arquivo_id: int) -> GerenciamentoQualitativoArquivo:
+    async def create_gerenciamento_meta_arquivo(self, gerenciamento_meta_id: int, arquivo_id: int) -> GerenciamentoMetaArquivo:
         async with get_session() as session:
             db_meta_arquivo = GerenciamentoMetaArquivoModel(gerenciamento_meta_id=gerenciamento_meta_id, arquivo_id=arquivo_id)
 
@@ -89,7 +89,7 @@ class GerenciamentoArquivoRepository(GerenciamentoArquivoRepository):
 
             return GerenciamentoQualitativoArquivo.model_validate({
                 'id': db_qualitativo_arquivo.id,
-                'gerenciamento_meta_id': db_qualitativo_arquivo.gerenciamento_qualitativo_id,
+                'gerenciamento_qualitativo_id': db_qualitativo_arquivo.gerenciamento_qualitativo_id,
                 'arquivo_id': db_qualitativo_arquivo.arquivo_id,
                 'tipo_arquivo_id': db_qualitativo_arquivo.arquivo.tipo_arquivo_id,
                 'nome': db_qualitativo_arquivo.arquivo.nome,
@@ -108,7 +108,7 @@ class GerenciamentoArquivoRepository(GerenciamentoArquivoRepository):
 
             return GerenciamentoContrapartidaArquivo.model_validate({
                 'id': db_contrapartida_arquivo.id,
-                'gerenciamento_meta_id': db_contrapartida_arquivo.gerenciamento_contrapartida_id,
+                'gerenciamento_contrapartida_id': db_contrapartida_arquivo.gerenciamento_contrapartida_id,
                 'arquivo_id': db_contrapartida_arquivo.arquivo_id,
                 'tipo_arquivo_id': db_contrapartida_arquivo.arquivo.tipo_arquivo_id,
                 'nome': db_contrapartida_arquivo.arquivo.nome,

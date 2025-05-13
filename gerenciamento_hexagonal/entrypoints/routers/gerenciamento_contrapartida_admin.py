@@ -1,29 +1,24 @@
 from http import HTTPStatus
-from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 
-from gerenciamento_hexagonal.application.dependencies import get_gerenciamento_contrapartida_admin_service
-from gerenciamento_hexagonal.application.services.gerenciamento.contrapartida_admin import GerenciamentoContrapartidaAdminServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoContrapartidaAdmin
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoContrapartidaAdminDTO
+from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoContrapartidaAdminDTO
+from gerenciamento_hexagonal.entrypoints.annotated import Service_Contrapartida_Admin
 
 router = APIRouter()
 
 
-Service = Annotated[GerenciamentoContrapartidaAdminServices, Depends(get_gerenciamento_contrapartida_admin_service)]
-
-
 @router.get('/', response_model=list[GerenciamentoContrapartidaAdmin])
-async def get_gerenciamento_contrapartida_admins(service: Service):
+async def get_gerenciamento_contrapartida_admins(service: Service_Contrapartida_Admin):
     gerenciamento_contrapartida_admin = await service.get_gerenciamento_contrapartida_admin()
 
     return gerenciamento_contrapartida_admin
 
 
 @router.get('/{gerenciamento_contrapartida_admin_id}', response_model=GerenciamentoContrapartidaAdmin)
-async def get_gerenciamento_contrapartida_admin_by_id(gerenciamento_contrapartida_admin_id: int, service: Service):
+async def get_gerenciamento_contrapartida_admin_by_id(gerenciamento_contrapartida_admin_id: int, service: Service_Contrapartida_Admin):
     try:
         gerenciamento_contrapartida_admin = await service.get_gerenciamento_contrapartida_admin_by_id(gerenciamento_contrapartida_admin_id)
 
@@ -34,7 +29,7 @@ async def get_gerenciamento_contrapartida_admin_by_id(gerenciamento_contrapartid
 
 
 @router.post('/{gerenciamento_contrapartida_id}', response_model=GerenciamentoContrapartidaAdmin)
-async def create_gerenciamento_contrapartida_admin(gerenciamento_contrapartida_id: int, gerenciamento_contrapartida_admin: GerenciamentoContrapartidaAdminDTO, service: Service):
+async def create_gerenciamento_contrapartida_admin(gerenciamento_contrapartida_id: int, gerenciamento_contrapartida_admin: GerenciamentoContrapartidaAdminDTO, service: Service_Contrapartida_Admin):
     try:
         gerenciamento_contrapartida_admin = await service.create_gerenciamento_contrapartida_admin(gerenciamento_contrapartida_id, gerenciamento_contrapartida_admin)
 
@@ -45,7 +40,7 @@ async def create_gerenciamento_contrapartida_admin(gerenciamento_contrapartida_i
 
 
 @router.put('/{gerenciamento_contrapartida_admin_id}', response_model=GerenciamentoContrapartidaAdmin)
-async def update_gerenciamento_contrapartida_admin(gerenciamento_contrapartida_admin_id: int, gerenciamento_contrapartida_admin: GerenciamentoContrapartidaAdminDTO, service: Service):
+async def update_gerenciamento_contrapartida_admin(gerenciamento_contrapartida_admin_id: int, gerenciamento_contrapartida_admin: GerenciamentoContrapartidaAdminDTO, service: Service_Contrapartida_Admin):
     try:
         gerenciamento_contrapartida_admin = await service.update_gerenciamento_contrapartida_admin(gerenciamento_contrapartida_admin_id, gerenciamento_contrapartida_admin)
 
@@ -56,7 +51,7 @@ async def update_gerenciamento_contrapartida_admin(gerenciamento_contrapartida_a
 
 
 @router.delete('/{gerenciamento_contrapartida_admin_id}')
-async def delete_gerenciamento_contrapartida_admin(gerenciamento_contrapartida_admin_id: int, service: Service):
+async def delete_gerenciamento_contrapartida_admin(gerenciamento_contrapartida_admin_id: int, service: Service_Contrapartida_Admin):
     try:
         result = await service.delete_gerenciamento_contrapartida_admin(gerenciamento_contrapartida_admin_id)
 

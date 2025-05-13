@@ -1,14 +1,14 @@
-from gerenciamento_hexagonal.application.services.gerenciamento.quantitativo import GerenciamentoQuantitativoServices
+from gerenciamento_hexagonal.application.services.interfaces.verify_gerenciamento import VerifyGerenciamentoExists
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoCaracterizacao
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoCaracterizacaoDTO
-from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy_repository import GerenciamentoCaracterizacaoRepository
+from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoCaracterizacaoDTO
+from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoCaracterizacaoRepository
 
 
 class GerenciamentoCaracterizacaoServices:
-    def __init__(self, repository: GerenciamentoCaracterizacaoRepository, service_quantitativo: GerenciamentoQuantitativoServices):
+    def __init__(self, repository: GerenciamentoCaracterizacaoRepository, verify: VerifyGerenciamentoExists):
         self.repository = repository
-        self.service_quantitativo = service_quantitativo
+        self.verify = verify
 
     async def get_gerenciamento_caracterizacao(self) -> list[GerenciamentoCaracterizacao]:
         gerenciamento_caracterizacoes = await self.repository.get_gerenciamento_caracterizacao()
@@ -24,7 +24,7 @@ class GerenciamentoCaracterizacaoServices:
         return gerenciamento_caracterizacao
 
     async def create_gerenciamento_caracterizacao(self, gerenciamento_quantitativo_id: int, gerenciamento_caracterizacao: GerenciamentoCaracterizacaoDTO) -> GerenciamentoCaracterizacao:
-        await self.service_quantitativo.get_gerenciamento_quantitativo_by_id(gerenciamento_quantitativo_id)
+        await self.verify.gerenciamento_quantitativo_exists(gerenciamento_quantitativo_id)
 
         gerenciamento_caracterizacao.categorizacoes_ids = list(set(gerenciamento_caracterizacao.categorizacoes_ids))
         categorizacao = await self.repository.find_categorizacoes_by_ids(gerenciamento_caracterizacao.categorizacoes_ids)

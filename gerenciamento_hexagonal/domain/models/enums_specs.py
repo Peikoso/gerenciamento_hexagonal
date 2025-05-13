@@ -11,6 +11,13 @@ class TipoArquivoContexto(str, Enum):
     GERENCIAMENTO_CONTRAPARTIDA = 'GERENCIAMENTO_CONTRAPARTIDA'
 
 
+class TipoGerenciamentoArquivo(str, Enum):
+    gerenciamento_meta = ('REGISTRO_DA_META',)
+    gerenciamento_qualitativo_fotos_do_projeto = ('FOTOS_DO_PROJETO',)
+    gerenciamento_qualitativo_relatorio_parcial = ('RELATORIO_PARCIAL',)
+    gerenciamento_contrapartida = 'COMPROVACAO_DA_CONTRAPARTIDA'
+
+
 class TipoGerenciamento(str, Enum):
     TRIMESTRAL = 'TRIMESTRAL'
     FINAL = 'FINAL'

@@ -1,17 +1,27 @@
 from sqlalchemy import select
 
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoCaracterizacao, GerenciamentoComentario, GerenciamentoContrapartida, GerenciamentoContrapartidaAdmin, GerenciamentoMeta, GerenciamentoProposta, GerenciamentoQualitativo, GerenciamentoQuantitativo
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import (
+from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import (
     GerenciamentoCaracterizacaoRelatorioResponse,
-    GerenciamentoComentarioDTO,
     GerenciamentoContrapartidaRelatorioResponse,
     GerenciamentoMetaRelatorioResponse,
+    GerenciamentoPropostaResponse,
     GerenciamentoQualitativoRelatorioResponse,
     GerenciamentoQuantitativoRelatorioResponse,
     RelatorioResponse,
 )
 from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoCaracterizacaoRepository, GerenciamentoComentarioRepository, GerenciamentoContrapartidaAdminRepository, GerenciamentoContrapartidaRepository, GerenciamentoMetaRepository, GerenciamentoPropostaRepository, GerenciamentoQualitativoRepository, GerenciamentoQuantitativoRepository
-from gerenciamento_hexagonal.infrastructure.database.models.gerenciamentoORM import CategorizacaoBeneficiarioModel, GerenciamentoCaracterizacaoModel, GerenciamentoComentarioModel, GerenciamentoContrapartidaAdminModel, GerenciamentoContrapartidaModel, GerenciamentoMetaModel, GerenciamentoPropostaModel, GerenciamentoQualitativoModel, GerenciamentoQuantitativoModel
+from gerenciamento_hexagonal.infrastructure.database.models.gerenciamento_orm import (
+    CategorizacaoBeneficiarioModel,
+    GerenciamentoCaracterizacaoModel,
+    GerenciamentoComentarioModel,
+    GerenciamentoContrapartidaAdminModel,
+    GerenciamentoContrapartidaModel,
+    GerenciamentoMetaModel,
+    GerenciamentoPropostaModel,
+    GerenciamentoQualitativoModel,
+    GerenciamentoQuantitativoModel,
+)
 from gerenciamento_hexagonal.infrastructure.database.sqlalchemyConfig import get_session
 
 
@@ -23,15 +33,10 @@ class RelatorioRepository:
             if not relatorio:
                 return None
 
-            gerenciamento_metas = [GerenciamentoMetaRelatorioResponse(id=gerenciamento_meta.id, ordem=gerenciamento_meta.ordem, alcancado=gerenciamento_meta.alcancado) for gerenciamento_meta in relatorio.gerenciamento_metas]
+            gerenciamento_metas = [GerenciamentoMetaRelatorioResponse(id=gerenciamento_meta.id, ordem=gerenciamento_meta.ordem, alcancado=gerenciamento_meta.alcancado, arquivos_ids=[arquivo.arquivo_id for arquivo in gerenciamento_meta.arquivos]) for gerenciamento_meta in relatorio.gerenciamento_metas]
 
             gerenciamento_qualitativos = [
-                GerenciamentoQualitativoRelatorioResponse(
-                    id=gerenciamento_qualitativo.id,
-                    acoes_previstas=gerenciamento_qualitativo.acoes_previstas,
-                    acoes_realizadas=gerenciamento_qualitativo.acoes_realizadas,
-                    visao_proponente=gerenciamento_qualitativo.visao_proponente,
-                )
+                GerenciamentoQualitativoRelatorioResponse(id=gerenciamento_qualitativo.id, acoes_previstas=gerenciamento_qualitativo.acoes_previstas, acoes_realizadas=gerenciamento_qualitativo.acoes_realizadas, visao_proponente=gerenciamento_qualitativo.visao_proponente, arquivos_ids=[arquivo.arquivo_id for arquivo in gerenciamento_qualitativo.arquivos])
                 for gerenciamento_qualitativo in relatorio.gerenciamento_qualitativo
             ]
 
@@ -54,11 +59,19 @@ class RelatorioRepository:
             ]
 
             gerenciamento_contrapartidas = [
-                GerenciamentoContrapartidaRelatorioResponse(id=gerenciamento_contrapartida.id, proposta_contrapartida_id=gerenciamento_contrapartida.proposta_contrapartida_id, quantidade=gerenciamento_contrapartida.quantidade, observacao=gerenciamento_contrapartida.observacao, data=gerenciamento_contrapartida.data, status=gerenciamento_contrapartida.status)
+                GerenciamentoContrapartidaRelatorioResponse(
+                    id=gerenciamento_contrapartida.id,
+                    proposta_contrapartida_id=gerenciamento_contrapartida.proposta_contrapartida_id,
+                    quantidade=gerenciamento_contrapartida.quantidade,
+                    observacao=gerenciamento_contrapartida.observacao,
+                    data=gerenciamento_contrapartida.data,
+                    status=gerenciamento_contrapartida.status,
+                    arquivos_ids=[arquivo.arquivo_id for arquivo in gerenciamento_contrapartida.arquivos],
+                )
                 for gerenciamento_contrapartida in relatorio.gerenciamento_contrapartida
             ]
 
-        return RelatorioResponse(proposta_id=relatorio.proposta_id, trimestre_de_referencia=relatorio.trimestre_de_referencia, tipo=relatorio.tipo, gerenciamento_metas=gerenciamento_metas, gerenciamento_qualitativo=gerenciamento_qualitativos, gerenciamento_quantitativo=gerenciamento_quantitativos, gerenciamento_contrapartida=gerenciamento_contrapartidas)
+        return RelatorioResponse(id=relatorio.id, proposta_id=relatorio.proposta_id, trimestre_de_referencia=relatorio.trimestre_de_referencia, tipo=relatorio.tipo, gerenciamento_metas=gerenciamento_metas, gerenciamento_qualitativo=gerenciamento_qualitativos, gerenciamento_quantitativo=gerenciamento_quantitativos, gerenciamento_contrapartida=gerenciamento_contrapartidas)
 
 
 class GerenciamentoComentarioRepository(GerenciamentoComentarioRepository):
@@ -87,7 +100,7 @@ class GerenciamentoComentarioRepository(GerenciamentoComentarioRepository):
 
             return db_gerenciamento_comentario
 
-    async def update_gerenciamento_comentario(self, gerenciamento_comentario_id, gerenciamento_comentario: GerenciamentoComentarioDTO) -> GerenciamentoComentario:
+    async def update_gerenciamento_comentario(self, gerenciamento_comentario_id, gerenciamento_comentario: GerenciamentoComentario) -> GerenciamentoComentario:
         async with get_session() as session:
             db_gerenciamento_comentario = await session.scalar(select(GerenciamentoComentarioModel).where(GerenciamentoComentarioModel.id == gerenciamento_comentario_id))
 
@@ -114,16 +127,30 @@ class GerenciamentoPropostaRepository(GerenciamentoPropostaRepository):
         async with get_session() as session:
             gerenciamento_propostas = await session.scalars(select(GerenciamentoPropostaModel))
 
-            result = [GerenciamentoProposta.model_validate({**vars(gerenciamento_proposta), 'metas_comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamento_comentario)) for gerenciamento_comentario in gerenciamento_proposta.metas_comentarios]}) for gerenciamento_proposta in gerenciamento_propostas if gerenciamento_proposta is not None]
+            result = [GerenciamentoPropostaResponse.model_validate(vars(gerenciamento_proposta)) for gerenciamento_proposta in gerenciamento_propostas]
 
-        return result
+            return result
 
     async def get_gerenciamento_proposta_by_id(self, gerenciamento_proposta_id: int) -> GerenciamentoProposta | None:
         async with get_session() as session:
             db_gerenciamento_proposta = await session.scalar(select(GerenciamentoPropostaModel).where(GerenciamentoPropostaModel.id == gerenciamento_proposta_id))
-            if db_gerenciamento_proposta:
-                return GerenciamentoProposta.model_validate({**vars(db_gerenciamento_proposta), 'metas_comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamento_comentario)) for gerenciamento_comentario in db_gerenciamento_proposta.metas_comentarios]})
-            return None
+
+            if not db_gerenciamento_proposta:
+                return None
+
+        arquivos_ids = []
+
+        for meta in db_gerenciamento_proposta.gerenciamento_metas:
+            arquivos_ids.extend([arq.arquivo_id for arq in meta.arquivos])
+
+        for contrapartida in db_gerenciamento_proposta.gerenciamento_contrapartida:
+            arquivos_ids.extend([arq.arquivo_id for arq in contrapartida.arquivos])
+
+        for qualitativo in db_gerenciamento_proposta.gerenciamento_qualitativo:
+            arquivos_ids.extend([arq.arquivo_id for arq in qualitativo.arquivos])
+
+        if db_gerenciamento_proposta:
+            return GerenciamentoProposta.model_validate({**vars(db_gerenciamento_proposta), 'metas_comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamento_comentario)) for gerenciamento_comentario in db_gerenciamento_proposta.metas_comentarios], 'arquivos_ids': arquivos_ids})
 
     async def create_gerenciamento_proposta(self, gerenciamento_proposta: GerenciamentoProposta) -> GerenciamentoProposta:
         async with get_session() as session:
@@ -132,7 +159,7 @@ class GerenciamentoPropostaRepository(GerenciamentoPropostaRepository):
             await session.commit()
             await session.refresh(db_gerenciamento_proposta)
 
-            return GerenciamentoProposta.model_validate(vars(db_gerenciamento_proposta))
+            return GerenciamentoPropostaResponse.model_validate(vars(db_gerenciamento_proposta))
 
     async def update_gerenciamento_proposta(self, gerenciamento_proposta_id: int, gerenciamento_proposta: GerenciamentoProposta) -> GerenciamentoProposta:
         async with get_session() as session:
@@ -145,7 +172,7 @@ class GerenciamentoPropostaRepository(GerenciamentoPropostaRepository):
             await session.commit()
             await session.refresh(db_gerenciamento_proposta)
 
-            return GerenciamentoProposta.model_validate({**vars(db_gerenciamento_proposta), 'metas_comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamento_comentario)) for gerenciamento_comentario in db_gerenciamento_proposta.metas_comentarios]})
+            return GerenciamentoPropostaResponse.model_validate(vars(db_gerenciamento_proposta))
 
     async def delete_gerenciamento_proposta(self, gerenciamento_proposta_id: int):
         async with get_session() as session:
@@ -170,7 +197,7 @@ class GerenciamentoPropostaRepository(GerenciamentoPropostaRepository):
                 await session.commit()
                 await session.refresh(db_gerenciamento_proposta)
 
-                return GerenciamentoProposta.model_validate({**vars(db_gerenciamento_proposta), 'metas_comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamento_comentario)) for gerenciamento_comentario in db_gerenciamento_proposta.metas_comentarios]})
+                return GerenciamentoComentario.model_validate(vars(db_gerenciamento_comentario))
 
             return None
 
@@ -179,7 +206,7 @@ class GerenciamentoPropostaRepository(GerenciamentoPropostaRepository):
             db_gerenciamento_quantitativo = await session.scalar(select(GerenciamentoQuantitativoModel).where(GerenciamentoQuantitativoModel.gerenciamento_proposta_id == gerenciamento_proposta_id))
             if not db_gerenciamento_quantitativo:
                 return False
-            
+
             db_gerenciamento_caracterizacao = await session.scalar(select(GerenciamentoCaracterizacaoModel).where(GerenciamentoCaracterizacaoModel.gerenciamento_quantitativo_id == db_gerenciamento_quantitativo.id))
             if db_gerenciamento_caracterizacao:
                 return True
@@ -192,7 +219,7 @@ class GerenciamentoMetaRepository(GerenciamentoMetaRepository):
         async with get_session() as session:
             db_gerenciamento_metas = await session.scalars(select(GerenciamentoMetaModel))
 
-            result = [GerenciamentoMeta.model_validate(vars(db_gerenciamento_meta)) for db_gerenciamento_meta in db_gerenciamento_metas]
+            result = [GerenciamentoMeta.model_validate({**vars(db_gerenciamento_meta), 'arquivos_ids': [arquivo.arquivo_id for arquivo in db_gerenciamento_meta.arquivos]}) for db_gerenciamento_meta in db_gerenciamento_metas]
 
             return result
 
@@ -201,7 +228,7 @@ class GerenciamentoMetaRepository(GerenciamentoMetaRepository):
             db_gerenciamento_meta = await session.scalar(select(GerenciamentoMetaModel).where(GerenciamentoMetaModel.id == gerenciamento_meta_id))
 
             if db_gerenciamento_meta:
-                return GerenciamentoMeta.model_validate(vars(db_gerenciamento_meta))
+                return GerenciamentoMeta.model_validate({**vars(db_gerenciamento_meta), 'arquivos_ids': [arquivo.arquivo_id for arquivo in db_gerenciamento_meta.arquivos]})
 
             return None
 

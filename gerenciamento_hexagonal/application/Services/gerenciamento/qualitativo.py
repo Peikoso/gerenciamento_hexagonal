@@ -1,14 +1,14 @@
-from gerenciamento_hexagonal.application.services.gerenciamento.proposta import GerenciamentoPropostaServices
+from gerenciamento_hexagonal.application.services.interfaces.verify_gerenciamento import VerifyGerenciamentoExists
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario, GerenciamentoQualitativo
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoComentarioDTO, GerenciamentoQualitativoDTO
-from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy_repository import GerenciamentoQualitativoRepository
+from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoComentarioDTO, GerenciamentoQualitativoDTO
+from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoQualitativoRepository
 
 
 class GerenciamentoQualitativoServices:
-    def __init__(self, repository: GerenciamentoQualitativoRepository, service_proposta: GerenciamentoPropostaServices):
+    def __init__(self, repository: GerenciamentoQualitativoRepository, verify: VerifyGerenciamentoExists):
         self.repository = repository
-        self.service_proposta = service_proposta
+        self.verify = verify
 
     async def get_gerenciamento_qualitativo(self) -> list[GerenciamentoQualitativo]:
         gerenciamento_qualitativos = await self.repository.get_gerenciamento_qualitativo()
@@ -24,7 +24,7 @@ class GerenciamentoQualitativoServices:
         return gerenciamento_qualitativo
 
     async def create_gerenciamento_qualitativo(self, gerenciamento_proposta_id: int, gerenciamento_qualitativo: GerenciamentoQualitativoDTO) -> GerenciamentoQualitativo:
-        await self.service_proposta.get_gerenciamento_proposta_by_id(gerenciamento_proposta_id)
+        await self.verify.gerencimento_proposta_exists(gerenciamento_proposta_id)
 
         gerenciamento_qualitativo = GerenciamentoQualitativo(**gerenciamento_qualitativo.model_dump())
         gerenciamento_qualitativo = await self.repository.create_gerenciamento_qualitativo(gerenciamento_proposta_id, gerenciamento_qualitativo)
@@ -40,7 +40,9 @@ class GerenciamentoQualitativoServices:
         return gerenciamento_qualitativo
 
     async def delete_gerenciamento_qualitativo(self, gerenciamento_qualitativo_id: int):
-        await self.get_gerenciamento_qualitativo_by_id(gerenciamento_qualitativo_id)
+        gerenciamento_qualitativo = await self.get_gerenciamento_qualitativo_by_id(gerenciamento_qualitativo_id)
+        if gerenciamento_qualitativo.arquivos_ids:
+            raise ValueError(f'gerenciamento_contrapartida with ID: {gerenciamento_qualitativo_id} cannot be deleted because it has associated files with IDs: {gerenciamento_qualitativo.arquivos_ids}.')
 
         await self.repository.delete_gerenciamento_qualitativo(gerenciamento_qualitativo_id)
 

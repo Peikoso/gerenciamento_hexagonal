@@ -1,14 +1,14 @@
-from gerenciamento_hexagonal.application.services.gerenciamento.proposta import GerenciamentoPropostaServices
+from gerenciamento_hexagonal.application.services.interfaces.verify_gerenciamento import VerifyGerenciamentoExists
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoContrapartida
-from gerenciamento_hexagonal.domain.models.gerenciamentoDTO_Response import GerenciamentoContrapartidaDTO
-from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy_repository import GerenciamentoContrapartidaRepository
+from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoContrapartidaDTO
+from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoContrapartidaRepository
 
 
 class GerenciamentoContrapartidaServices:
-    def __init__(self, repository: GerenciamentoContrapartidaRepository, service_proposta: GerenciamentoPropostaServices):
+    def __init__(self, repository: GerenciamentoContrapartidaRepository, verify: VerifyGerenciamentoExists):
         self.repository = repository
-        self.service_proposta = service_proposta
+        self.verify = verify
 
     async def get_gerenciamento_contrapartida(self) -> list[GerenciamentoContrapartida]:
         gerenciamento_contrapartidas = await self.repository.get_gerenciamento_contrapartida()
@@ -24,7 +24,7 @@ class GerenciamentoContrapartidaServices:
         return gerenciamento_contrapartida
 
     async def create_gerenciamento_contrapartida(self, gerenciamento_proposta_id: int, gerenciamento_contrapartida: GerenciamentoContrapartidaDTO) -> GerenciamentoContrapartida:
-        await self.service_proposta.get_gerenciamento_proposta_by_id(gerenciamento_proposta_id)
+        await self.verify.gerencimento_proposta_exists(gerenciamento_proposta_id)
 
         gerenciamento_contrapartida = GerenciamentoContrapartida(gerenciamento_proposta_id=gerenciamento_proposta_id, **gerenciamento_contrapartida.model_dump())
         gerenciamento_contrapartida = await self.repository.create_gerenciamento_contrapartida(gerenciamento_contrapartida)
@@ -40,7 +40,9 @@ class GerenciamentoContrapartidaServices:
         return gerenciamento_contrapartida
 
     async def delete_gerenciamento_contrapartida(self, gerenciamento_contrapartida_id: int):
-        await self.get_gerenciamento_contrapartida_by_id(gerenciamento_contrapartida_id)
+        gerenciamento_contrapartida = await self.get_gerenciamento_contrapartida_by_id(gerenciamento_contrapartida_id)
+        if gerenciamento_contrapartida.arquivos_ids:
+            raise ValueError(f'gerenciamento_contrapartida with ID: {gerenciamento_contrapartida_id} cannot be deleted because it has associated files with IDs: {gerenciamento_contrapartida.arquivos_ids}.')
 
         await self.repository.delete_gerenciamento_contrapartida(gerenciamento_contrapartida_id)
 

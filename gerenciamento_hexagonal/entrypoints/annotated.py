@@ -1,0 +1,45 @@
+from typing import Annotated
+
+from fastapi import Depends
+
+from gerenciamento_hexagonal.application.dependencies import (
+    get_arquivo_service,
+    get_gerenciamento_caracterizacao_service,
+    get_gerenciamento_comentario_service,
+    get_gerenciamento_contrapartida_admin_service,
+    get_gerenciamento_contrapartida_service,
+    get_gerenciamento_meta_service,
+    get_gerenciamento_proposta_service,
+    get_gerenciamento_qualitativo_service,
+    get_gerenciamento_quantitativo_service,
+    get_validacao_arquivo_service,
+)
+from gerenciamento_hexagonal.application.services.arquivo.gerenciamento_arquivo import GerenciamentoArquivoServices
+from gerenciamento_hexagonal.application.services.gerenciamento.caracterizacao import GerenciamentoCaracterizacaoServices
+from gerenciamento_hexagonal.application.services.gerenciamento.comentario import GerenciamentoComentarioServices
+from gerenciamento_hexagonal.application.services.gerenciamento.contrapartida import GerenciamentoContrapartidaServices
+from gerenciamento_hexagonal.application.services.gerenciamento.contrapartida_admin import GerenciamentoContrapartidaAdminServices
+from gerenciamento_hexagonal.application.services.gerenciamento.meta import GerenciamentoMetaServices
+from gerenciamento_hexagonal.application.services.gerenciamento.proposta import GerenciamentoPropostaServices
+from gerenciamento_hexagonal.application.services.gerenciamento.qualitativo import GerenciamentoQualitativoServices
+from gerenciamento_hexagonal.application.services.gerenciamento.quantitativo import GerenciamentoQuantitativoServices
+from gerenciamento_hexagonal.domain.services.arquivo_service import ValidacaoArquivoService
+
+Service_Proposta = Annotated[GerenciamentoPropostaServices, Depends(get_gerenciamento_proposta_service)]
+
+Service_Comentario = Annotated[GerenciamentoComentarioServices, Depends(get_gerenciamento_comentario_service)]
+
+Service_Meta = Annotated[GerenciamentoMetaServices, Depends(get_gerenciamento_meta_service)]
+
+Service_Quantitativo = Annotated[GerenciamentoQuantitativoServices, Depends(get_gerenciamento_quantitativo_service)]
+
+Service_Qualitativo = Annotated[GerenciamentoQualitativoServices, Depends(get_gerenciamento_qualitativo_service)]
+
+Service_Contrapartida = Annotated[GerenciamentoContrapartidaServices, Depends(get_gerenciamento_contrapartida_service)]
+
+Service_Contrapartida_Admin = Annotated[GerenciamentoContrapartidaAdminServices, Depends(get_gerenciamento_contrapartida_admin_service)]
+
+Service_Caracterizacao = Annotated[GerenciamentoCaracterizacaoServices, Depends(get_gerenciamento_caracterizacao_service)]
+
+Service_Arquivo = Annotated[GerenciamentoArquivoServices, Depends(get_arquivo_service)]
+Validacao_Arquivo = Annotated[ValidacaoArquivoService, Depends(get_validacao_arquivo_service)]
