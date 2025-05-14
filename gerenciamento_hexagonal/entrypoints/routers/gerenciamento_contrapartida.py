@@ -1,12 +1,11 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, HTTPException
 
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoContrapartida
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoContrapartidaDTO
-from gerenciamento_hexagonal.entrypoints.annotated import Service_Arquivo, Service_Contrapartida, Validacao_Arquivo
-from gerenciamento_hexagonal.entrypoints.arquivo_wrapper import ArquivoWrapper
+from gerenciamento_hexagonal.entrypoints.annotated import Service_Contrapartida
 
 router = APIRouter()
 
@@ -63,19 +62,3 @@ async def delete_gerenciamento_contrapartida(gerenciamento_contrapartida_id: int
 
     except ValueError as e:
         raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=str(e))
-
-
-@router.post('/Arquivo/{gerenciamento_contrapartida_id}')
-async def create_gerenciamento_contrapartida_arquivo(service_arquivo: Service_Arquivo, validacao_service: Validacao_Arquivo, gerenciamento_contrapartida_id: int, gerenciamento_meta_arquivo: list[UploadFile] = File(...)):
-    try:
-        nomes_arquivos = [arquivo.filename for arquivo in gerenciamento_meta_arquivo]
-
-        validacao_service.validar_comprovacao_contrapartida(nomes_arquivos)
-
-        arquivos = [await ArquivoWrapper.from_upload_file(file) for file in gerenciamento_meta_arquivo]
-
-        metadados = await service_arquivo.create_gerenciamento_contrapartida_arquivo(gerenciamento_contrapartida_id=gerenciamento_contrapartida_id, arquivos=arquivos)
-        return metadados
-
-    except NotFoundError as e:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))

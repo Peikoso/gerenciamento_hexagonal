@@ -1,12 +1,11 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, HTTPException
 
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoMeta
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoMetaDTO
-from gerenciamento_hexagonal.entrypoints.annotated import Service_Arquivo, Service_Meta, Validacao_Arquivo
-from gerenciamento_hexagonal.entrypoints.arquivo_wrapper import ArquivoWrapper
+from gerenciamento_hexagonal.entrypoints.annotated import Service_Meta
 
 router = APIRouter()
 
@@ -63,23 +62,3 @@ async def delete_gerenciamento_meta(gerenciamento_meta_id: int, service: Service
 
     except ValueError as e:
         raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=str(e))
-
-
-@router.post('/Arquivo/{gerenciamento_meta_id}')
-async def create_gerenciamento_meta_arquivo(service_arquivo: Service_Arquivo, validacao_service: Validacao_Arquivo, gerenciamento_meta_id: int, gerenciamento_meta_arquivo: list[UploadFile] = File(...)):
-    try:
-        nomes_arquivos = [arquivo.filename for arquivo in gerenciamento_meta_arquivo]
-
-        validacao_service.validar_arquivos_metas(nomes_arquivos)
-
-        arquivos = [await ArquivoWrapper.from_upload_file(file) for file in gerenciamento_meta_arquivo]
-
-        metadados = await service_arquivo.create_gerenciamento_meta_arquivo(gerenciamento_meta_id=gerenciamento_meta_id, arquivos=arquivos)
-
-        return metadados
-
-    except ValueError as e:
-        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=str(e))
-
-    except NotFoundError as e:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
