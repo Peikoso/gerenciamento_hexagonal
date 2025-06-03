@@ -1,7 +1,7 @@
 [project]
 name = "gerenciamento-hexagonal"
 version = "0.1.0"
-description = ""
+description = "Projeto para faculdade/IC"
 authors = [
     {name = "João Martins",email = "joaommn1998@gmail.com"}
 ]
