@@ -92,4 +92,12 @@ def get_relatorio_service() -> RelatorioServices:
     caracterizacao = get_gerenciamento_caracterizacao_service()
     contrapartida = get_gerenciamento_contrapartida_service()
     relatorio_repository = RelatorioRepository()
-    return RelatorioServices(repository_relatorio=relatorio_repository, proposta=proposta, meta=meta, quantitativo=quantitativo, qualitativo=qualitativo, caracterizacao=caracterizacao, contrapartida=contrapartida)
+    return RelatorioServices(
+        repository_relatorio=relatorio_repository, 
+        proposta=proposta, meta=meta, 
+        quantitativo=quantitativo, 
+        qualitativo=qualitativo, 
+        caracterizacao=caracterizacao, 
+        contrapartida=contrapartida
+    )
+

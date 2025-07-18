@@ -63,7 +63,7 @@ async def create_gerenciamento_meta_arquivo(service_arquivo: Service_Arquivo, va
 
 
 @router.post('/Qualitativo/{gerenciamento_qualitativo_id}')
-async def create_gerenciamento_qualitativo_arquivo(service_arquivo: Service_Arquivo, validacao_service: Validacao_Arquivo, gerenciamento_qulitativo_id: int, fotos_projeto: list[UploadFile] = File(...), relatorios_parciais: list[UploadFile] = File(...)):
+async def create_gerenciamento_qualitativo_arquivo(service_arquivo: Service_Arquivo, validacao_service: Validacao_Arquivo, gerenciamento_qualitativo_id: int, fotos_projeto: list[UploadFile] = File(...), relatorios_parciais: list[UploadFile] = File(...)):
     try:
         nomes_fotos = [arquivo.filename for arquivo in fotos_projeto]
         nomes_relatorios = [arquivo.filename for arquivo in relatorios_parciais]
@@ -74,8 +74,8 @@ async def create_gerenciamento_qualitativo_arquivo(service_arquivo: Service_Arqu
         fotos = [await ArquivoWrapper.from_upload_file(file) for file in fotos_projeto]
         relatorios = [await ArquivoWrapper.from_upload_file(file) for file in relatorios_parciais]
 
-        fotos_metadados = await service_arquivo.create_gerenciamento_qualitativo_arquivo_fotos(gerenciamento_qualitativo_id=gerenciamento_qulitativo_id, arquivos=fotos)
-        relatorios_metadados = await service_arquivo.create_gerenciamento_qualitativo_arquivo_relatorio(gerenciamento_qualitativo_id=gerenciamento_qulitativo_id, arquivos=relatorios)
+        fotos_metadados = await service_arquivo.create_gerenciamento_qualitativo_arquivo_fotos(gerenciamento_qualitativo_id=gerenciamento_qualitativo_id, arquivos=fotos)
+        relatorios_metadados = await service_arquivo.create_gerenciamento_qualitativo_arquivo_relatorio(gerenciamento_qualitativo_id=gerenciamento_qualitativo_id, arquivos=relatorios)
 
         return fotos_metadados + relatorios_metadados
 

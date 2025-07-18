@@ -5,13 +5,21 @@ from gerenciamento_hexagonal.application.services.gerenciamento.proposta import 
 from gerenciamento_hexagonal.application.services.gerenciamento.qualitativo import GerenciamentoQualitativoServices
 from gerenciamento_hexagonal.application.services.gerenciamento.quantitativo import GerenciamentoQuantitativoServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
-from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoCaracterizacaoDTO, GerenciamentoContrapartidaDTO, GerenciamentoMetaDTO, GerenciamentoPropostaDTO, GerenciamentoQualitativoDTO, GerenciamentoQuantitativoDTO, RelatorioDTO, RelatorioResponse
+from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import (
+    GerenciamentoCaracterizacaoDTO, GerenciamentoContrapartidaDTO, GerenciamentoMetaDTO, GerenciamentoPropostaDTO, GerenciamentoQualitativoDTO, GerenciamentoQuantitativoDTO, RelatorioDTO, RelatorioResponse)
 from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy.relatorio import RelatorioRepository
 
 
 class RelatorioServices:
     def __init__(  # noqa: PLR0913, PLR0917
-        self, repository_relatorio: RelatorioRepository, proposta: GerenciamentoPropostaServices, meta: GerenciamentoMetaServices, quantitativo: GerenciamentoQuantitativoServices, qualitativo: GerenciamentoQualitativoServices, caracterizacao: GerenciamentoCaracterizacaoServices, contrapartida: GerenciamentoContrapartidaServices
+        self, 
+        repository_relatorio: RelatorioRepository, 
+        proposta: GerenciamentoPropostaServices, 
+        meta: GerenciamentoMetaServices, 
+        quantitativo: GerenciamentoQuantitativoServices, 
+        qualitativo: GerenciamentoQualitativoServices, 
+        caracterizacao: GerenciamentoCaracterizacaoServices, 
+        contrapartida: GerenciamentoContrapartidaServices
     ):
         self.repository = repository_relatorio
         self.proposta = proposta
@@ -62,3 +70,4 @@ class RelatorioServices:
         relatorio = await self.repository.get_relatorio(gerenciamento_proposta_id=proposta_id)
 
         return relatorio
+
