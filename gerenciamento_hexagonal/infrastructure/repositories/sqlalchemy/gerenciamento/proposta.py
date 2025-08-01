@@ -37,9 +37,7 @@ class GerenciamentoPropostaRepository(GerenciamentoPropostaRepository):
             arquivos_ids.extend([arq.arquivo_id for arq in qualitativo.arquivos])
 
         if db_gerenciamento_proposta:
-            return GerenciamentoProposta.model_validate(
-                {**vars(db_gerenciamento_proposta), 
-                 'metas_comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamento_comentario)) for gerenciamento_comentario in db_gerenciamento_proposta.metas_comentarios], 'arquivos_ids': arquivos_ids})
+            return GerenciamentoProposta.model_validate({**vars(db_gerenciamento_proposta), 'metas_comentarios': [GerenciamentoComentario.model_validate(vars(gerenciamento_comentario)) for gerenciamento_comentario in db_gerenciamento_proposta.metas_comentarios], 'arquivos_ids': arquivos_ids})
 
     async def create_gerenciamento_proposta(self, gerenciamento_proposta: GerenciamentoProposta) -> GerenciamentoProposta:
         async with get_session() as session:

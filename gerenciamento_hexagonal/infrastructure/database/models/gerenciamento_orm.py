@@ -20,17 +20,12 @@ class GerenciamentoPropostaModel:
     criado_em: Mapped[datetime] = mapped_column(DateTime, init=False, nullable=False, server_default=func.now())
     proposta_id: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    gerenciamento_quantitativo: Mapped[list['GerenciamentoQuantitativoModel']] = relationship(
-        'GerenciamentoQuantitativoModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
-    gerenciamento_qualitativo: Mapped[list['GerenciamentoQualitativoModel']] = relationship(
-        'GerenciamentoQualitativoModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
-    gerenciamento_metas: Mapped[list['GerenciamentoMetaModel']] = relationship(
-        'GerenciamentoMetaModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
-    gerenciamento_contrapartida: Mapped[list['GerenciamentoContrapartidaModel']] = relationship(
-        'GerenciamentoContrapartidaModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
+    gerenciamento_quantitativo: Mapped[list['GerenciamentoQuantitativoModel']] = relationship('GerenciamentoQuantitativoModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
+    gerenciamento_qualitativo: Mapped[list['GerenciamentoQualitativoModel']] = relationship('GerenciamentoQualitativoModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
+    gerenciamento_metas: Mapped[list['GerenciamentoMetaModel']] = relationship('GerenciamentoMetaModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
+    gerenciamento_contrapartida: Mapped[list['GerenciamentoContrapartidaModel']] = relationship('GerenciamentoContrapartidaModel', back_populates='gerenciamento_proposta', cascade='all, delete-orphan', default_factory=list, lazy='selectin')
 
-    metas_comentarios: Mapped[list['GerenciamentoComentarioModel']] = relationship(
-        secondary='gerenciamento_proposta_comentario_association', back_populates='comentario_gerenciamento_propostas', cascade='all, delete', default_factory=list, lazy='selectin')
+    metas_comentarios: Mapped[list['GerenciamentoComentarioModel']] = relationship(secondary='gerenciamento_proposta_comentario_association', back_populates='comentario_gerenciamento_propostas', cascade='all, delete', default_factory=list, lazy='selectin')
 
 
 @table_registry.mapped_as_dataclass

@@ -1,15 +1,10 @@
-from gerenciamento_hexagonal.application.services.interfaces.verify_gerenciamento import VerifyGerenciamentoExists
+from gerenciamento_hexagonal.application.services.interfaces.gerenciamento.qualitativo import GerenciamentoQualitativoServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario, GerenciamentoQualitativo
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoComentarioDTO, GerenciamentoQualitativoDTO
-from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoQualitativoRepository
 
 
-class GerenciamentoQualitativoServices:
-    def __init__(self, repository: GerenciamentoQualitativoRepository, verify: VerifyGerenciamentoExists):
-        self.repository = repository
-        self.verify = verify
-
+class GerenciamentoQualitativoServicesImpl(GerenciamentoQualitativoServices):
     async def get_gerenciamento_qualitativo(self) -> list[GerenciamentoQualitativo]:
         gerenciamento_qualitativos = await self.repository.get_gerenciamento_qualitativo()
 

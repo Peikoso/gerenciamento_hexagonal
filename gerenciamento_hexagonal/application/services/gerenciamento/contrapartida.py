@@ -1,15 +1,10 @@
-from gerenciamento_hexagonal.application.services.interfaces.verify_gerenciamento import VerifyGerenciamentoExists
+from gerenciamento_hexagonal.application.services.interfaces.gerenciamento.contrapartida import GerenciamentoContrapartidaServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoContrapartida
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoContrapartidaDTO
-from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoContrapartidaRepository
 
 
-class GerenciamentoContrapartidaServices:
-    def __init__(self, repository: GerenciamentoContrapartidaRepository, verify: VerifyGerenciamentoExists):
-        self.repository = repository
-        self.verify = verify
-
+class GerenciamentoContrapartidaServicesImpl(GerenciamentoContrapartidaServices):
     async def get_gerenciamento_contrapartida(self) -> list[GerenciamentoContrapartida]:
         gerenciamento_contrapartidas = await self.repository.get_gerenciamento_contrapartida()
 

@@ -1,15 +1,10 @@
-from gerenciamento_hexagonal.application.services.interfaces.verify_gerenciamento import VerifyGerenciamentoExists
+from gerenciamento_hexagonal.application.services.interfaces.gerenciamento.meta import GerenciamentoMetaServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoMeta
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoMetaDTO
-from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoMetaRepository
 
 
-class GerenciamentoMetaServices:
-    def __init__(self, repository: GerenciamentoMetaRepository, verify: VerifyGerenciamentoExists):
-        self.repository = repository
-        self.verify = verify
-
+class GerenciamentoMetaServicesImpl(GerenciamentoMetaServices):
     async def get_gerenciamento_meta(self) -> list[GerenciamentoMeta]:
         gerenciamento_metas = await self.repository.get_gerenciamento_meta()
 

@@ -1,15 +1,10 @@
-from gerenciamento_hexagonal.application.services.interfaces.verify_gerenciamento import VerifyGerenciamentoExists
+from gerenciamento_hexagonal.application.services.interfaces.gerenciamento.caracterizacao import GerenciamentoCaracterizacaoServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoCaracterizacao
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoCaracterizacaoDTO
-from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoCaracterizacaoRepository
 
 
-class GerenciamentoCaracterizacaoServices:
-    def __init__(self, repository: GerenciamentoCaracterizacaoRepository, verify: VerifyGerenciamentoExists):
-        self.repository = repository
-        self.verify = verify
-
+class GerenciamentoCaracterizacaoServicesImpl(GerenciamentoCaracterizacaoServices):
     async def get_gerenciamento_caracterizacao(self) -> list[GerenciamentoCaracterizacao]:
         gerenciamento_caracterizacoes = await self.repository.get_gerenciamento_caracterizacao()
 

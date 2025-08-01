@@ -1,13 +1,10 @@
+from gerenciamento_hexagonal.application.services.interfaces.gerenciamento.proposta import GerenciamentoPropostaServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError, NotNullViolationError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario, GerenciamentoProposta
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoComentarioDTO, GerenciamentoPropostaDTO
-from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoPropostaRepository
 
 
-class GerenciamentoPropostaServices:
-    def __init__(self, repository: GerenciamentoPropostaRepository):
-        self.repository = repository
-
+class GerenciamentoPropostaServicesImpl(GerenciamentoPropostaServices):
     async def get_gerenciamento_proposta(self) -> list[GerenciamentoProposta]:
         gerenciamento_propostas = await self.repository.get_gerenciamento_proposta()
 

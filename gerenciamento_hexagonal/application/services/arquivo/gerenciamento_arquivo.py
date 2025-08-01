@@ -1,7 +1,7 @@
 import os
 
 from gerenciamento_hexagonal.application.services.arquivo.arquivo_service import ArquivoServices
-from gerenciamento_hexagonal.application.services.interfaces.verify_gerenciamento import VerifyGerenciamentoExists
+from gerenciamento_hexagonal.application.services.interfaces.gerenciamento.verify_gerenciamento import VerifyGerenciamentoExists
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.arquivo import Arquivo
 from gerenciamento_hexagonal.domain.models.enums_specs import TipoGerenciamentoArquivo

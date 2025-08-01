@@ -1,12 +1,8 @@
-from gerenciamento_hexagonal.application.services.interfaces.verify_gerenciamento import VerifyGerenciamentoExists
+from gerenciamento_hexagonal.application.services.interfaces.gerenciamento.verify_gerenciamento import VerifyGerenciamentoExists
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
-from gerenciamento_hexagonal.domain.repositories.gerenciamento import VerifyGerenciamentoExistsRepository
 
 
 class VerifyGerenciamentoServices(VerifyGerenciamentoExists):
-    def __init__(self, repository: VerifyGerenciamentoExistsRepository):
-        self.repository = repository
-
     async def gerencimento_proposta_exists(self, gerenciamento_proposta_id: int) -> bool:
         exists = await self.repository.gerencimento_proposta_exists(gerenciamento_proposta_id)
         if not exists:
