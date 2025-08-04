@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException
 
 from gerenciamento_hexagonal.application.dependencies import get_relatorio_service
-from gerenciamento_hexagonal.application.relatorio import RelatorioServices
+from gerenciamento_hexagonal.application.services.relatorio import RelatorioServices
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import RelatorioDTO, WrappedRelatorioResponse
 

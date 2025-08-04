@@ -1,6 +1,6 @@
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario, GerenciamentoQualitativo
 from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoComentarioRepository, GerenciamentoQualitativoRepository
-from gerenciamento_hexagonal.infrastructure.database.models.gerenciamento_orm import GerenciamentoQualitativoModel
+from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy.models.gerenciamento_orm import GerenciamentoQualitativoModel
 from gerenciamento_hexagonal.infrastructure.database.sqlalchemyConfig import get_session
 from sqlalchemy import select
 

@@ -1,4 +1,4 @@
-from gerenciamento_hexagonal.application.relatorio import RelatorioServicesImpl
+from gerenciamento_hexagonal.application.services.relatorio import RelatorioServicesImpl
 from gerenciamento_hexagonal.application.services.arquivo.arquivo_service import ArquivoServices
 from gerenciamento_hexagonal.application.services.arquivo.gerenciamento_arquivo import GerenciamentoArquivoServices
 from gerenciamento_hexagonal.application.services.gerenciamento.caracterizacao import GerenciamentoCaracterizacaoServicesImpl

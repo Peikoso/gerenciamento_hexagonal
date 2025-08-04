@@ -1,7 +1,12 @@
 from abc import ABC, abstractmethod
 
+from gerenciamento_hexagonal.domain.repositories.gerenciamento import VerifyGerenciamentoExistsRepository
+
 
 class VerifyGerenciamentoExists(ABC):
+    def __init__(self, repository: VerifyGerenciamentoExistsRepository):
+        self.repository = repository
+
     @abstractmethod
     async def gerencimento_proposta_exists(self, gerenciamento_proposta_id: int):
         pass

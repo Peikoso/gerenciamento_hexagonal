@@ -1,6 +1,6 @@
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoCaracterizacao
 from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoCaracterizacaoRepository
-from gerenciamento_hexagonal.infrastructure.database.models.gerenciamento_orm import CategorizacaoBeneficiarioModel, GerenciamentoCaracterizacaoModel
+from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy.models.gerenciamento_orm import CategorizacaoBeneficiarioModel, GerenciamentoCaracterizacaoModel
 from gerenciamento_hexagonal.infrastructure.database.sqlalchemyConfig import get_session
 from sqlalchemy import select
 

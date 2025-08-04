@@ -1,6 +1,6 @@
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoContrapartidaAdmin
 from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoContrapartidaAdminRepository
-from gerenciamento_hexagonal.infrastructure.database.models.gerenciamento_orm import (
+from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy.models.gerenciamento_orm import (
     GerenciamentoContrapartidaAdminModel,
 )
 from gerenciamento_hexagonal.infrastructure.database.sqlalchemyConfig import get_session
