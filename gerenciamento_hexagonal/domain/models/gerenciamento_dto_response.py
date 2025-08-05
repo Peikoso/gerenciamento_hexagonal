@@ -14,7 +14,7 @@ PositiveInt = Annotated[int, Field(gt=0)]
 class GerenciamentoPropostaDTO(BaseModel):
     proposta_id: int
     trimestre_de_referencia: date
-    tipo: TipoGerenciamento = Field(default_factory=TipoGerenciamento.TRIMESTRAL)
+    tipo: TipoGerenciamento = Field(default=TipoGerenciamento.TRIMESTRAL)
 
 
 class GerenciamentoPropostaResponse(GerenciamentoPropostaDTO):
@@ -30,6 +30,9 @@ class GerenciamentoMetaDTO(BaseModel):
     alcancado: int
     ordem: Optional[int] = None
 
+class GerenciamentoMetaUpdate(GerenciamentoMetaDTO):
+    id: int
+
 
 class GerenciamentoQuantitativoDTO(BaseModel):
     educacao_financeira_impactados: int
@@ -40,15 +43,26 @@ class GerenciamentoQuantitativoDTO(BaseModel):
     pessoas_impactadas: int
 
 
+class GerenciamentoQuantitativoUpdate(GerenciamentoQuantitativoDTO):
+    id: int
+
+
 class GerenciamentoQualitativoDTO(BaseModel):
     acoes_realizadas: Optional[str] = None
     acoes_previstas: Optional[str] = None
     visao_proponente: Optional[str] = None
 
 
+class GerenciamentoQualitativoUpdate(GerenciamentoQualitativoDTO):
+    id: int
+
+
 class GerenciamentoCaracterizacaoDTO(BaseModel):
     quantidade: int = Field(..., gt=0)
     categorizacoes_ids: list[PositiveInt]
+    
+class GerenciamentoCaracterizacaoUpdate(GerenciamentoCaracterizacaoDTO):
+    id: int
 
 
 class GerenciamentoQuantitativoCaracterozacaoDTO(BaseModel):
@@ -60,6 +74,10 @@ class GerenciamentoQuantitativoCaracterozacaoDTO(BaseModel):
     pessoas_impactadas: int
     gerenciamento_caracterizacao: list[GerenciamentoCaracterizacaoDTO] = Field(default_factory=list)
 
+class GerenciamentoQuantitativoCaracterozacaoUpdate(GerenciamentoQuantitativoCaracterozacaoDTO):
+    id: int
+    gerenciamento_caracterizacao: list[GerenciamentoCaracterizacaoUpdate] = Field(default_factory=list)
+
 
 class GerenciamentoContrapartidaDTO(BaseModel):
     proposta_contrapartida_id: int
@@ -68,11 +86,17 @@ class GerenciamentoContrapartidaDTO(BaseModel):
     data: date
     status: StatusGereciamentoContrapartida = Field(default_factory=StatusGereciamentoContrapartida.EM_APROVACAO)
 
+class GerenciamentoContrapartidaUpdate(GerenciamentoContrapartidaDTO):
+    id: int
+
 
 class GerenciamentoContrapartidaAdminDTO(BaseModel):
     quantidade: int
     justificativa: str = Field(..., max_length=150)
     data: date
+
+class GerenciamentoContrapartidaAdminUpdate(GerenciamentoContrapartidaAdminDTO):
+    id: int
 
 
 class GerenciamentoMetaRelatorioResponse(BaseModel):
@@ -122,6 +146,12 @@ class RelatorioDTO(GerenciamentoPropostaDTO):
     gerenciamento_qualitativo: list[GerenciamentoQualitativoDTO]
     gerenciamento_quantitativo: list[GerenciamentoQuantitativoCaracterozacaoDTO]
     gerenciamento_contrapartida: list[GerenciamentoContrapartidaDTO]
+
+class RelatorioUpdateDTO(GerenciamentoPropostaDTO):
+    gerenciamento_metas: list[GerenciamentoMetaUpdate]
+    gerenciamento_qualitativo: list[GerenciamentoQualitativoUpdate]
+    gerenciamento_quantitativo: list[GerenciamentoQuantitativoCaracterozacaoUpdate]
+    gerenciamento_contrapartida: list[GerenciamentoContrapartidaUpdate]
 
 
 class RelatorioResponse(BaseModel):

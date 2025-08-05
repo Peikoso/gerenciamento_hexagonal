@@ -6,7 +6,7 @@ from gerenciamento_hexagonal.application.services.gerenciamento.meta import Gere
 from gerenciamento_hexagonal.application.services.gerenciamento.proposta import GerenciamentoPropostaServices
 from gerenciamento_hexagonal.application.services.gerenciamento.qualitativo import GerenciamentoQualitativoServices
 from gerenciamento_hexagonal.application.services.gerenciamento.quantitativo import GerenciamentoQuantitativoServices
-from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import RelatorioDTO, RelatorioResponse
+from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import RelatorioDTO, RelatorioResponse, RelatorioUpdateDTO
 from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy.relatorio import RelatorioRepository
 
 
@@ -26,4 +26,7 @@ class RelatorioServices(ABC):
         pass
 
     async def create_relatorio(self, relatorio: RelatorioDTO):
+        pass
+    
+    async def update_relatorio(self, relatorio: RelatorioUpdateDTO, gerenciamento_proposta_id: int):
         pass
