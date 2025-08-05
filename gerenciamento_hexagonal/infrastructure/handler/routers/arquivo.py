@@ -4,8 +4,8 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
-from gerenciamento_hexagonal.entrypoints.annotated import Service_Arquivo, Validacao_Arquivo
-from gerenciamento_hexagonal.entrypoints.arquivo_wrapper import ArquivoWrapper
+from gerenciamento_hexagonal.infrastructure.handler.annotated import Service_Arquivo, Validacao_Arquivo
+from gerenciamento_hexagonal.infrastructure.handler.arquivo_wrapper import ArquivoWrapper
 
 router = APIRouter()
 

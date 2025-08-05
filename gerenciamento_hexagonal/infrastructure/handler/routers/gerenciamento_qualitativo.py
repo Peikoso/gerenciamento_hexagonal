@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError, UniqueViolation
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoQualitativo
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoComentarioDTO, GerenciamentoQualitativoDTO
-from gerenciamento_hexagonal.entrypoints.annotated import Service_Qualitativo
+from gerenciamento_hexagonal.infrastructure.handler.annotated import Service_Qualitativo
 
 router = APIRouter()
 

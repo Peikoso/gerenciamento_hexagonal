@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoContrapartida
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoContrapartidaDTO
-from gerenciamento_hexagonal.entrypoints.annotated import Service_Contrapartida
+from gerenciamento_hexagonal.infrastructure.handler.annotated import Service_Contrapartida
 
 router = APIRouter()
 

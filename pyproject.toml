@@ -50,7 +50,7 @@ pythonpath = "."
 addopts = '-p no:warnings'
 
 [tool.taskipy.tasks]
-run = 'fastapi dev gerenciamento_hexagonal/app.py'
+run = 'fastapi dev gerenciamento_hexagonal/infrastructure/handler/app.py'
 pre_test = 'task lint'
 test = 'pytest --cov=gerenciamento_hexagonal -vv'
 post_test = 'coverage html'
