@@ -32,7 +32,7 @@ class ArquivoIndividualService:
         nome_original, self.extensao = os.path.splitext(self._get_arquivo().filename)
         self.extensao = self.extensao.lower().lstrip('.')
         self.nome = nome_original
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3]
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')
 
         nome_normalizado = normalizar_nome_arquivo(self.nome)
         self.uri = f'arquivos/{nome_normalizado}_{self._rel_id}_{timestamp}.{self.extensao}'

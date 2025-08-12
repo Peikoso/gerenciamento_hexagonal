@@ -2,6 +2,7 @@ from gerenciamento_hexagonal.application.services.interfaces.gerenciamento.propo
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError, NotNullViolationError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario, GerenciamentoProposta
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoComentarioDTO, GerenciamentoPropostaDTO
+from gerenciamento_hexagonal.domain.services.validations import ValidacaoService
 
 
 class GerenciamentoPropostaServicesImpl(GerenciamentoPropostaServices):
@@ -48,6 +49,8 @@ class GerenciamentoPropostaServicesImpl(GerenciamentoPropostaServices):
 
     async def create_gerenciamento_proposta_comentario(self, gerenciamento_proposta_id: int, gerenciamento_comentario: GerenciamentoComentarioDTO) -> GerenciamentoProposta:
         await self.get_gerenciamento_proposta_by_id(gerenciamento_proposta_id)
+
+        ValidacaoService.validar_tamanho_string(gerenciamento_comentario.comentario, 100)
 
         gerenciamento_comentario = GerenciamentoComentario(**gerenciamento_comentario.model_dump())
         gerenciamento_proposta = await self.repository.create_gerenciamento_proposta_comentario(gerenciamento_proposta_id, gerenciamento_comentario)

@@ -6,6 +6,7 @@ from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import No
 from gerenciamento_hexagonal.domain.models.arquivo import Arquivo
 from gerenciamento_hexagonal.domain.models.enums_specs import TipoGerenciamentoArquivo
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoContrapartidaArquivo, GerenciamentoMetaArquivo, GerenciamentoQualitativoArquivo
+from gerenciamento_hexagonal.domain.services.arquivo_service import ValidacaoArquivoService
 from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy.arquivo import GerenciamentoArquivoRepository
 
 
@@ -62,22 +63,20 @@ class GerenciamentoArquivoServices:
 
         return arquivos_meta_salvos
 
-    async def create_gerenciamento_qualitativo_arquivo_fotos(self, gerenciamento_qualitativo_id: int, arquivos):
+    async def create_gerenciamento_qualitativo_arquivo(self, gerenciamento_qualitativo_id: int, fotos, relatorios):
         await self.verify.gerenciamento_qualitativo_exists(gerenciamento_qualitativo_id)
 
-        arquivos_ids = await self.create_arquivo(gerenciamento_id=gerenciamento_qualitativo_id, arquivos=arquivos, tipo_gerenciamento=TipoGerenciamentoArquivo.gerenciamento_qualitativo_fotos_do_projeto)
+        nomes_fotos = [foto.filename for foto in fotos]
+        nomes_relatorios = [relatorio.filename for relatorio in relatorios]
 
-        arquivos_qualitativo_salvos = []
-        for arquivo_id in arquivos_ids:
-            db_arquivo = await self.repository.create_gerenciamento_qualitativo_arquivo(gerenciamento_qualitativo_id=gerenciamento_qualitativo_id, arquivo_id=arquivo_id)
-            arquivos_qualitativo_salvos.append(db_arquivo)
+        ValidacaoArquivoService.validar_fotos_projeto(nomes_fotos)
+        ValidacaoArquivoService.validar_relatorio_parcial(nomes_relatorios)
+        
 
-        return arquivos_qualitativo_salvos
+        fotos_ids = await self.create_arquivo(gerenciamento_id=gerenciamento_qualitativo_id, arquivos=fotos, tipo_gerenciamento=TipoGerenciamentoArquivo.gerenciamento_qualitativo_fotos_do_projeto)
+        relatorios_ids = await self.create_arquivo(gerenciamento_id=gerenciamento_qualitativo_id, arquivos=relatorios, tipo_gerenciamento=TipoGerenciamentoArquivo.gerenciamento_qualitativo_relatorio_parcial)
 
-    async def create_gerenciamento_qualitativo_arquivo_relatorio(self, gerenciamento_qualitativo_id: int, arquivos):
-        await self.verify.gerenciamento_qualitativo_exists(gerenciamento_qualitativo_id)
-
-        arquivos_ids = await self.create_arquivo(gerenciamento_id=gerenciamento_qualitativo_id, arquivos=arquivos, tipo_gerenciamento=TipoGerenciamentoArquivo.gerenciamento_qualitativo_relatorio_parcial)
+        arquivos_ids = fotos_ids + relatorios_ids
 
         arquivos_qualitativo_salvos = []
         for arquivo_id in arquivos_ids:
