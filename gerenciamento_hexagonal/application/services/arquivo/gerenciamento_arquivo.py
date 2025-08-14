@@ -75,7 +75,6 @@ class GerenciamentoArquivoServices:
 
         ValidacaoArquivoService.validar_fotos_projeto(nomes_fotos)
         ValidacaoArquivoService.validar_relatorio_parcial(nomes_relatorios)
-        
 
         fotos_ids = await self.create_arquivo(gerenciamento_id=gerenciamento_qualitativo_id, arquivos=fotos, tipo_gerenciamento=TipoGerenciamentoArquivo.gerenciamento_qualitativo_fotos_do_projeto)
         relatorios_ids = await self.create_arquivo(gerenciamento_id=gerenciamento_qualitativo_id, arquivos=relatorios, tipo_gerenciamento=TipoGerenciamentoArquivo.gerenciamento_qualitativo_relatorio_parcial)

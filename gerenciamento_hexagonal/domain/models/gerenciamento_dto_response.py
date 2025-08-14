@@ -30,6 +30,7 @@ class GerenciamentoMetaDTO(BaseModel):
     alcancado: int
     ordem: Optional[int] = None
 
+
 class GerenciamentoMetaUpdate(GerenciamentoMetaDTO):
     id: int
 
@@ -60,7 +61,8 @@ class GerenciamentoQualitativoUpdate(GerenciamentoQualitativoDTO):
 class GerenciamentoCaracterizacaoDTO(BaseModel):
     quantidade: int = Field(..., gt=0)
     categorizacoes_ids: list[PositiveInt]
-    
+
+
 class GerenciamentoCaracterizacaoUpdate(GerenciamentoCaracterizacaoDTO):
     id: int
 
@@ -74,6 +76,7 @@ class GerenciamentoQuantitativoCaracterozacaoDTO(BaseModel):
     pessoas_impactadas: int
     gerenciamento_caracterizacao: list[GerenciamentoCaracterizacaoDTO] = Field(default_factory=list)
 
+
 class GerenciamentoQuantitativoCaracterozacaoUpdate(GerenciamentoQuantitativoCaracterozacaoDTO):
     id: int
     gerenciamento_caracterizacao: list[GerenciamentoCaracterizacaoUpdate] = Field(default_factory=list)
@@ -86,6 +89,7 @@ class GerenciamentoContrapartidaDTO(BaseModel):
     data: date
     status: StatusGereciamentoContrapartida = Field(default_factory=StatusGereciamentoContrapartida.EM_APROVACAO)
 
+
 class GerenciamentoContrapartidaUpdate(GerenciamentoContrapartidaDTO):
     id: int
 
@@ -94,6 +98,7 @@ class GerenciamentoContrapartidaAdminDTO(BaseModel):
     quantidade: int
     justificativa: str = Field(..., max_length=150)
     data: date
+
 
 class GerenciamentoContrapartidaAdminUpdate(GerenciamentoContrapartidaAdminDTO):
     id: int
@@ -146,6 +151,7 @@ class RelatorioDTO(GerenciamentoPropostaDTO):
     gerenciamento_qualitativo: list[GerenciamentoQualitativoDTO]
     gerenciamento_quantitativo: list[GerenciamentoQuantitativoCaracterozacaoDTO]
     gerenciamento_contrapartida: list[GerenciamentoContrapartidaDTO]
+
 
 class RelatorioUpdateDTO(GerenciamentoPropostaDTO):
     gerenciamento_metas: list[GerenciamentoMetaUpdate]

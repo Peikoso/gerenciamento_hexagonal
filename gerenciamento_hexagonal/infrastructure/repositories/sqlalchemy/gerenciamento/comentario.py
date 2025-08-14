@@ -1,7 +1,7 @@
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario
 from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoComentarioRepository
-from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy.models.gerenciamento_orm import GerenciamentoComentarioModel
 from gerenciamento_hexagonal.infrastructure.database.sqlalchemyConfig import get_session
+from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy.models.gerenciamento_orm import GerenciamentoComentarioModel
 from sqlalchemy import select
 
 

@@ -1,7 +1,7 @@
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoMeta
 from gerenciamento_hexagonal.domain.repositories.gerenciamento import GerenciamentoMetaRepository
-from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy.models.gerenciamento_orm import GerenciamentoMetaModel
 from gerenciamento_hexagonal.infrastructure.database.sqlalchemyConfig import get_session
+from gerenciamento_hexagonal.infrastructure.repositories.sqlalchemy.models.gerenciamento_orm import GerenciamentoMetaModel
 from sqlalchemy import select
 
 

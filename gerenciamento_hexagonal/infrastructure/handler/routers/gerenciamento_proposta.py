@@ -3,6 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, HTTPException
 
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import (
+    DomainValidationError,
     NotFoundError,
     NotNullViolationError,
 )
@@ -33,6 +34,9 @@ async def create_gerenciamento_propostaComentario(gerenciamento_proposta_id: int
 
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
+
+    except DomainValidationError as e:
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e))
 
 
 @router.get('/', response_model=list[GerenciamentoPropostaResponse])

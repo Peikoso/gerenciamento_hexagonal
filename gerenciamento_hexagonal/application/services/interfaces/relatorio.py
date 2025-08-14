@@ -27,6 +27,6 @@ class RelatorioServices(ABC):
 
     async def create_relatorio(self, relatorio: RelatorioDTO):
         pass
-    
+
     async def update_relatorio(self, relatorio: RelatorioUpdateDTO, gerenciamento_proposta_id: int):
         pass

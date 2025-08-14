@@ -8,3 +8,7 @@ class NotFoundError(Exception):
 
 class NotNullViolationError(Exception):
     pass
+
+
+class DomainValidationError(Exception):
+    pass

@@ -63,7 +63,6 @@ class RelatorioServicesImpl(RelatorioServices):
 
             await self.quantitativo.update_gerenciamento_quantitativo(gerenciamento_quantitativo_id=quantitativo.id, gerenciamento_quantitativo=quantitativo_dto)
 
-
             for categorizacao in categorizacoes:
                 categorizacao_dto = GerenciamentoCaracterizacaoDTO.model_validate(categorizacao.model_dump())
                 await self.caracterizacao.update_gerenciamento_caracterizacao(gerenciamento_caracterizacao_id=categorizacao.id, gerenciamento_caracterizacao=categorizacao_dto)

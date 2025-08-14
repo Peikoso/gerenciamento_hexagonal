@@ -1,11 +1,10 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Column, Date, DateTime, Enum, ForeignKey, Integer, SmallInteger, String, Table, UniqueConstraint, func
-from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
-
 from gerenciamento_hexagonal.domain.models.enums_specs import GerenciamentoBeneficiarioCategorizacaoSpec, StatusGereciamentoContrapartida, TipoArquivoContexto
 from gerenciamento_hexagonal.domain.models.gerenciamento import TipoGerenciamento
+from sqlalchemy import Column, Date, DateTime, Enum, ForeignKey, Integer, SmallInteger, String, Table, UniqueConstraint, func
+from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
 
 table_registry = registry()
 
