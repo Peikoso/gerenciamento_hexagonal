@@ -54,6 +54,10 @@ class GerenciamentoArquivoServices:
     async def create_gerenciamento_meta_arquivo(self, gerenciamento_meta_id: int, arquivos):
         await self.verify.gerenciamento_meta_exists(gerenciamento_meta_id)
 
+        nomes_arquivos = [arquivo.filename for arquivo in arquivos]
+
+        ValidacaoArquivoService.validar_arquivos_metas(nomes_arquivos)
+
         arquivos_ids = await self.create_arquivo(gerenciamento_id=gerenciamento_meta_id, arquivos=arquivos, tipo_gerenciamento=TipoGerenciamentoArquivo.gerenciamento_meta)
 
         arquivos_meta_salvos = []
@@ -87,6 +91,10 @@ class GerenciamentoArquivoServices:
 
     async def create_gerenciamento_contrapartida_arquivo(self, gerenciamento_contrapartida_id: int, arquivos):
         await self.verify.gerenciamento_contrapartida_exists(gerenciamento_contrapartida_id)
+
+        nomes_arquivos = [arquivo.filename for arquivo in arquivos]
+
+        ValidacaoArquivoService.validar_comprovacao_contrapartida(nomes_arquivos)
 
         arquivos_ids = await self.create_arquivo(gerenciamento_id=gerenciamento_contrapartida_id, arquivos=arquivos, tipo_gerenciamento=TipoGerenciamentoArquivo.gerenciamento_contrapartida)
 

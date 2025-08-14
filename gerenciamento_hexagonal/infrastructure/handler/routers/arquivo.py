@@ -4,7 +4,7 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
-from gerenciamento_hexagonal.infrastructure.handler.annotated import Service_Arquivo, Validacao_Arquivo
+from gerenciamento_hexagonal.infrastructure.handler.annotated import Service_Arquivo
 from gerenciamento_hexagonal.infrastructure.handler.arquivo_wrapper import ArquivoWrapper
 
 router = APIRouter()
@@ -43,12 +43,8 @@ async def delete_arquivo(arquivo_id: int, service: Service_Arquivo):
 
 
 @router.post('/Meta/{gerenciamento_meta_id}')
-async def create_gerenciamento_meta_arquivo(service_arquivo: Service_Arquivo, validacao_service: Validacao_Arquivo, gerenciamento_meta_id: int, gerenciamento_meta_arquivo: list[UploadFile] = File(...)):
+async def create_gerenciamento_meta_arquivo(service_arquivo: Service_Arquivo, gerenciamento_meta_id: int, gerenciamento_meta_arquivo: list[UploadFile] = File(...)):
     try:
-        nomes_arquivos = [arquivo.filename for arquivo in gerenciamento_meta_arquivo]
-
-        validacao_service.validar_arquivos_metas(nomes_arquivos)
-
         arquivos = [await ArquivoWrapper.from_upload_file(file) for file in gerenciamento_meta_arquivo]
 
         metadados = await service_arquivo.create_gerenciamento_meta_arquivo(gerenciamento_meta_id=gerenciamento_meta_id, arquivos=arquivos)
@@ -63,14 +59,8 @@ async def create_gerenciamento_meta_arquivo(service_arquivo: Service_Arquivo, va
 
 
 @router.post('/Qualitativo/{gerenciamento_qualitativo_id}')
-async def create_gerenciamento_qualitativo_arquivo(service_arquivo: Service_Arquivo, validacao_service: Validacao_Arquivo, gerenciamento_qualitativo_id: int, fotos_projeto: list[UploadFile] = File(...), relatorios_parciais: list[UploadFile] = File(...)):
+async def create_gerenciamento_qualitativo_arquivo(service_arquivo: Service_Arquivo, gerenciamento_qualitativo_id: int, fotos_projeto: list[UploadFile] = File(...), relatorios_parciais: list[UploadFile] = File(...)):
     try:
-        #nomes_fotos = [arquivo.filename for arquivo in fotos_projeto]
-        #nomes_relatorios = [arquivo.filename for arquivo in relatorios_parciais]
-
-        #validacao_service.validar_fotos_projeto(nomes_fotos)
-        #validacao_service.validar_relatorio_parcial(nomes_relatorios)
-
         fotos = [await ArquivoWrapper.from_upload_file(file) for file in fotos_projeto]
         relatorios = [await ArquivoWrapper.from_upload_file(file) for file in relatorios_parciais]
 
@@ -86,13 +76,9 @@ async def create_gerenciamento_qualitativo_arquivo(service_arquivo: Service_Arqu
 
 
 @router.post('/Contrapartida/{gerenciamento_contrapartida_id}')
-async def create_gerenciamento_contrapartida_arquivo(service_arquivo: Service_Arquivo, validacao_service: Validacao_Arquivo, gerenciamento_contrapartida_id: int, gerenciamento_meta_arquivo: list[UploadFile] = File(...)):
+async def create_gerenciamento_contrapartida_arquivo(service_arquivo: Service_Arquivo, gerenciamento_contrapartida_id: int, gerenciamento_contrapartida_arquivo: list[UploadFile] = File(...)):
     try:
-        nomes_arquivos = [arquivo.filename for arquivo in gerenciamento_meta_arquivo]
-
-        validacao_service.validar_comprovacao_contrapartida(nomes_arquivos)
-
-        arquivos = [await ArquivoWrapper.from_upload_file(file) for file in gerenciamento_meta_arquivo]
+        arquivos = [await ArquivoWrapper.from_upload_file(file) for file in gerenciamento_contrapartida_arquivo]
 
         metadados = await service_arquivo.create_gerenciamento_contrapartida_arquivo(gerenciamento_contrapartida_id=gerenciamento_contrapartida_id, arquivos=arquivos)
         return metadados
