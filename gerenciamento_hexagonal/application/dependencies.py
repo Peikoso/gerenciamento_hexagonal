@@ -68,9 +68,9 @@ def get_gerenciamento_contrapartida_service() -> GerenciamentoContrapartidaServi
 
 
 def get_gerenciamento_contrapartida_admin_service() -> GerenciamentoContrapartidaAdminServicesImpl:
-    gerenciamento_contrapartida_service = VerifyGerenciamentoServices()
+    verify = VerifyGerenciamentoServices(VerifyGerenciamentoRepository())
     gerenciamento_contrapartida_admin_repository = GerenciamentoContrapartidaAdminRepository()
-    return GerenciamentoContrapartidaAdminServicesImpl(gerenciamento_contrapartida_admin_repository, gerenciamento_contrapartida_service)
+    return GerenciamentoContrapartidaAdminServicesImpl(gerenciamento_contrapartida_admin_repository, verify)
 
 
 def get_arquivo_service() -> GerenciamentoArquivoServices:

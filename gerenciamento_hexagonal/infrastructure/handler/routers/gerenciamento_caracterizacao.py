@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, HTTPException
 
-from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError, UniqueViolation
+from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoCaracterizacao
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoCaracterizacaoDTO
 from gerenciamento_hexagonal.infrastructure.handler.annotated import Service_Caracterizacao
@@ -37,9 +37,6 @@ async def create_gerenciamento_caracterizacao(gerencimento_quantitativo_id: int,
 
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
-
-    except UniqueViolation as e:
-        raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=str(e))
 
 
 @router.put('/{gerenciamento_caracterizacao_id}', response_model=GerenciamentoCaracterizacao)

@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
-from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
+from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import DomainValidationError, NotFoundError
 from gerenciamento_hexagonal.infrastructure.handler.annotated import Service_Arquivo
 from gerenciamento_hexagonal.infrastructure.handler.arquivo_wrapper import ArquivoWrapper
 
@@ -57,6 +57,9 @@ async def create_gerenciamento_meta_arquivo(service_arquivo: Service_Arquivo, ge
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
 
+    except DomainValidationError as e:
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e))
+
 
 @router.post('/Qualitativo/{gerenciamento_qualitativo_id}')
 async def create_gerenciamento_qualitativo_arquivo(service_arquivo: Service_Arquivo, gerenciamento_qualitativo_id: int, fotos_projeto: list[UploadFile] = File(...), relatorios_parciais: list[UploadFile] = File(...)):
@@ -74,6 +77,9 @@ async def create_gerenciamento_qualitativo_arquivo(service_arquivo: Service_Arqu
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
 
+    except DomainValidationError as e:
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e))
+
 
 @router.post('/Contrapartida/{gerenciamento_contrapartida_id}')
 async def create_gerenciamento_contrapartida_arquivo(service_arquivo: Service_Arquivo, gerenciamento_contrapartida_id: int, gerenciamento_contrapartida_arquivo: list[UploadFile] = File(...)):
@@ -88,3 +94,6 @@ async def create_gerenciamento_contrapartida_arquivo(service_arquivo: Service_Ar
 
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
+
+    except DomainValidationError as e:
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e))

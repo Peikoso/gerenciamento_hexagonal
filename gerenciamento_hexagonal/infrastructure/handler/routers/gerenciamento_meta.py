@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, HTTPException
 
-from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
+from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import DomainValidationError, NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoMeta
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoMetaDTO
 from gerenciamento_hexagonal.infrastructure.handler.annotated import Service_Meta
@@ -38,6 +38,9 @@ async def create_gerenciamento_meta(gerenciamento_proposta_id: int, gerenciament
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
 
+    except DomainValidationError as e:
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e))
+
 
 @router.put('/{gerenciamento_meta_id}', response_model=GerenciamentoMeta)
 async def update_gerenciamento_meta(gerenciamento_meta_id: int, gerenciamento_meta: GerenciamentoMetaDTO, service: Service_Meta):
@@ -48,6 +51,9 @@ async def update_gerenciamento_meta(gerenciamento_meta_id: int, gerenciamento_me
 
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
+
+    except DomainValidationError as e:
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e))
 
 
 @router.delete('/{gerenciamento_meta_id}')

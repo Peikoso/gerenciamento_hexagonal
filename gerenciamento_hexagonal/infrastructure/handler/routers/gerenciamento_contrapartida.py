@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, HTTPException
 
-from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
+from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import DomainValidationError, NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoContrapartida
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoContrapartidaDTO
 from gerenciamento_hexagonal.infrastructure.handler.annotated import Service_Contrapartida
@@ -38,6 +38,9 @@ async def create_gerenciamento_contrapartida(gerenciamento_proposta_id: int, ger
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
 
+    except DomainValidationError as e:
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e))
+
 
 @router.put('/{gerenciamento_contrapartida_id}', response_model=GerenciamentoContrapartida)
 async def update_gerenciamento_contrapartida(gerenciamento_contrapartida_id: int, gerenciamento_contrapartida: GerenciamentoContrapartidaDTO, service: Service_Contrapartida):
@@ -48,6 +51,9 @@ async def update_gerenciamento_contrapartida(gerenciamento_contrapartida_id: int
 
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
+
+    except DomainValidationError as e:
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e))
 
 
 @router.delete('/{gerenciamento_contrapartida_id}')

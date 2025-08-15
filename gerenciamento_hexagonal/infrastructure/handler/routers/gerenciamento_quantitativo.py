@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, HTTPException
 
-from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError, NotNullViolationError, UniqueViolation
+from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import DomainValidationError, NotFoundError, NotNullViolationError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoQuantitativo
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoComentarioDTO, GerenciamentoQuantitativoDTO
 from gerenciamento_hexagonal.infrastructure.handler.annotated import Service_Quantitativo
@@ -38,8 +38,8 @@ async def create_gerenciamento_quantitativo(gerenciamentoProposta_id: int, geren
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
 
-    except UniqueViolation as e:
-        raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=str(e))
+    except DomainValidationError as e:
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e))
 
 
 @router.post('/Comentario/{gerenciamento_quantitativo_id}', response_model=GerenciamentoQuantitativo)
@@ -52,6 +52,9 @@ async def create_gerenciamento_quantitativo_comentario(gerenciamento_quantitativ
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
 
+    except DomainValidationError as e:
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e))
+
 
 @router.put('/{gerenciamento_quantitativo_id}', response_model=GerenciamentoQuantitativo)
 async def update_gerenciamento_quantitativo(gerenciamento_quantitativo_id: int, gerenciamento_quantitativo: GerenciamentoQuantitativoDTO, service: Service_Quantitativo):
@@ -62,6 +65,9 @@ async def update_gerenciamento_quantitativo(gerenciamento_quantitativo_id: int, 
 
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))
+
+    except DomainValidationError as e:
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e))
 
 
 @router.delete('/{gerenciamento_quantitativo_id}')
