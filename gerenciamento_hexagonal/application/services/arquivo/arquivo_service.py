@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 
 from gerenciamento_hexagonal.domain.services.arquivo_service import normalizar_nome_arquivo
+from gerenciamento_hexagonal.domain.services.validations import ValidacaoService
 
 
 class ArquivoIndividualService:
@@ -67,9 +68,8 @@ class ArquivoServices:
         metadados = []
         for arquivo in self._arquivos:
             service = ArquivoIndividualService(arquivo, self._rel_id, self.base_dir, self.files_dir)
+            ValidacaoService.validar_tamanho_string('Nome Arquivo', arquivo.filename, 30)
             await service.verifica_tamanho()
-        for arquivo in self._arquivos:
-            service = ArquivoIndividualService(arquivo, self._rel_id, self.base_dir, self.files_dir)
             await service.processar_arquivo()  # Processa cada arquivo individualmente
             metadados.append(service.get_metadados())  # Coleta os metadados após o processamento
         return metadados

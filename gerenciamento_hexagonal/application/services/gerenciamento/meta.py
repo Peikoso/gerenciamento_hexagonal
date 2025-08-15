@@ -2,6 +2,7 @@ from gerenciamento_hexagonal.application.services.interfaces.gerenciamento.meta 
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoMeta
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoMetaDTO
+from gerenciamento_hexagonal.domain.services.validations import ValidacaoService
 
 
 class GerenciamentoMetaServicesImpl(GerenciamentoMetaServices):
@@ -20,6 +21,9 @@ class GerenciamentoMetaServicesImpl(GerenciamentoMetaServices):
     async def create_gerenciamento_meta(self, gerenciamento_proposta_id: int, gerenciamento_meta: GerenciamentoMetaDTO) -> GerenciamentoMeta:
         await self.verify.gerencimento_proposta_exists(gerenciamento_proposta_id)
 
+        ValidacaoService.validar_num_positivo('gerenciamento meta alcancado', gerenciamento_meta.alcancado)
+        ValidacaoService.validar_num_positivo('gerenciamento meta ordem', gerenciamento_meta.ordem)
+
         gerenciamento_meta = GerenciamentoMeta(**gerenciamento_meta.model_dump())
         gerenciamento_meta = await self.repository.create_gerenciamento_meta(gerenciamento_proposta_id, gerenciamento_meta)
 
@@ -27,6 +31,9 @@ class GerenciamentoMetaServicesImpl(GerenciamentoMetaServices):
 
     async def update_gerenciamento_meta(self, gerenciamento_meta_id: int, gerenciamento_meta: GerenciamentoMetaDTO) -> GerenciamentoMeta:
         await self.get_gerenciamento_meta_by_id(gerenciamento_meta_id)
+
+        ValidacaoService.validar_num_positivo('gerenciamento meta alcancado', gerenciamento_meta.alcancado)
+        ValidacaoService.validar_num_positivo('gerenciamento meta ordem', gerenciamento_meta.ordem)
 
         gerenciamento_meta = GerenciamentoMeta(**gerenciamento_meta.model_dump())
         gerenciamento_meta = await self.repository.update_gerenciamento_meta(gerenciamento_meta_id, gerenciamento_meta)

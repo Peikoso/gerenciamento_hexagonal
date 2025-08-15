@@ -2,6 +2,7 @@ from gerenciamento_hexagonal.application.services.interfaces.gerenciamento.comen
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoComentario
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoComentarioDTO
+from gerenciamento_hexagonal.domain.services.validations import ValidacaoService
 
 
 class GerenciamentoComentarioServicesImpl(GerenciamentoComentarioServices):
@@ -20,6 +21,8 @@ class GerenciamentoComentarioServicesImpl(GerenciamentoComentarioServices):
 
     async def update_gerenciamento_comentario(self, gerenciamento_comentario_id: int, gerenciamento_comentario: GerenciamentoComentarioDTO) -> GerenciamentoComentario:
         await self.get_gerenciamento_comentario_by_id(gerenciamento_comentario_id)
+
+        ValidacaoService.validar_tamanho_string('gerenciamento comentario', gerenciamento_comentario.comentario, 100)
 
         gerenciamento_comentario = GerenciamentoComentario(**gerenciamento_comentario.model_dump())
         gerenciamento_comentario = await self.repository.update_gerenciamento_comentario(gerenciamento_comentario_id, gerenciamento_comentario)

@@ -2,6 +2,7 @@ from gerenciamento_hexagonal.application.services.interfaces.gerenciamento.contr
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoContrapartida
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoContrapartidaDTO
+from gerenciamento_hexagonal.domain.services.validations import ValidacaoService
 
 
 class GerenciamentoContrapartidaServicesImpl(GerenciamentoContrapartidaServices):
@@ -21,6 +22,9 @@ class GerenciamentoContrapartidaServicesImpl(GerenciamentoContrapartidaServices)
     async def create_gerenciamento_contrapartida(self, gerenciamento_proposta_id: int, gerenciamento_contrapartida: GerenciamentoContrapartidaDTO) -> GerenciamentoContrapartida:
         await self.verify.gerencimento_proposta_exists(gerenciamento_proposta_id)
 
+        ValidacaoService.validar_num_positivo('gerenciamento contrapartida quantidade', gerenciamento_contrapartida.quantidade)
+        ValidacaoService.validar_tamanho_string('gerenciamento contrapartida observacao', gerenciamento_contrapartida.observacao, 300)
+
         gerenciamento_contrapartida = GerenciamentoContrapartida(gerenciamento_proposta_id=gerenciamento_proposta_id, **gerenciamento_contrapartida.model_dump())
         gerenciamento_contrapartida = await self.repository.create_gerenciamento_contrapartida(gerenciamento_contrapartida)
 
@@ -28,6 +32,9 @@ class GerenciamentoContrapartidaServicesImpl(GerenciamentoContrapartidaServices)
 
     async def update_gerenciamento_contrapartida(self, gerenciamento_contrapartida_id: int, gerenciamento_contrapartida: GerenciamentoContrapartidaDTO) -> GerenciamentoContrapartida:
         await self.get_gerenciamento_contrapartida_by_id(gerenciamento_contrapartida_id)
+
+        ValidacaoService.validar_num_positivo('gerenciamento contrapartida quantidade', gerenciamento_contrapartida.quantidade)
+        ValidacaoService.validar_tamanho_string('gerenciamento contrapartida observacao', gerenciamento_contrapartida.observacao, 300)
 
         gerenciamento_contrapartida = GerenciamentoContrapartida(**gerenciamento_contrapartida.model_dump())
         gerenciamento_contrapartida = await self.repository.update_gerenciamento_contrapartida(gerenciamento_contrapartida_id, gerenciamento_contrapartida)

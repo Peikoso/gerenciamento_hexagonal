@@ -2,6 +2,7 @@ from gerenciamento_hexagonal.application.services.interfaces.gerenciamento.contr
 from gerenciamento_hexagonal.domain.exceptions.gerenciamentoExceptions import NotFoundError
 from gerenciamento_hexagonal.domain.models.gerenciamento import GerenciamentoContrapartidaAdmin
 from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import GerenciamentoContrapartidaAdminDTO
+from gerenciamento_hexagonal.domain.services.validations import ValidacaoService
 
 
 class GerenciamentoContrapartidaAdminServicesImpl(GerenciamentoContrapartidaAdminServices):
@@ -20,6 +21,9 @@ class GerenciamentoContrapartidaAdminServicesImpl(GerenciamentoContrapartidaAdmi
 
     async def create_gerenciamento_contrapartida_admin(self, gerenciamento_contrapartida_id: int, gerenciamento_contrapartida_admin: GerenciamentoContrapartidaAdminDTO) -> GerenciamentoContrapartidaAdmin:
         await self.verify.gerenciamento_contrapartida_exists(gerenciamento_contrapartida_id)
+
+        ValidacaoService.validar_num_positivo('gerenciamento contrapartida admin quantidade', gerenciamento_contrapartida_admin.quantidade)
+        ValidacaoService.validar_tamanho_string('gerenciamento contrapartida justificativa', gerenciamento_contrapartida_admin.justificativa, 150)
 
         gerenciamento_contrapartida_admin = GerenciamentoContrapartidaAdmin(gerenciamento_contrapartida_id=gerenciamento_contrapartida_id, **gerenciamento_contrapartida_admin.model_dump())
         gerenciamento_contrapartida_admin = await self.repository.create_gerenciamento_contrapartida_admin(gerenciamento_contrapartida_admin)
