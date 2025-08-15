@@ -187,15 +187,6 @@ class GerenciamentoContrapartidaAdminModel:
     gerenciamento_contrapartida: Mapped['GerenciamentoContrapartidaModel'] = relationship(back_populates='gerenciamento_contrapartida_admin', lazy='selectin', init=False)
 
 
-@table_registry.mapped_as_dataclass
-class TipoArquivoModel:
-    __tablename__ = 'tipo_arquivo'
-
-    id: Mapped[str] = mapped_column(String(32), primary_key=True, nullable=False)
-    contexto: Mapped[TipoArquivoContexto] = mapped_column(Enum(TipoArquivoContexto), nullable=False)
-    descricao: Mapped[str] = mapped_column(String(120), nullable=False, unique=True)
-    info: Mapped[str] = mapped_column(String(1000), nullable=False, default=None)
-
 
 @table_registry.mapped_as_dataclass
 class ArquivoModel:
@@ -207,8 +198,7 @@ class ArquivoModel:
     tamanho: Mapped[int] = mapped_column(Integer, nullable=False)
     uri: Mapped[str] = mapped_column(String(250), nullable=False)
 
-    tipo_arquivo_id: Mapped[str] = mapped_column(String(32), ForeignKey('tipo_arquivo.id'), nullable=False)
-    tipo_arquivo: Mapped['TipoArquivoModel'] = relationship(lazy='selectin', init=False)
+    tipo_arquivo_id: Mapped[str] = mapped_column(String(32), nullable=False)
 
 
 @table_registry.mapped_as_dataclass
