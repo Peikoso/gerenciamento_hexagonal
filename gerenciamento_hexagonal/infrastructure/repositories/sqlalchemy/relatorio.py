@@ -20,7 +20,7 @@ class RelatorioRepository:
             ]
 
             gerenciamento_caracterizacoes = [
-                GerenciamentoCaracterizacaoRelatorioResponse(id=gerenciamento_caracterizacao.id, quantidade=gerenciamento_caracterizacao.quantidade, categorizacoes_ids=[c.id for c in gerenciamento_caracterizacao.categorizacoes]) for gerenciamento_quantitativo in relatorio.gerenciamento_quantitativo for gerenciamento_caracterizacao in gerenciamento_quantitativo.gerenciamento_caracterizacao
+                GerenciamentoCaracterizacaoRelatorioResponse(id=gerenciamento_caracterizacao.id, quantidade=gerenciamento_caracterizacao.quantidade, categorizacoes_ids=gerenciamento_caracterizacao.categorizacoes_ids) for gerenciamento_quantitativo in relatorio.gerenciamento_quantitativo for gerenciamento_caracterizacao in gerenciamento_quantitativo.gerenciamento_caracterizacao
             ]
 
             gerenciamento_quantitativos = [

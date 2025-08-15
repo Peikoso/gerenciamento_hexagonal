@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Optional
 
-from gerenciamento_hexagonal.domain.models.enums_specs import GerenciamentoBeneficiarioCategorizacaoSpec, StatusGereciamentoContrapartida, TipoArquivoContexto
+from gerenciamento_hexagonal.domain.models.enums_specs import GerenciamentoBeneficiarioCategorizacaoSpec, StatusGereciamentoContrapartida
 from gerenciamento_hexagonal.domain.models.gerenciamento import TipoGerenciamento
-from sqlalchemy import Column, Date, DateTime, Enum, ForeignKey, Integer, SmallInteger, String, Table, UniqueConstraint, func
+from sqlalchemy import ARRAY, Column, Date, DateTime, Enum, ForeignKey, Integer, SmallInteger, String, Table, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
 
 table_registry = registry()
@@ -111,46 +111,22 @@ gerenciamento_qualitativo_comentario_association = Table('gerenciamento_qualitat
 
 
 @table_registry.mapped_as_dataclass
-class TipoCategorizacaoBeneficiarioModel:
-    __tablename__ = 'tipo_categorizacao_beneficiario'
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False, autoincrement=True, init=False)
-    info: Mapped[str] = mapped_column(String(50), nullable=False)
-    descricao: Mapped[str] = mapped_column(String(150))
-
-
-@table_registry.mapped_as_dataclass
-class CategorizacaoBeneficiarioModel:
-    __tablename__ = 'categorizacao_beneficiario'
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False, autoincrement=True, init=False)
-    tipo_categ_beneficiario_id: Mapped[int] = mapped_column(ForeignKey('tipo_categorizacao_beneficiario.id', ondelete='RESTRICT'))
-    valor: Mapped[str] = mapped_column(String(64), nullable=False)
-    tipo: Mapped[TipoCategorizacaoBeneficiarioModel] = relationship()
-
-    gerenciamentos: Mapped[list['GerenciamentoCaracterizacaoModel']] = relationship(secondary=GerenciamentoBeneficiarioCategorizacaoSpec.MODEL_NAME, back_populates='categorizacoes', default_factory=list, lazy='selectin')
-
-    __table_args__ = (UniqueConstraint('tipo_categ_beneficiario_id', 'valor', name='categorizacao_beneficiario_tipo_valor_uq'),)
-
-
-@table_registry.mapped_as_dataclass
 class GerenciamentoCaracterizacaoModel:
     __tablename__ = 'gerenciamento_caracterizacao'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False, autoincrement=True, init=False)
     quantidade: Mapped[int] = mapped_column(Integer, nullable=False)
+    categorizacoes_ids: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=False)
 
     gerenciamento_quantitativo_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_quantitativo.id', ondelete='RESTRICT'), nullable=False)
     gerenciamento_quantitativo: Mapped['GerenciamentoQuantitativoModel'] = relationship(back_populates='gerenciamento_caracterizacao', lazy='selectin', init=False)
-
-    categorizacoes: Mapped[list['CategorizacaoBeneficiarioModel']] = relationship(secondary=GerenciamentoBeneficiarioCategorizacaoSpec.MODEL_NAME, back_populates='gerenciamentos', default_factory=list, lazy='selectin')
 
 
 gerenciamento_beneficiario_categorizacao = Table(
     'gerenciamento_beneficiario_categorizacao',
     table_registry.metadata,
     Column('gerenciamento_beneficiario_id', ForeignKey('gerenciamento_caracterizacao.id', ondelete='CASCADE'), primary_key=True),
-    Column('categorizacao_id', ForeignKey('categorizacao_beneficiario.id', ondelete='CASCADE'), primary_key=True),
+    Column('categorizacao_id', Integer, primary_key=True),
     UniqueConstraint(GerenciamentoBeneficiarioCategorizacaoSpec.FIELD_GERENCIAMENTO_BENEFICIARIO, GerenciamentoBeneficiarioCategorizacaoSpec.FIELD_CATEGORIZACAO, name=GerenciamentoBeneficiarioCategorizacaoSpec.CONSTRAINT_GERENCIAMENTO_BENEFICIARIO_CATEGORIZACAO_UQ),
 )
 
@@ -185,7 +161,6 @@ class GerenciamentoContrapartidaAdminModel:
 
     gerenciamento_contrapartida_id: Mapped[int] = mapped_column(Integer, ForeignKey('gerenciamento_contrapartida.id', ondelete='CASCADE'), nullable=False)
     gerenciamento_contrapartida: Mapped['GerenciamentoContrapartidaModel'] = relationship(back_populates='gerenciamento_contrapartida_admin', lazy='selectin', init=False)
-
 
 
 @table_registry.mapped_as_dataclass

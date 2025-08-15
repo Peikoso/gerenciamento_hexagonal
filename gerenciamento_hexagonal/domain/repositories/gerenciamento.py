@@ -168,10 +168,6 @@ class GerenciamentoCaracterizacaoRepository(ABC):
     async def delete_gerenciamento_caracterizacao(self, gerenciamento_caracterizacao_id: int):
         pass
 
-    @abstractmethod
-    async def find_categorizacoes_by_ids(self, categorizacoes_ids: list[int]) -> bool:
-        pass
-
 
 class GerenciamentoContrapartidaRepository(ABC):
     @abstractmethod

@@ -1,16 +1,6 @@
 from enum import Enum
 
 
-class TipoArquivoContexto(str, Enum):
-    PROPONENTE = 'PROPONENTE'
-    PROJETO = 'PROJETO'
-    DADOS_BANCARIOS = 'DADOS_BANCARIOS'
-    EDITAL = 'EDITAL'
-    GERENCIAMENTO_META = 'GERENCIAMENTO_META'
-    GERENCIAMENTO_QUALITATIVO = 'GERENCIAMENTO_QUALITATIVO'
-    GERENCIAMENTO_CONTRAPARTIDA = 'GERENCIAMENTO_CONTRAPARTIDA'
-
-
 class TipoGerenciamentoArquivo(str, Enum):
     gerenciamento_meta = ('REGISTRO_DA_META',)
     gerenciamento_qualitativo_fotos_do_projeto = ('FOTOS_DO_PROJETO',)

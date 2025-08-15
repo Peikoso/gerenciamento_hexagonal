@@ -22,10 +22,6 @@ class GerenciamentoCaracterizacaoServicesImpl(GerenciamentoCaracterizacaoService
         await self.verify.gerenciamento_quantitativo_exists(gerenciamento_quantitativo_id)
 
         gerenciamento_caracterizacao.categorizacoes_ids = list(set(gerenciamento_caracterizacao.categorizacoes_ids))
-        categorizacao = await self.repository.find_categorizacoes_by_ids(gerenciamento_caracterizacao.categorizacoes_ids)
-
-        if categorizacao:
-            raise NotFoundError(f'categorizacao with ID: {categorizacao} not found')
 
         gerenciamento_caracterizacao = GerenciamentoCaracterizacao(**gerenciamento_caracterizacao.model_dump())
         gerenciamento_caracterizacao = await self.repository.create_gerenciamento_caracterizacao(gerenciamento_quantitativo_id, gerenciamento_caracterizacao)
@@ -36,10 +32,6 @@ class GerenciamentoCaracterizacaoServicesImpl(GerenciamentoCaracterizacaoService
         await self.get_gerenciamento_caracterizacao_by_id(gerenciamento_caracterizacao_id)
 
         gerenciamento_caracterizacao.categorizacoes_ids = list(set(gerenciamento_caracterizacao.categorizacoes_ids))
-        categorizacao = await self.repository.find_categorizacoes_by_ids(gerenciamento_caracterizacao.categorizacoes_ids)
-
-        if categorizacao:
-            raise NotFoundError(f'categorizacao with ID: {categorizacao} not found')
 
         gerenciamento_caracterizacao = GerenciamentoCaracterizacao(**gerenciamento_caracterizacao.model_dump())
         gerenciamento_caracterizacao = await self.repository.update_gerenciamento_caracterizacao(gerenciamento_caracterizacao_id, gerenciamento_caracterizacao)
