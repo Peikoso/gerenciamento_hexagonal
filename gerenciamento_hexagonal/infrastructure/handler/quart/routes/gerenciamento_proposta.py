@@ -23,7 +23,7 @@ async def create_gerenciamento_proposta():
         data = await request.get_json()
         dto = GerenciamentoPropostaDTO(**data)
         result = await service.create_gerenciamento_proposta(dto)
-        return jsonify(result.dict()), HTTPStatus.CREATED
+        return jsonify(result.model_dump()), HTTPStatus.CREATED
     except ValidationError as e:
         return jsonify({"detail": e.errors()}), HTTPStatus.UNPROCESSABLE_ENTITY
 
@@ -35,7 +35,7 @@ async def create_gerenciamento_proposta_comentario(gerenciamento_proposta_id):
         data = await request.get_json()
         dto = GerenciamentoComentarioDTO(**data)
         result = await service.create_gerenciamento_proposta_comentario(gerenciamento_proposta_id, dto)
-        return jsonify(result.dict()), HTTPStatus.CREATED
+        return jsonify(result.model_dump()), HTTPStatus.CREATED
     except NotFoundError as e:
         return jsonify({"detail": str(e)}), HTTPStatus.NOT_FOUND
     except DomainValidationError as e:
@@ -46,7 +46,7 @@ async def create_gerenciamento_proposta_comentario(gerenciamento_proposta_id):
 async def get_gerenciamento_propostas():
     service = get_service_gerenciamento_proposta()
     result = await service.get_gerenciamento_proposta()
-    return jsonify([p.dict() for p in result]), HTTPStatus.OK
+    return jsonify([p.model_dump() for p in result]), HTTPStatus.OK
 
 
 @proposta_bp.route("/<int:gerenciamento_proposta_id>", methods=["GET"])
@@ -54,7 +54,7 @@ async def get_by_id_gerenciamento_proposta(gerenciamento_proposta_id):
     service = get_service_gerenciamento_proposta()
     try:
         result = await service.get_gerenciamento_proposta_by_id(gerenciamento_proposta_id)
-        return jsonify(result.dict()), HTTPStatus.OK
+        return jsonify(result.model_dump()), HTTPStatus.OK
     except NotFoundError as e:
         return jsonify({"detail": str(e)}), HTTPStatus.NOT_FOUND
 
@@ -66,7 +66,7 @@ async def update_gerenciamento_proposta(gerenciamento_proposta_id):
         data = await request.get_json()
         dto = GerenciamentoPropostaDTO(**data)
         result = await service.update_gerenciamento_proposta(gerenciamento_proposta_id, dto)
-        return jsonify(result.dict()), HTTPStatus.OK
+        return jsonify(result.model_dump()), HTTPStatus.OK
     except NotFoundError as e:
         return jsonify({"detail": str(e)}), HTTPStatus.NOT_FOUND
 
