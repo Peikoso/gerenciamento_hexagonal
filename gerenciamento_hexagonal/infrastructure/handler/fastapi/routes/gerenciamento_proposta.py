@@ -13,7 +13,7 @@ from gerenciamento_hexagonal.domain.models.gerenciamento_dto_response import (
     GerenciamentoPropostaDTO,
     GerenciamentoPropostaResponse,
 )
-from gerenciamento_hexagonal.infrastructure.handler.annotated import Service_Proposta
+from gerenciamento_hexagonal.infrastructure.handler.fastapi.annotated import Service_Proposta
 
 router = APIRouter()
 
