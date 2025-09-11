@@ -1,9 +1,6 @@
-````markdown
 # Gerenciamento Hexagonal
 
-**Versão:** 0.1.0  
-**Autor:** João Martins (<joaommn1998@gmail.com>)  
-**Descrição:** Projeto de faculdade / iniciação científica utilizando Arquitetura Hexagonal, FastAPI, SQLAlchemy e Pydantic.
+  **Descrição:** Projeto de faculdade / iniciação científica utilizando Arquitetura Hexagonal, FastAPI, SQLAlchemy e Pydantic.
 
 ---
 
@@ -90,3 +87,4 @@ O projeto segue o modelo **Ports & Adapters**, garantindo:
 * **Organização modular**, facilitando manutenção e testes.
 
 ---
+
