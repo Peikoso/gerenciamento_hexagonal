@@ -12,7 +12,7 @@ PositiveInt = Annotated[int, Field(gt=0)]
 
 
 class GerenciamentoPropostaDTO(BaseModel):
-    proposta_id: int
+    proposta_id: int = Field(ge=0, le=10000)
     trimestre_de_referencia: date
     tipo: TipoGerenciamento = Field(default=TipoGerenciamento.TRIMESTRAL)
 
