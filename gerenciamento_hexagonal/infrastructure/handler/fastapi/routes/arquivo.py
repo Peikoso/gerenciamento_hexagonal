@@ -1,4 +1,5 @@
 from http import HTTPStatus
+import mimetypes
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
@@ -25,8 +26,10 @@ async def get_arquivo_by_id(arquivo_id: int, service: Service_Arquivo):
 async def download_arquivo_by_id(arquivo_id: int, service: Service_Arquivo):
     try:
         result = await service.get_gerenciamento_arquivo_download_by_id(arquivo_id)
-
-        return FileResponse(result, headers={'Content-Disposition': 'attachment'})
+        
+        media_type = mimetypes.guess_type(str(result.uri))[0] or "application/octet-stream"
+        
+        return FileResponse(path=result.uri, media_type=media_type, filename=result.nome)
 
     except NotFoundError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e))

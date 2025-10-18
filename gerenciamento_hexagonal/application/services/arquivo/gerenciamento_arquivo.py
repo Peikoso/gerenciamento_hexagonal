@@ -30,7 +30,7 @@ class GerenciamentoArquivoServices:
         if not os.path.exists(arquivo.uri):
             raise NotFoundError(f'arquivo with ID: {arquivo_id} not found in directory')
 
-        return arquivo.uri
+        return arquivo
 
     async def create_arquivo(self, gerenciamento_id: int, arquivos, tipo_gerenciamento: TipoGerenciamentoArquivo):
         metadados = await self.service_arquivo.processar_arquivos(arquivos=arquivos, rel_id=gerenciamento_id)
