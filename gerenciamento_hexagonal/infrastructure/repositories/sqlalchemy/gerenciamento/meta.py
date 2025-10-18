@@ -10,7 +10,11 @@ class GerenciamentoMetaRepository(GerenciamentoMetaRepository):
         async with get_session() as session:
             db_gerenciamento_metas = await session.scalars(select(GerenciamentoMetaModel))
 
-            result = [GerenciamentoMeta.model_validate({**vars(db_gerenciamento_meta), 'arquivos_ids': [arquivo.arquivo_id for arquivo in db_gerenciamento_meta.arquivos]}) for db_gerenciamento_meta in db_gerenciamento_metas]
+            result = [GerenciamentoMeta.model_validate(
+                {**vars(db_gerenciamento_meta), 
+                 'arquivos_ids': [arquivo.arquivo_id for arquivo in db_gerenciamento_meta.arquivos]
+                }
+            ) for db_gerenciamento_meta in db_gerenciamento_metas]
 
             return result
 
@@ -19,7 +23,11 @@ class GerenciamentoMetaRepository(GerenciamentoMetaRepository):
             db_gerenciamento_meta = await session.scalar(select(GerenciamentoMetaModel).where(GerenciamentoMetaModel.id == gerenciamento_meta_id))
 
             if db_gerenciamento_meta:
-                return GerenciamentoMeta.model_validate({**vars(db_gerenciamento_meta), 'arquivos_ids': [arquivo.arquivo_id for arquivo in db_gerenciamento_meta.arquivos]})
+                return GerenciamentoMeta.model_validate(
+                    {**vars(db_gerenciamento_meta), 
+                     'arquivos_ids': [arquivo.arquivo_id for arquivo in db_gerenciamento_meta.arquivos]
+                    }
+                )
 
             return None
 
